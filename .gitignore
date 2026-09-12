@@ -47,3 +47,12 @@ next-env.d.ts
 
 # Local TypeScript incremental state
 *.tsbuildinfo
+
+# Local image-tool environments and private inspection photos
+**/.venv/
+**/__pycache__/
+**/*.egg-info/
+/agent-tools/image-focus/.image-workspace/
+
+# User-provided local inspection photos, not website assets
+/images/
