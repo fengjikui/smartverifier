@@ -21,7 +21,10 @@ def request_template(path: str) -> tuple[dict, str]:
     # LM Studio's Jinja runtime does not implement HTML's safe filter. Its
     # prompt renderer has no HTML autoescaping; removing this no-op preserves
     # the model's JSON tool history without editing the installed template.
-    template = "{% set enable_thinking = false %}\n" + source.replace(" | safe", "")
+    # Qwen 4B uses an unsupported `sequence` test for JSON arrays. At this
+    # branch strings/mappings have already been handled, so iterable is equivalent.
+    compatible = source.replace(" | safe", "").replace("args_value is sequence", "args_value is iterable")
+    template = "{% set enable_thinking = false %}\n" + compatible
     return {"type": "jinja", "jinjaPromptTemplate": {"template": template}, "stopStrings": []}, hashlib.sha256(source.encode()).hexdigest()
 
 

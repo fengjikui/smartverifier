@@ -52,6 +52,16 @@ class LmStudioTransportTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("rotate_image", reply["tool_calls"][0]["function"]["name"])
         self.assertIn('-90', reply["tool_calls"][0]["function"]["arguments"])
 
+    def test_qwen4b_array_test_is_adapted_without_changing_installed_template(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "chat_template.jinja"
+            source = "{% if enable_thinking %}<think>{% endif %}{% if args_value is sequence %}{{ args_value | safe }}{% endif %}"
+            path.write_text(source)
+            template, _ = request_template(str(path))
+            self.assertIn("args_value is iterable", template["jinjaPromptTemplate"]["template"])
+            self.assertNotIn(" | safe", template["jinjaPromptTemplate"]["template"])
+            self.assertEqual(source, path.read_text())
+
     async def test_history_preserves_tool_result_and_actual_image_bytes(self):
         import lmstudio
         transport = object.__new__(LmStudioTransport)
