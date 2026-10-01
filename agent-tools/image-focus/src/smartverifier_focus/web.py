@@ -130,6 +130,14 @@ async def loaded_models(model_root: Path) -> list[dict]:
 
 def create_app(state_dir: Path, static_dir: Path | None = None, model_root: Path | None = None, *, predictor=None, models_provider=None):
     store = Store(state_dir)
+    # Cookie 不按端口隔离；不同状态目录的试用服务必须使用不同名称。
+    cookie_name = 'sv_session_' + hashlib.sha256(store.key.encode()).hexdigest()[:12]
+    def session_cookie(request):
+        for name in (cookie_name, 'sv_session'):
+            value = request.cookies.get(name, '')
+            if value and hashlib.sha256(value.encode()).hexdigest() in store.data['sessions']:
+                return value
+        return ''
     model_root = model_root or Path.home() / ".lmstudio/models"
     tasks: dict[str, asyncio.Task] = {}
     inference_slot, image_slot = asyncio.Semaphore(1), asyncio.Semaphore(1)
@@ -153,12 +161,16 @@ def create_app(state_dir: Path, static_dir: Path | None = None, model_root: Path
             if origin and urlparse(origin).netloc != request.headers.get("host"):
                 return JSONResponse({"detail": "请从本机提供的局域网页面访问。"}, status_code=403)
             if request.url.path not in {"/api/health", "/api/connect"}:
-                cookie = request.cookies.get("sv_session", "")
+                cookie = session_cookie(request)
                 owner = store.data["sessions"].get(hashlib.sha256(cookie.encode()).hexdigest()) if cookie else None
                 if not owner:
                     return JSONResponse({"detail": "请扫描电脑上的连接二维码。"}, status_code=401)
                 request.state.owner = owner
         response = await call_next(request)
+        # 首次使用旧会话时迁移到独立名称，保持原有设备身份与聊天历史。
+        current = session_cookie(request)
+        if current and request.cookies.get(cookie_name) != current:
+            response.set_cookie(cookie_name, current, httponly=True, samesite='strict', max_age=60 * 60 * 24 * 30)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Cache-Control"] = "no-store" if request.url.path.startswith("/api/") else "no-cache"
@@ -176,13 +188,13 @@ def create_app(state_dir: Path, static_dir: Path | None = None, model_root: Path
     async def connect(data: ConnectRequest, response: Response, request: Request):
         if not secrets.compare_digest(data.key, store.key):
             raise HTTPException(401, "连接码不正确，请重新扫描电脑上的二维码。")
-        current = request.cookies.get("sv_session", "")
+        current = session_cookie(request)
         if hashlib.sha256(current.encode()).hexdigest() in store.data["sessions"]:
             return {"ok": True}
         cookie = secrets.token_urlsafe(32)
         store.data["sessions"][hashlib.sha256(cookie.encode()).hexdigest()] = uuid.uuid4().hex
         store.save()
-        response.set_cookie("sv_session", cookie, httponly=True, samesite="strict", max_age=60 * 60 * 24 * 30)
+        response.set_cookie(cookie_name, cookie, httponly=True, samesite="strict", max_age=60 * 60 * 24 * 30)
         return {"ok": True}
 
     @app.get("/api/chats")

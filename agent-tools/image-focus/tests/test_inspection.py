@@ -265,5 +265,26 @@ class InspectionTests(unittest.IsolatedAsyncioTestCase):
         folder=self.service.store.folder('task',task['id']);export_files(stale,folder)
         self.assertEqual(frozen['sha256'],hashlib.sha256((folder/frozen['name']).read_bytes()).hexdigest())
 
+    async def test_shared_browser_cookies_do_not_collide_between_ports_and_legacy_migrates(self):
+        other=create_app(self.root/'other-service',models_provider=lambda:asyncio.sleep(0,result=[]))
+        a=httpx.ASGITransport(app=self.app);b=httpx.ASGITransport(app=other)
+        class Ports(httpx.AsyncBaseTransport):
+            async def handle_async_request(inner,request):
+                return await (b if request.url.port==5190 else a).handle_async_request(request)
+        async with httpx.AsyncClient(transport=Ports(),base_url='http://test:5188') as browser:
+            await browser.post('/api/connect',json={'key':self.app.state.store.key})
+            await browser.put('/api/inspection/profile',json={'employee_id':'MAIN','name':'主工作区'})
+            await browser.post('http://test:5190/api/connect',json={'key':other.state.store.key})
+            await browser.put('http://test:5190/api/inspection/profile',json={'employee_id':'TEST','name':'隔离测试'})
+            main=(await browser.get('/api/inspection/bootstrap')).json()
+            self.assertEqual('MAIN',main['profile']['employee_id'])
+            self.assertEqual(2,len([name for name in browser.cookies if name.startswith('sv_session_')]))
+        current_name=next(name for name in self.client.cookies if name.startswith('sv_session_'))
+        value=self.client.cookies.get(current_name)
+        self.client.cookies.clear();self.client.cookies.set('sv_session',value)
+        result=await self.client.get('/api/inspection/bootstrap')
+        self.assertEqual('QA01',result.json()['profile']['employee_id'])
+        self.assertIn(current_name,self.client.cookies)
+
 
 if __name__=='__main__':unittest.main()
