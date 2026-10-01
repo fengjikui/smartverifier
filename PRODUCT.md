@@ -1,33 +1,36 @@
-# Product
+# 产品上下文
 
 ## Register
 
 product
 
-## Users
+## 用户与场景
 
-Factory inspection staff photographing small electronic components on a bright inspection bench, and their quality reviewers. The current local experiment also serves the project owner on a Xiaomi 13 Ultra in portrait orientation. Users want to photograph or select a real image, choose what the model sees, and ask follow-up questions without managing model parameters.
+主要用户为工厂来料检验员，手持华为平板在明亮检验台拍摄一小批电子器件；质量负责人负责正品标准、可变字段与复核规则。具体平板型号和浏览器待确认。先在当前 Mac 本地试用，后续部署到公司电脑；初期低并发，潜在几十至约百人使用，需要将在线人数与推理容量分别规划。
 
-## Product Purpose
+## 产品目的
 
-SmartVerifier helps collect visual evidence and inspect differences. The original responsive reference-comparison prototype remains available. The local vision chat adds real LM Studio inference, manual viewport crop/rotation, full-image mode, and ongoing questions. Success means the exact selected image region reaches the model, the result is clearly attributable to that image, and work survives a page refresh.
+把照片与正品标准对照，将丝印检测项的结论、不合格件数、原始照片和逐件 JSON 报告回填 MES。正常流程：建立或领取任务 → 连续拍照 → 自动定位裁剪与比对 → 处理异常 → 保存检测项。最终整单提交仍由人在 MES 完成。
 
-## Brand Personality
+成功意味着不漏样、不误绑任务、不把看不清当成通过；中断后已保存的资料可以恢复；每条结论有图片与人工复核依据。首轮提供模拟 MES 和可联调合同，不能冒称真实 MES 已接通。
 
-Calm, precise, approachable. Continue the light surfaces, graphite text, and restrained deep green already accepted by the user and documented in DESIGN-NOTES.md.
+## 界面性格
 
-## Anti-references
+平静、清晰、实用。浅色台面、深石墨文字、克制的深绿色。交互清楚优先于装饰。重要正文 16 px，主要触控目标 48 px。横屏适当并列参考与结果，竖屏保持可读。
 
-Avoid decorative dashboards, fabricated confidence percentages, and mock analysis applied to user uploads. Avoid making inspectors operate crop coordinates or inference settings. Do not turn uncertain text into a definitive reading.
+## 原则
 
-## Design Principles
+1. 操作员不需要理解模型参数或裁剪坐标，默认自动处理图像。
+2. 每个阶段只有一个主要推进动作，异常件先展示，正常件折叠。
+3. 原图与裁片区分，编号不遮挡丝印；旋转等修改使对应结果重新待检。
+4. 照片数不等于器件数，数量与结果由确定性逻辑汇总。
+5. 明确保存、等待、失败与重试；不展示虚构概率，不把无效 JSON 当作成功。
+6. 通过配对身份隔离本地试用数据；生产企业登录及 MES 任务授权是独立接入工作。
 
-1. Show the actual image sent to the model.
-2. Let ordinary inspection take few actions; expose adjustments when requested.
-3. Preserve original evidence and clearly mark transformed views.
-4. Keep failures recoverable and computation bounded.
-5. Optimize for portrait phone use while retaining a useful desktop workspace.
+## 既有能力
 
-## Accessibility & Inclusion
+图片多轮对话保留在 `/?view=chat`，继续提供手动自由比例取景、放大、旋转和模型问答。自主裁剪 Agent 保留在 `agent-tools/image-focus` 的独立 CLI/MCP 入口，尚不是聊天网页按钮。历史 `/mobile` 演示原型保留，不能与本次真实检验工作台混淆。
 
-Large touch targets, readable system typography, text labels for important actions, keyboard alternatives to gestures, visible focus, reduced-motion support, and no color-only status. Layout must tolerate different Android display scaling and the software keyboard.
+## 反例
+
+不使用装饰性仪表盘、假准确率、需要操作员手工输入坐标的日常流程、对图片生成式补字、每一步都弹窗确认、整单自动提交或掩盖尚未接通的 MES。

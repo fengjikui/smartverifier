@@ -1,0 +1,225 @@
+{
+  "date": "2026-10-01",
+  "hardware": "Mac Studio M2 Ultra / 64 GiB",
+  "model": "hr-qwen",
+  "input": "fixtures/inspection/four-components.png",
+  "reference": "fixtures/inspection/reference.png",
+  "synthetic": true,
+  "run": {
+    "status": "completed",
+    "model": "hr-qwen",
+    "queued_at": 1790852858.50273,
+    "current": null,
+    "error": null,
+    "started": 1790852858.504836,
+    "finished": 1790852905.383287
+  },
+  "samples": [
+    {
+      "label": "P001-01",
+      "analysis": {
+        "verdict": "PASS",
+        "observed_text": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "features": [
+          "黑色方形SOIC-8封装，每侧四个引脚",
+          "左侧有半圆形缺口和圆点定位标记"
+        ],
+        "differences": [],
+        "uncertainties": [],
+        "summary": "待检器件文字与正品参考一致，可见外观特征相符。"
+      },
+      "model_metadata": {
+        "model": "hr-qwen",
+        "seconds": 11.19,
+        "usage": {
+          "prompt_tokens": 373,
+          "completion_tokens": 77,
+          "reasoning_tokens": 0
+        },
+        "prompt_version": "inspection-v1"
+      },
+      "raw_output": "{\"verdict\":\"PASS\",\"observed_text\":[\"SV358\",\"A26\",\"0147\"],\"features\":[\"黑色方形SOIC-8封装，每侧四个引脚\",\"左侧有半圆形缺口和圆点定位标记\"],\"differences\":[],\"uncertainties\":[],\"summary\":\"待检器件文字与正品参考一致，可见外观特征相符。\"}",
+      "review": null,
+      "quality_flags": [],
+      "transform": {
+        "laplacian_variance": 378.54,
+        "source_body_size": [
+          296,
+          296
+        ],
+        "rotation_ccw_degrees": -13.67,
+        "crop_size": [
+          486,
+          486
+        ],
+        "padding_pixels": 94.82
+      }
+    },
+    {
+      "label": "P001-02",
+      "analysis": {
+        "verdict": "PASS",
+        "observed_text": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "features": [
+          "黑色方形塑封体，表面有颗粒纹理",
+          "上下各四个银色引脚",
+          "左侧中部有半圆形缺口标记",
+          "左下区域有一个圆形凹点"
+        ],
+        "differences": [],
+        "uncertainties": [],
+        "summary": "待检器件可见文字与正品参考一致，外观特征（引脚、缺口、凹点）相符。"
+      },
+      "model_metadata": {
+        "model": "hr-qwen",
+        "seconds": 11.22,
+        "usage": {
+          "prompt_tokens": 373,
+          "completion_tokens": 94,
+          "reasoning_tokens": 0
+        },
+        "prompt_version": "inspection-v1"
+      },
+      "raw_output": "{\"verdict\":\"PASS\",\"observed_text\":[\"SV358\",\"A26\",\"0147\"],\"features\":[\"黑色方形塑封体，表面有颗粒纹理\",\"上下各四个银色引脚\",\"左侧中部有半圆形缺口标记\",\"左下区域有一个圆形凹点\"],\"differences\":[],\"uncertainties\":[],\"summary\":\"待检器件可见文字与正品参考一致，外观特征（引脚、缺口、凹点）相符。\"}",
+      "review": null,
+      "quality_flags": [],
+      "transform": {
+        "laplacian_variance": 421.02,
+        "source_body_size": [
+          297,
+          298
+        ],
+        "rotation_ccw_degrees": 16.26,
+        "crop_size": [
+          487,
+          488
+        ],
+        "padding_pixels": 95.1
+      }
+    },
+    {
+      "label": "P001-03",
+      "analysis": {
+        "verdict": "FAIL",
+        "observed_text": [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        "features": [
+          "黑色方形封装，每侧四个引脚",
+          "左侧有半圆形缺口和圆点定位标记"
+        ],
+        "differences": [
+          {
+            "category": "text",
+            "sample": "SV385",
+            "reference": "SV358",
+            "description": "第一行型号文字不符"
+          }
+        ],
+        "uncertainties": [],
+        "summary": "待检器件丝印型号与正品参考不一致，判定为 FAIL。"
+      },
+      "model_metadata": {
+        "model": "hr-qwen",
+        "seconds": 11.39,
+        "usage": {
+          "prompt_tokens": 373,
+          "completion_tokens": 100,
+          "reasoning_tokens": 0
+        },
+        "prompt_version": "inspection-v1"
+      },
+      "raw_output": "{\"verdict\":\"FAIL\",\"observed_text\":[\"SV385\",\"A26\",\"0147\"],\"features\":[\"黑色方形封装，每侧四个引脚\",\"左侧有半圆形缺口和圆点定位标记\"],\"differences\":[{\"category\":\"text\",\"sample\":\"SV385\",\"reference\":\"SV358\",\"description\":\"第一行型号文字不符\"}],\"uncertainties\":[],\"summary\":\"待检器件丝印型号与正品参考不一致，判定为 FAIL。\"}",
+      "review": {
+        "verdict": "FAIL",
+        "reason": "已对照两张图核实，型号为 SV385，与标准 SV358 不一致。",
+        "at": 1790853087.663975,
+        "operator": {
+          "employee_id": "QA-UI",
+          "name": "界面试用",
+          "identity_source": "local_trial"
+        }
+      },
+      "quality_flags": [],
+      "transform": {
+        "laplacian_variance": 645.38,
+        "source_body_size": [
+          303,
+          296
+        ],
+        "rotation_ccw_degrees": 0.4,
+        "crop_size": [
+          492,
+          485
+        ],
+        "padding_pixels": 94.71
+      }
+    },
+    {
+      "label": "P001-04",
+      "analysis": {
+        "verdict": "PASS",
+        "observed_text": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "features": [
+          "黑色方形SOIC-8封装，每侧四个引脚",
+          "左侧有半圆形缺口和圆点定位标记"
+        ],
+        "differences": [],
+        "uncertainties": [],
+        "summary": "待检器件文字与正品参考一致，可见外观特征相符。"
+      },
+      "model_metadata": {
+        "model": "hr-qwen",
+        "seconds": 10.65,
+        "usage": {
+          "prompt_tokens": 373,
+          "completion_tokens": 77,
+          "reasoning_tokens": 0
+        },
+        "prompt_version": "inspection-v1"
+      },
+      "raw_output": "{\"verdict\":\"PASS\",\"observed_text\":[\"SV358\",\"A26\",\"0147\"],\"features\":[\"黑色方形SOIC-8封装，每侧四个引脚\",\"左侧有半圆形缺口和圆点定位标记\"],\"differences\":[],\"uncertainties\":[],\"summary\":\"待检器件文字与正品参考一致，可见外观特征相符。\"}",
+      "review": null,
+      "quality_flags": [],
+      "transform": {
+        "laplacian_variance": 496.04,
+        "source_body_size": [
+          302,
+          324
+        ],
+        "rotation_ccw_degrees": 29.05,
+        "crop_size": [
+          495,
+          517
+        ],
+        "padding_pixels": 96.51
+      }
+    }
+  ],
+  "transfer": {
+    "status": "saved",
+    "mode": "mock",
+    "receipt": {
+      "receipt_id": "MOCK-c666e00d954aa4",
+      "status": "saved",
+      "mode": "mock",
+      "item_version": "1790853093508",
+      "saved_at": 1790853093.50864,
+      "final_submission": false
+    }
+  }
+}

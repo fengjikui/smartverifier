@@ -1,0 +1,71 @@
+{
+  "synthetic": true,
+  "purpose": "仅验证定位、文字比对与流程，不代表真实器件或生产准确率",
+  "images": [
+    {
+      "file": "reference.png",
+      "count": 1,
+      "text": [
+        "SV358",
+        "A26",
+        "0147"
+      ],
+      "sha256": "ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97"
+    },
+    {
+      "file": "mismatch.png",
+      "count": 1,
+      "text": [
+        "SV385",
+        "A26",
+        "0147"
+      ],
+      "expected": "FAIL",
+      "sha256": "b0926e327952e093b2895bfa852bacad76e47e03efe3c552b5a9d15d7b9d9afa"
+    },
+    {
+      "file": "four-components.png",
+      "count": 4,
+      "reading_order": "从上到下，同排从左到右",
+      "samples": [
+        {
+          "label": "P001-01",
+          "text": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expected": "PASS"
+        },
+        {
+          "label": "P001-02",
+          "text": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expected": "PASS"
+        },
+        {
+          "label": "P001-03",
+          "text": [
+            "SV385",
+            "A26",
+            "0147"
+          ],
+          "expected": "FAIL"
+        },
+        {
+          "label": "P001-04",
+          "text": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expected": "PASS"
+        }
+      ],
+      "sha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b"
+    }
+  ]
+}

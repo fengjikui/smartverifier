@@ -364,6 +364,10 @@ def create_app(state_dir: Path, static_dir: Path | None = None, model_root: Path
             store.save()
         return {"status": job["status"]}
 
+    from .inspection.routes import install as install_inspection
+    install_inspection(app, state_dir, inference_slot, image_slot, tasks,
+                       models_provider or (lambda: loaded_models(model_root)), predictor=predictor)
+
     if static_dir:
         app.mount("/", StaticFiles(directory=static_dir, html=True), name="web")
     return app

@@ -19,6 +19,9 @@ web = [
     "python-multipart>=0.0.20,<1",
     "segno>=1.6,<2",
     "uvicorn>=0.34,<1",
+    "opencv-python-headless>=4.13,<5",
+    "psutil>=7,<8",
+    "httpx>=0.28.1,<1",
 ]
 
 [project.scripts]

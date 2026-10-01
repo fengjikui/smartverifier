@@ -1,21 +1,29 @@
-# SmartVerifier design
+# 观微设计约定
 
-## Physical setting and theme
+## 环境与视觉
 
-Inspectors hold a phone at a bright factory bench and need to read tiny markings without squinting. Use a light app surface, charcoal text, and a darker neutral photographic stage that separates photographs from controls. Preserve the accepted deep green action color.
+明亮工厂检验台，平板为主，手机和电脑兼容。背景 #f5f6f3、白色工作区域，深石墨正文 #23352f，深绿动作色 #245b47。琥珀表示待处理，砖红表示不合格。状态必须有文字，不能只靠颜色。
 
-## Color and type
+使用系统中文字体；正文 16 px，辅助说明 12–14 px，标题 25–34 px。清晰边界、足够留白，不使用渐变、玻璃效果、大面积发光或无意义数据卡片。
 
-Use restrained OKLCH tinted neutrals and one deep green accent. Amber indicates uncertainty; red indicates an actionable failure. Use system sans-serif with Chinese fallbacks. Body 15–16px, supporting labels 12–13px, important titles 22–26px. No gradients or display fonts.
+## 页面布局
 
-## Layout and controls
+工作台：任务列表与一个新建入口；首次先记录试用人员。新建任务、标准维护采用内联表单。
 
-Portrait phone: compact header with model selection; photographs and conversation form one task; sticky bottom input and photo actions. Crop editing takes a dedicated inline workspace with a framed viewport and accessible controls. Desktop: photo workspace and conversation can sit side by side. Avoid nested cards and decorative statistics.
+任务：任务身份与四步进度 → 采集 / 结果工作区 → 比对标准与汇总 → 底部主要动作。产生结果后，异常优先移到前面，正品与待检图并列；其他件通过可展开列表查看。横屏侧栏放参考和批次结果；窄屏换成上下布局，页面不得横向溢出。
 
-## Interaction
+照片列表显示编号、检测件数、重拍与移除。常规操作不打开裁剪编辑器。单个裁片提供旋转 90° 的恢复手段，提示需要重新识别。移除在原位置确认，避免每次操作都使用弹窗。
 
-Minimum primary touch target 44px. Use existing button and slider primitives. Drag translates the image; pinch zooms around the gesture center. Rotation has quarter-turn buttons and a precise slider. A server-generated preview is the final representation sent to the model. Surface loading, cancellation, retry, and model-unavailable states explicitly.
+## 交互
 
-## Motion
+主按钮随状态变化：完成拍摄并识别 → 停止识别 / 查看待复核 → 回填检测项 → 返回工作台。草稿服务端保存；未确认保存的上传有明确提示与重试入口。
 
-Keep state transitions short. Animate opacity and transforms only. Honor prefers-reduced-motion. No animated page entrance.
+触控目标以 48 px 为主，轻量辅助控件最低 44 px；必须有可见焦点、输入标签和图像替代文本。拍照采用独立相机视图；离开后停止视频轨道。普通局域网 HTTP 提供系统相机/相册后备，真机能力未验证时不作保证。
+
+## 动效
+
+只做短状态过渡；加载图标遵守减少动态效果偏好。禁止页面入场动画和持续装饰动画。
+
+## 旧版图片对话
+
+位于独立入口，保留自由比例、拖动、双指缩放、手动旋转和对话历史；不把这些编辑参数搬到检验员主流程。样式与代码拆包，避免日常检验加载整套编辑器。
