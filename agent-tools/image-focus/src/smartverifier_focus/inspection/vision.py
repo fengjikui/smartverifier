@@ -5,7 +5,7 @@ from io import BytesIO
 from pathlib import Path
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageOps, ImageFont
 
 cv2.setNumThreads(2)
 MAX_BYTES = 64 * 1024 * 1024
@@ -115,13 +115,35 @@ def process_photo(data: bytes, folder: Path, photo_id: str, label: str, mode='si
         components.append({'id':f'{photo_id}C{i:02d}','photo_id':photo_id,'label':f'{label}-{i:02d}',
                            'crop_file':name,'box':r['box'],'transform':transform,'quality_flags':warnings,
                            'analysis':None,'review':None,'error':None,'orientation':0})
-    # 编号在图外留白处；原图和模型裁片均没有标注。
-    stage=Image.new('RGB',(preview.width,preview.height+46),(241,244,242));stage.paste(preview,(0,0))
+    # 将编号放在原图外的左右侧栏，用引线与轮廓关联，文字不盖住丝印。
+    # annotation_box 为展示坐标；模型仍仅接收无标注的原始分辨率裁片。
+    gutter=170
+    stage=Image.new('RGB',(preview.width+2*gutter,preview.height+46),(246,247,249))
+    stage.paste(preview,(gutter,0))
     draw=ImageDraw.Draw(stage);ratio=preview.width/image.width
+    font=ImageFont.load_default(size=18)
+    sides={True:[],False:[]}
     for c in components:
-        pts=[(x*ratio,y*ratio) for x,y in c['box']]
-        draw.line(pts+[pts[0]],fill=(33,118,85),width=3)
-    draw.text((14,preview.height+16),f'{label} | '+ '  '.join(c['label'] for c in components),fill=(30,48,40))
+        sides[sum(x for x,_ in c['box'])/4 < image.width/2].append(c)
+    for left,group in sides.items():
+        last_y=-45
+        ordered=sorted(group,key=lambda c:sum(y for _,y in c['box'])/4)
+        for index,c in enumerate(ordered):
+            pts=[(x*ratio+gutter,y*ratio) for x,y in c['box']]
+            anchor=(min if left else max)(pts,key=lambda point:point[0])
+            center_y=sum(y for _,y in pts)/4
+            available=preview.height-24-(len(ordered)-index-1)*44
+            label_y=max(24,last_y+44,min(center_y,available));last_y=label_y
+            label_x=12 if left else gutter+preview.width+28
+            rect=[label_x,round(label_y-16),label_x+130,round(label_y+16)]
+            c['annotation_box']=rect
+            c['annotation_image_bounds']=[gutter,0,gutter+preview.width,preview.height]
+            draw.line(pts+[pts[0]],fill=(199,0,11),width=3)
+            elbow=gutter-8 if left else gutter+preview.width+8
+            draw.line([(rect[2] if left else rect[0],label_y),(elbow,label_y),anchor],fill=(199,0,11),width=2)
+            draw.rounded_rectangle(rect,radius=5,fill=(199,0,11))
+            draw.text((label_x+8,label_y-11),c['label'],font=font,fill='white')
+    draw.text((14,preview.height+12),f'{label} | {len(components)} components',font=font,fill=(55,63,75))
     annotation=f'{photo_id}-annotation.jpg';stage.save(folder/annotation,quality=92)
     return {'id':photo_id,'label':label,'original_file':original,'normalized_file':normalized,'preview_file':preview_name,
             'annotation_file':annotation,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'size':list(image.size),

@@ -6,6 +6,7 @@ import time
 import zipfile
 from pathlib import Path
 from typing import Literal
+from datetime import date, datetime, time as day_time, timezone, timedelta
 from fastapi import File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import Field
@@ -16,6 +17,7 @@ from .vision import MAX_BYTES, process_photo
 from .service import InspectionService, mutate_content, thermal_snapshot
 from .mes import adapter_from_env
 from .report import export_files
+from .auth import LocalAccounts
 
 
 class Profile(StrictModel):
@@ -57,6 +59,8 @@ async def read_upload(file):
 
 def install(app,root,slot,image_slot,jobs,model_provider,*,predictor=None,adapter=None):
     store=InspectionStore(root/'inspection')
+    app.state.inspection_auth=LocalAccounts(store)
+    app.state.inspection_auth.install(app)
     model_lock=asyncio.Lock()
     model_cache={'until':0,'items':[]}
     async def cached_models():
@@ -93,7 +97,7 @@ def install(app,root,slot,image_slot,jobs,model_provider,*,predictor=None,adapte
             ahead=queue.index(task['id']) if task['id'] in queue else 0
             result['run']={**task['run'],'ahead':ahead}
         if compact:
-            return {k:result.get(k) for k in ('id','number','material','expected_count','updated','summary','run','transfer','synthetic_test')}
+            return {k:result.get(k) for k in ('id','number','material','expected_count','created','updated','summary','run','transfer','synthetic_test')}
         result['reference']=reference_view(task['reference'])
         result['photos']=[]
         for p in task['photos']:
@@ -169,6 +173,25 @@ def install(app,root,slot,image_slot,jobs,model_provider,*,predictor=None,adapte
     @app.post(prefix+'/tasks')
     async def new_task(data:TaskInput,request:Request):
         return task_view(add_task(request.state.owner,data))
+
+    @app.get(prefix+'/tasks')
+    async def find_tasks(request:Request,q:str='',status:Literal['all','pending','active','review','complete']='all',
+                         date_from:date|None=None,date_to:date|None=None):
+        if len(q)>150:raise HTTPException(400,'查询文字过长。')
+        if date_from and date_to and date_from>date_to:raise HTTPException(400,'开始日期不能晚于结束日期。')
+        zone=timezone(timedelta(hours=8))
+        start=datetime.combine(date_from,day_time.min,zone).timestamp() if date_from else float('-inf')
+        end=datetime.combine(date_to,day_time.min,zone).timestamp()+86400 if date_to else float('inf')
+        rows=[]
+        for t in store.list('task',request.state.owner):
+            if not start<=t.get('created',t['updated'])<end or q.strip().casefold() not in (t['number']+' '+t['material']).casefold():continue
+            row=task_view(t,True);summary=row['summary']
+            state=('complete' if t.get('transfer',{}).get('status')=='saved' else
+                   'active' if t['run']['status'] in ('running','queued') or t.get('transfer',{}).get('status')=='sending' else
+                   'review' if summary['review_count'] or summary['error_count'] or summary['can_submit'] else
+                   'active' if summary['photo_count'] else 'pending')
+            if status=='all' or status==state:rows.append(row)
+        return {'items':rows,'total':len(rows),'date_basis':'task_created','source':'local_trial'}
 
     @app.get(prefix+'/tasks/{task_id}')
     async def task(task_id:str,request:Request):

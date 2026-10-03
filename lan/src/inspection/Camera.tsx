@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Camera, X } from 'lucide-react';
+import { ArrowRight, Camera, X } from 'lucide-react';
 
-export function CaptureCamera({ onPhoto, onClose, count }: { onPhoto: (file: File) => Promise<void>; onClose: () => void; count: number }) {
+export function CaptureCamera({ onPhoto, onClose, onSystem, count, sampleCount, expected, replacement, blocked }: { onPhoto: (file: File) => Promise<void>; onClose: () => void; onSystem: () => void; count: number; sampleCount: number; expected: number; replacement: boolean; blocked: boolean }) {
   const video = useRef<HTMLVideoElement>(null), stream = useRef<MediaStream | null>(null);
   const [error, setError] = useState(''), [ready, setReady] = useState(false), [busy, setBusy] = useState(false);
   useEffect(() => {
@@ -28,9 +28,9 @@ export function CaptureCamera({ onPhoto, onClose, count }: { onPhoto: (file: Fil
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
   }
-  return <section className="iw-camera" aria-label="连续拍摄">
-    <div className="iw-camera-head"><span>连续拍摄 · 已保存 {count} 张</span><button onClick={onClose} disabled={busy} aria-label="关闭相机"><X /></button></div>
+  return <section className="iw-camera" role="dialog" aria-modal="true" aria-label="连续拍摄" onKeyDown={e => { if (e.key === 'Escape' && !busy) onClose(); }}>
+    <div className="iw-camera-head"><span>{replacement ? '重拍这一张' : '连续拍摄'} · 已保存 {count} 张 · {sampleCount} / {expected} 件</span><button autoFocus onClick={onClose} disabled={busy} aria-label="关闭相机"><X /></button></div>
     <video ref={video} playsInline muted aria-label="实时取景" />
-    <div className="iw-camera-foot"><p>{error || '使用纯色背景，器件完整入镜，轻触快门。'}</p><button className="iw-shutter" onClick={() => void capture()} disabled={!ready || busy} aria-label="拍照并保存"><Camera size={30} /></button><span>{busy ? '正在保存，请稍候…' : '拍摄后可继续下一张'}</span></div>
+    <div className="iw-camera-foot"><p>{blocked ? '照片尚未保存，请返回照片页重试。' : error || '使用纯色背景，器件完整入镜，文字清晰后拍摄。'}</p><button className="iw-shutter" onClick={() => void capture()} disabled={!ready || busy || blocked} aria-label="拍照并保存"><Camera size={30} /></button><span aria-live="polite">{busy ? '正在保存，请稍候…' : error || blocked ? '返回照片页可处理上传或从相册添加' : '拍摄后可继续下一张'}</span><div className="iw-actions">{error && <button onClick={onSystem} disabled={busy || blocked}>使用系统相机</button>}<button onClick={onClose} disabled={busy}>完成拍摄，查看照片<ArrowRight size={18} /></button></div></div>
   </section>;
 }

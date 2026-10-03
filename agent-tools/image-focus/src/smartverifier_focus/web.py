@@ -166,6 +166,11 @@ def create_app(state_dir: Path, static_dir: Path | None = None, model_root: Path
                 if not owner:
                     return JSONResponse({"detail": "请扫描电脑上的连接二维码。"}, status_code=401)
                 request.state.owner = owner
+                if request.url.path.startswith('/api/inspection/') and not request.url.path.startswith('/api/inspection/auth/'):
+                    user = app.state.inspection_auth.session(owner)
+                    if not user:
+                        return JSONResponse({'detail': '登录已失效，请重新登录检验工作台。'}, status_code=403)
+                    request.state.owner = user['owner']
         response = await call_next(request)
         # 首次使用旧会话时迁移到独立名称，保持原有设备身份与聊天历史。
         current = session_cookie(request)

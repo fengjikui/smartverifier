@@ -74,6 +74,7 @@ class InspectionTests(unittest.IsolatedAsyncioTestCase):
         self.app=create_app(self.root,predictor=predict,models_provider=models)
         self.client=httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app),base_url='http://test',trust_env=False)
         await self.client.post('/api/connect',json={'key':self.app.state.store.key})
+        await self.client.post('/api/inspection/auth/register',json={'account':'QA01','password':'local-test-123','name':'测试人员'})
         self.service=self.app.state.inspection
         await self.client.put('/api/inspection/profile',json={'employee_id':'QA01','name':'测试人员'})
         response=await self.client.post('/api/inspection/references',data={'name':'人工确认标准','text':'SV358\nA26\n0147','approved':'true'},files={'file':('ref.png',(FIXTURES/'reference.png').read_bytes(),'image/png')})
@@ -115,6 +116,7 @@ class InspectionTests(unittest.IsolatedAsyncioTestCase):
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app),base_url='http://test') as other:
             self.assertEqual(401,(await other.get(task['photos'][0]['original_url'])).status_code)
             await other.post('/api/connect',json={'key':self.app.state.store.key})
+            await other.post('/api/inspection/auth/register',json={'account':'QA02','password':'local-test-456','name':'其他人员'})
             self.assertEqual(404,(await other.get('/api/inspection/tasks/'+task['id'])).status_code)
             self.assertEqual(404,(await other.get(task['reference']['image_url'])).status_code)
 
@@ -265,6 +267,84 @@ class InspectionTests(unittest.IsolatedAsyncioTestCase):
         folder=self.service.store.folder('task',task['id']);export_files(stale,folder)
         self.assertEqual(frozen['sha256'],hashlib.sha256((folder/frozen['name']).read_bytes()).hexdigest())
 
+    async def test_trial_account_login_expiry_and_cross_device_ownership(self):
+        task=await self.task()
+        auth='/api/inspection/auth/'
+        await self.client.post(auth+'logout',json={})
+        self.assertIsNone((await self.client.get(auth+'status')).json()['user'])
+        self.assertEqual(403,(await self.client.get('/api/inspection/bootstrap')).status_code)
+        self.assertEqual(401,(await self.client.post(auth+'login',json={'account':'QA01','password':'wrong-password'})).status_code)
+        self.assertEqual(200,(await self.client.post(auth+'login',json={'account':'qa01','password':'local-test-123'})).status_code)
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app),base_url='http://test') as other:
+            await other.post('/api/connect',json={'key':self.app.state.store.key})
+            await other.post(auth+'login',json={'account':'QA01','password':'local-test-123'})
+            self.assertEqual(task['id'],(await other.get('/api/inspection/tasks/'+task['id'])).json()['id'])
+        with self.service.store.connect() as db:
+            rows=db.execute('SELECT salt,digest FROM trial_accounts').fetchall()
+            self.assertNotIn('local-test-123',str(rows))
+            db.execute('UPDATE trial_logins SET expires=0')
+        self.assertEqual(403,(await self.client.get('/api/inspection/tasks')).status_code)
+        self.assertEqual(200,(await self.client.post(auth+'login',json={'account':'qa01','password':'local-test-123'})).status_code)
+
+    async def test_first_account_adopts_legacy_device_documents(self):
+        template=await self.task()
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app),base_url='http://test') as legacy:
+            await legacy.post('/api/connect',json={'key':self.app.state.store.key})
+            cookie=next(value for name,value in legacy.cookies.items() if name.startswith('sv_session_'))
+            owner=self.app.state.store.data['sessions'][hashlib.sha256(cookie.encode()).hexdigest()]
+            self.service.store.create('profile',owner,{'employee_id':'OLD','name':'原试用人员','identity_source':'local_trial'})
+            value=self.service.store.get('task',template['id']);value.pop('id');value['number']='LEGACY-001'
+            old=self.service.store.create('task',owner,value)
+            response=await legacy.post('/api/inspection/auth/register',json={'account':'legacy','password':'legacy-test-123','name':'新账号人员'})
+            self.assertEqual(200,response.status_code,response.text)
+            result=(await legacy.get('/api/inspection/bootstrap')).json()
+            self.assertEqual([old['id']],[t['id'] for t in result['tasks']])
+            self.assertEqual('legacy',result['profile']['employee_id'])
+            self.assertEqual(owner,self.app.state.store.data['sessions'][hashlib.sha256(cookie.encode()).hexdigest()])
+
+    async def test_trial_account_second_login_isolated_and_rate_limited(self):
+        task=await self.task()
+        auth='/api/inspection/auth/'
+        await self.client.post(auth+'logout',json={})
+        response=await self.client.post(auth+'register',json={'account':'NEW','password':'different-test-123','name':'新人员'})
+        self.assertEqual(200,response.status_code,response.text)
+        self.assertEqual(404,(await self.client.get('/api/inspection/tasks/'+task['id'])).status_code)
+        self.assertEqual([],(await self.client.get('/api/inspection/tasks')).json()['items'])
+        await self.client.post(auth+'logout',json={})
+        for _ in range(8):
+            self.assertEqual(401,(await self.client.post(auth+'login',json={'account':'QA01','password':'wrong-password'})).status_code)
+        self.assertEqual(429,(await self.client.post(auth+'login',json={'account':'QA01','password':'wrong-password'})).status_code)
+
+    async def test_task_filters_dates_keyword_status_and_validation(self):
+        from datetime import datetime,timezone,timedelta
+        task=await self.task(); other=await self.task()
+        owner=self.service.store.get('task',task['id'])['owner']
+        end=datetime(2026,10,3,23,59,59,tzinfo=timezone(timedelta(hours=8))).timestamp()
+        self.service.store.change('task',task['id'],owner,lambda t:t.update(created=end,material='IC-358'))
+        self.service.store.change('task',other['id'],owner,lambda t:t.update(created=end+1))
+        base='/api/inspection/tasks'
+        result=(await self.client.get(base,params={'date_from':'2026-10-03','date_to':'2026-10-03','q':'ic-358','status':'pending'})).json()
+        self.assertEqual([task['id']],[x['id'] for x in result['items']])
+        self.assertEqual('task_created',result['date_basis'])
+        self.assertEqual([],(await self.client.get(base,params={'status':'active'})).json()['items'])
+        await self.upload(task)
+        self.assertEqual([task['id']],[x['id'] for x in (await self.client.get(base,params={'status':'active'})).json()['items']])
+        self.assertEqual(400,(await self.client.get(base,params={'date_from':'2026-10-04','date_to':'2026-10-03'})).status_code)
+        self.assertEqual(422,(await self.client.get(base,params={'status':'unknown'})).status_code)
+
+    async def test_annotations_outside_original_and_unmarked_model_crops(self):
+        task=await self.upload(await self.task(4,'multi'),'four-components')
+        stored=self.service.store.get('task',task['id']);photo=stored['photos'][0]
+        self.assertEqual(4,len(photo['components']))
+        folder=self.service.store.folder('task',task['id'])
+        self.assertEqual((FIXTURES/'four-components.png').read_bytes(),(folder/photo['original_file']).read_bytes())
+        positions=[c['annotation_box'] for c in photo['components']]
+        bounds=photo['components'][0]['annotation_image_bounds']
+        self.assertTrue(all(box[2]<bounds[0] or box[0]>bounds[2] for box in positions))
+        for left in (True,False):
+            ordered=sorted([box for box in positions if (box[2]<bounds[0])==left],key=lambda box:box[1])
+            self.assertTrue(all(a[3]<b[1] for a,b in zip(ordered,ordered[1:])))
+
     async def test_shared_browser_cookies_do_not_collide_between_ports_and_legacy_migrates(self):
         other=create_app(self.root/'other-service',models_provider=lambda:asyncio.sleep(0,result=[]))
         a=httpx.ASGITransport(app=self.app);b=httpx.ASGITransport(app=other)
@@ -273,8 +353,10 @@ class InspectionTests(unittest.IsolatedAsyncioTestCase):
                 return await (b if request.url.port==5190 else a).handle_async_request(request)
         async with httpx.AsyncClient(transport=Ports(),base_url='http://test:5188') as browser:
             await browser.post('/api/connect',json={'key':self.app.state.store.key})
+            await browser.post('/api/inspection/auth/register',json={'account':'MAIN','password':'main-test-123','name':'主工作区'})
             await browser.put('/api/inspection/profile',json={'employee_id':'MAIN','name':'主工作区'})
             await browser.post('http://test:5190/api/connect',json={'key':other.state.store.key})
+            await browser.post('http://test:5190/api/inspection/auth/register',json={'account':'TEST','password':'other-test-123','name':'隔离测试'})
             await browser.put('http://test:5190/api/inspection/profile',json={'employee_id':'TEST','name':'隔离测试'})
             main=(await browser.get('/api/inspection/bootstrap')).json()
             self.assertEqual('MAIN',main['profile']['employee_id'])
