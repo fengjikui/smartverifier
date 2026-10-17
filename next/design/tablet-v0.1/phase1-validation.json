@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-17",
+  "stage": "phase1-local-flow",
+  "mode": "mock",
+  "automated": {
+    "typecheck": "passed",
+    "tests": 6,
+    "testGroups": {
+      "domain": 5,
+      "http_sqlite_integration": 1
+    },
+    "build": "passed"
+  },
+  "browser": "Codex in-app browser",
+  "viewports": [
+    [
+      1280,
+      840
+    ],
+    [
+      1280,
+      800
+    ],
+    [
+      1024,
+      768
+    ],
+    [
+      800,
+      1280
+    ],
+    [
+      393,
+      852
+    ]
+  ],
+  "browserChecks": [
+    "登录与任务关键词筛选",
+    "缺少标准阻断",
+    "内置四元件样例识别",
+    "人工修正同步汇总且保留原判",
+    "补4张仅识别新增部分",
+    "详情返回保留相册位置335px",
+    "刷新恢复8件草稿",
+    "报告包含人工结果及AI原文",
+    "系统文件选择器上传并查看原图",
+    "未知照片不生成伪造判定并阻止提交",
+    "明确移除草稿照片",
+    "模拟MES成功回执及任务已有结果标记"
+  ],
+  "browserErrors": [],
+  "limits": [
+    "未接真实定位裁剪与VLM",
+    "未接IDaaS与公司MES",
+    "尚未华为平板实机验证",
+    "未进行百人并发验证",
+    "相机入口未完成目标硬件连续拍照实测"
+  ],
+  "screenshots": [
+    "outputs/next-e2e/phase1-overview.png",
+    "outputs/next-e2e/phase1-detail.png",
+    "outputs/next-e2e/incremental-progress.png",
+    "outputs/next-e2e/saved-portrait.png"
+  ]
+}

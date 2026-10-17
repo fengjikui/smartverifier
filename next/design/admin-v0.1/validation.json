@@ -1,0 +1,265 @@
+{
+  "date": "2026-10-17",
+  "stage": "可点击静态原型，尚未实现真实服务",
+  "screenCount": 43,
+  "structural": {
+    "screenCount": 43,
+    "invalidDestinationCount": 0,
+    "bad": [],
+    "issues": [],
+    "issueCount": 0,
+    "checks": [
+      {
+        "id": "I3913:1248;3910:951",
+        "name": "按钮 / 详情",
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "3925:2519",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false
+          }
+        ]
+      },
+      {
+        "id": "I3913:1248;3910:957",
+        "name": "按钮 / 恢复",
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "3909:482",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false
+          }
+        ]
+      },
+      {
+        "id": "I3913:1277;3910:951",
+        "name": "按钮 / 详情",
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "3925:2520",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false
+          }
+        ]
+      },
+      {
+        "id": "3912:1867",
+        "name": "按钮 / 关闭原图",
+        "actions": [
+          {
+            "type": "BACK"
+          }
+        ]
+      },
+      {
+        "id": "3912:1045",
+        "name": "按钮 / 替换图片",
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "3925:2525",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false
+          }
+        ]
+      },
+      {
+        "id": "3913:1751",
+        "name": "日志 / 新增标准",
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "3925:2527",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false
+          }
+        ]
+      },
+      {
+        "id": "3913:1757",
+        "name": "日志 / 替换图片",
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "3925:2528",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false
+          }
+        ]
+      },
+      {
+        "id": "3913:1763",
+        "name": "日志 / 恢复标准",
+        "actions": [
+          {
+            "type": "NODE",
+            "destinationId": "3925:2529",
+            "navigation": "NAVIGATE",
+            "transition": null,
+            "resetVideoPosition": false
+          }
+        ]
+      }
+    ]
+  },
+  "browser": {
+    "browser": "Chrome",
+    "method": "原生鼠标点击 Figma 原型，核对节点 URL 与画面",
+    "passed": [
+      "导览 → IDaaS 模拟登录 → 正品列表",
+      "列表 → 编辑 → 查看改动 → 保存 → 已保存的 v2 详情",
+      "删除确认 → 回收站 → 恢复 → 返回列表",
+      "关键词查询 → 新增 → 示例图片与字段 → 保存 → 四条记录及成功提示"
+    ]
+  },
+  "limitations": [
+    "登录、上传、表单填写、保存均为预设状态，不代表真实接口或权限已接通",
+    "以 MAT-358-08 / 华信电子 为代表记录，其他记录仅作列表示意",
+    "未做目标平板或真实管理员可用性测试",
+    "批量导入文件协议与权限细节在实施阶段确认"
+  ],
+  "quota": "复用已有主题、组件和自有虚构图片，未使用 Figma AI 生图；未核实账户剩余额度",
+  "reviewRevision": {
+    "date": "2026-10-17",
+    "changes": [
+      "回收站详情与恢复分开",
+      "原图关闭返回来源页",
+      "替换图片不误入新增",
+      "维护日志按事件对应",
+      "非主示例记录明确提示",
+      "新增 Excel / JSON 下载模板预览"
+    ],
+    "structural": {
+      "screenCount": 43,
+      "invalidDestinationCount": 0,
+      "bad": [],
+      "issues": [],
+      "issueCount": 0,
+      "checks": [
+        {
+          "id": "I3913:1248;3910:951",
+          "name": "按钮 / 详情",
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "3925:2519",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false
+            }
+          ]
+        },
+        {
+          "id": "I3913:1248;3910:957",
+          "name": "按钮 / 恢复",
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "3909:482",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false
+            }
+          ]
+        },
+        {
+          "id": "I3913:1277;3910:951",
+          "name": "按钮 / 详情",
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "3925:2520",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false
+            }
+          ]
+        },
+        {
+          "id": "3912:1867",
+          "name": "按钮 / 关闭原图",
+          "actions": [
+            {
+              "type": "BACK"
+            }
+          ]
+        },
+        {
+          "id": "3912:1045",
+          "name": "按钮 / 替换图片",
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "3925:2525",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false
+            }
+          ]
+        },
+        {
+          "id": "3913:1751",
+          "name": "日志 / 新增标准",
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "3925:2527",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false
+            }
+          ]
+        },
+        {
+          "id": "3913:1757",
+          "name": "日志 / 替换图片",
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "3925:2528",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false
+            }
+          ]
+        },
+        {
+          "id": "3913:1763",
+          "name": "日志 / 恢复标准",
+          "actions": [
+            {
+              "type": "NODE",
+              "destinationId": "3925:2529",
+              "navigation": "NAVIGATE",
+              "transition": null,
+              "resetVideoPosition": false
+            }
+          ]
+        }
+      ]
+    },
+    "browserPassed": [
+      "Chrome 点击：回收站详情打开 3925:2519；恢复按钮再进入 3909:482",
+      "Chrome 点击：导入 → 下载模板 → JSON 模板预览 → JSON 导入，对应节点依次为 3909:487 / 3925:2521 / 3925:2523 / 3925:2524"
+    ],
+    "templatesVerified": [
+      "Excel 已渲染核对两张工作表；正式清单只有表头",
+      "JSON 两条记录字段、组合及图片引用有效",
+      "示例包和模板总包 ZIP 完整性检查通过"
+    ],
+    "limitations": [
+      "Figma 下载按钮仅预览模板，真实文件在 next/templates/reference-import-v1",
+      "尚未实现实际导入器、文件上传、IDaaS 或数据库",
+      "JSON Schema 文件作为协议草案提供；本轮以标准库检查示例字段、类型与图片引用，未运行外部 JSON Schema 验证引擎"
+    ]
+  }
+}

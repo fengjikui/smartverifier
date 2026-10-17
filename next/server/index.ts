@@ -1,0 +1,126 @@
+import http from 'node:http';
+import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { randomBytes } from 'node:crypto';
+import { z } from 'zod';
+import { ApiError, InspectionService, person } from './service.ts';
+
+const root = fileURLToPath(new URL('../../', import.meta.url));
+const revisionSchema = z.number().int().positive();
+const mime: Record<string,string> = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.webp':'image/webp', '.woff2':'font/woff2', '.md':'text/markdown; charset=utf-8', '.json':'application/json; charset=utf-8' };
+async function body(req: http.IncomingMessage, max = 128 * 1024) {
+  if (Number(req.headers['content-length'] ?? 0) > max) { req.resume(); throw new ApiError(413,'上传内容过大，单张照片最多20MB。'); }
+  const chunks: Buffer[] = []; let length=0;
+  for await (const chunk of req) { length += chunk.length; if (length > max) throw new ApiError(413,'上传内容过大。'); chunks.push(chunk); }
+  return Buffer.concat(chunks);
+}
+async function jsonBody(req: http.IncomingMessage): Promise<Record<string, unknown>> {
+  if (!req.headers['content-type']?.startsWith('application/json')) throw new ApiError(415,'请求需要JSON格式。');
+  try { const data=JSON.parse((await body(req)).toString()); if (!data || typeof data!=='object' || Array.isArray(data)) throw new Error(); return data; } catch(e) { if(e instanceof ApiError)throw e; throw new ApiError(400,'请求内容不是有效的JSON对象。'); }
+}
+function send(res: http.ServerResponse, data: unknown, status=200) { res.writeHead(status, {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}); res.end(JSON.stringify(data)); }
+async function file(res: http.ServerResponse, filename: string, privateFile=false) {
+  let info; try { info=await stat(filename); } catch { throw new ApiError(404,'文件不存在。'); }
+  if (!info.isFile()) throw new ApiError(404,'文件不存在。');
+  res.writeHead(200, {'Content-Type':mime[path.extname(filename)] ?? 'application/octet-stream','Content-Length':info.size,'Cache-Control':privateFile?'private, no-store':'no-cache'});
+  const stream=createReadStream(filename); stream.on('error',()=>res.destroy()); stream.pipe(res);
+}
+
+export function startServer(options: { state?: string; port?: number; host?: string; delay?: number } = {}) {
+  const state=path.resolve(options.state ?? process.env.SV_NEXT_STATE_DIR ?? path.join(root,'outputs/next-state'));
+  const staticDir=path.join(root,'outputs/next-web/dist');
+  const service=new InspectionService(state,root,options.delay ?? Number(process.env.SV_NEXT_MOCK_DELAY_MS ?? 1200));
+  let uploads=0;
+  const server=http.createServer(async(req,res)=>{
+    res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','same-origin'); res.setHeader('X-Frame-Options','SAMEORIGIN');
+    try {
+      const url=new URL(req.url ?? '/', 'http://localhost'), pathname=decodeURIComponent(url.pathname);
+      if (req.method!=='GET'&&req.method!=='HEAD') {
+        const origin=req.headers.origin;
+        if (origin && !['http://'+req.headers.host,'https://'+req.headers.host].includes(origin)) throw new ApiError(403,'请从本应用页面发起操作。');
+      }
+      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',schemaVersion:1});
+      const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('sv_next_session='))?.slice('sv_next_session='.length);
+      const session=token?service.store.db.prepare('SELECT person,expires FROM sessions WHERE token=?').get(token):null;
+      if(pathname==='/api/session'&&req.method==='POST'){
+        await jsonBody(req); const key=randomBytes(32).toString('hex');
+        service.store.db.prepare('DELETE FROM sessions WHERE expires<?').run(Date.now());
+        service.store.db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(key,JSON.stringify(person),Date.now()+24*60*60*1000);
+        res.setHeader('Set-Cookie',`sv_next_session=${key}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
+        return send(res,{person,mode:'mock',tasks:service.list()});
+      }
+      if(pathname.startsWith('/api/')){
+        if(!session||Number(session.expires)<Date.now())throw new ApiError(401,'本地试用会话已过期，请重新进入，草稿已保留。');
+        const actor=JSON.parse(String(session.person));
+        if(pathname==='/api/session'&&req.method==='DELETE'){
+          service.store.db.prepare('DELETE FROM sessions WHERE token=?').run(token!);res.setHeader('Set-Cookie','sv_next_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,{ok:true});
+        }
+        if(pathname==='/api/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',tasks:service.list()});
+        const taskMatch=pathname.match(/^\/api\/tasks\/([A-Z0-9]+)(?:\/(open|rounds))?$/);
+        if(taskMatch){const [,id,action]=taskMatch;
+          if(req.method==='GET'&&!action)return send(res,service.view(id));
+          if(req.method==='POST'&&action==='open'){await jsonBody(req);return send(res,service.open(id));}
+          if(req.method==='POST'&&action==='rounds'){const data=z.object({reuse:z.boolean()}).parse(await jsonBody(req));return send(res,service.newRound(id,data.reuse));}
+        }
+        const fileMatch=pathname.match(/^\/api\/files\/([a-f0-9-]+\.(png|jpg|webp))$/);
+        if(fileMatch&&req.method==='GET')return await file(res,path.join(state,'files',fileMatch[1]),true);
+        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|photos|remove|notes|review|analyze|submit|report\.md)$/);
+        if(match){const [,id,action]=match;
+          if(action==='report.md'&&req.method==='GET'){
+            const round=service.round(id);res.writeHead(200,{'Content-Type':'text/markdown; charset=utf-8','Content-Disposition':`attachment; filename="${round.taskId}-R${round.number}.md"`,'Cache-Control':'private, no-store'});return res.end(service.report(round));
+          }
+          if(req.method!=='POST')throw new ApiError(405,'此操作不支持该请求方式。');
+          if(action==='photos'){
+            if(uploads>=2){req.resume();throw new ApiError(429,'当前有其他照片正在保存，请稍后重试。');}
+            uploads++;
+            try {
+              const bytes=await body(req,22*1024*1024);
+              const request=new Request('http://localhost/upload',{method:'POST',headers:{'Content-Type':req.headers['content-type']??''},body:new Uint8Array(bytes)});
+              const data=await request.formData(),photo=data.get('photo');
+              if(!(photo instanceof File))throw new ApiError(400,'请选择一张照片。');
+              const revision=revisionSchema.parse(Number(data.get('revision')));
+              return send(res,await service.addPhoto(id,revision,{bytes:Buffer.from(await photo.arrayBuffer()),filename:photo.name,width:Number(data.get('width')),height:Number(data.get('height')),replaceId:String(data.get('replaceId')??'')||undefined,clientId:z.string().min(1).max(100).parse(data.get('clientId'))},actor));
+            } finally { uploads--; }
+          }
+          const data=await jsonBody(req),revision=revisionSchema.parse(data.revision);
+          if(action==='sample'){const input=z.object({sample:z.enum(['pass','fail','four','quality']),replaceId:z.string().optional()}).parse(data);return send(res,await service.addSample(id,revision,input.sample,input.replaceId,actor));}
+          if(action==='remove')return send(res,service.remove(id,revision,z.string().parse(data.photoId),actor));
+          if(action==='notes')return send(res,service.notes(id,revision,z.string().parse(data.instruction),actor));
+          if(action==='review'){const input=z.object({componentId:z.string(),verdict:z.enum(['PASS','FAIL']),reason:z.string()}).parse(data);return send(res,service.review(id,revision,input.componentId,input.verdict,input.reason,actor));}
+          if(action==='analyze')return send(res,service.analyze(id,revision),202);
+          if(action==='submit')return send(res,service.submit(id,revision,actor,data.simulateFailure===true),202);
+        }
+        throw new ApiError(404,'接口不存在。');
+      }
+      if(req.method!=='GET'&&req.method!=='HEAD')throw new ApiError(405,'请求方式不支持。');
+      const full=path.resolve(staticDir,'.'+pathname);
+      if(full!==staticDir&&!full.startsWith(staticDir+path.sep))throw new ApiError(404,'文件不存在。');
+      try { if((await stat(full)).isFile())return await file(res,full); } catch { /* Client routes use the application entry. */ }
+      if(path.extname(pathname))throw new ApiError(404,'文件不存在。');
+      return await file(res,path.join(staticDir,'index.html'));
+    } catch(error){
+      if(res.headersSent){res.destroy();return;}
+      const status=error instanceof ApiError?error.status:error instanceof z.ZodError?400:500;
+      if(status===500)console.error('请求处理失败',error);
+      send(res,{message:error instanceof z.ZodError?'请求参数不完整或格式不正确。':status===500?'服务暂时无法完成操作，请稍后重试。':(error as Error).message},status);
+    }
+  });
+  server.requestTimeout=120000;server.headersTimeout=15000;
+  server.listen(options.port ?? Number(process.env.SV_NEXT_PORT??5190),options.host??process.env.SV_NEXT_HOST??'0.0.0.0',()=>{
+    const addr=server.address();if(!addr||typeof addr==='string')return;
+    console.log(`新版平板工作台（本地模拟）：http://127.0.0.1:${addr.port}`);
+    for(const entries of Object.values(os.networkInterfaces()))for(const entry of entries??[])if(entry.family==='IPv4'&&!entry.internal&&/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(entry.address))console.log(`局域网试用：http://${entry.address}:${addr.port}`);
+  });
+  return {server,service};
+}
+
+if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
+  const {server,service}=startServer();
+  for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>{
+    service.closing=true;server.closeAllConnections();server.close();
+    setTimeout(()=>{service.store.close();process.exit(0);},service.interval+100).unref();
+  });
+}

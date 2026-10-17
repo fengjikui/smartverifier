@@ -14,7 +14,11 @@
     "db:generate": "drizzle-kit generate",
     "build:lan": "vite build --config lan/vite.config.ts",
     "start:lan": "node scripts/start-lan.mjs",
-    "lan": "npm run build:lan && npm run start:lan"
+    "lan": "npm run build:lan && npm run start:lan",
+    "build:next": "vite build --config next/vite.config.ts",
+    "start:next": "node next/server/index.ts",
+    "check:next": "tsc -p next/tsconfig.json",
+    "test:next": "node --test --test-concurrency=1 next/tests/*.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

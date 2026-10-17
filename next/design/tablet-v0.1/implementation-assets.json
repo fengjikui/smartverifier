@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-17",
+  "fileKey": "6kmN9EjSyVpFuTQxC1NaBE",
+  "sourceNodes": [
+    "3889:466",
+    "3889:467",
+    "3941:1167",
+    "3889:473",
+    "3889:485"
+  ],
+  "dynamicImages": {
+    "album-p001.png": {
+      "fixture": "reference.png",
+      "identical": true,
+      "sha256": "ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97"
+    },
+    "album-p006.png": {
+      "fixture": "mismatch.png",
+      "identical": true,
+      "sha256": "b0926e327952e093b2895bfa852bacad76e47e03efe3c552b5a9d15d7b9d9afa"
+    },
+    "detail-photo.png": {
+      "fixture": "four-components.png",
+      "identical": true,
+      "sha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b"
+    },
+    "report-photo.png": {
+      "fixture": "four-components.png",
+      "identical": true,
+      "sha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b"
+    }
+  },
+  "staticAssets": [
+    {
+      "file": "album-frame.svg",
+      "bytes": 296,
+      "sha256": "b346f4b37adc133ef43b6d18bb7c7a4baf12dc104568fb82e519351c6a327a3d"
+    },
+    {
+      "file": "tasks-scan.svg",
+      "bytes": 453,
+      "sha256": "ed73aa7867ee890072a36aab1a81687a4513668fa908b56ab0e81d5380daeb3b"
+    },
+    {
+      "file": "detail-1.png",
+      "bytes": 2171456,
+      "sha256": "ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97"
+    },
+    {
+      "file": "report-frame1.svg",
+      "bytes": 272,
+      "sha256": "f6741a3dcaabfa6d4a8f7da64573229a41342f4902b3a70fc231e0a50bf226bd"
+    },
+    {
+      "file": "login-shield.svg",
+      "bytes": 544,
+      "sha256": "0a4b28d959906fe4a06375f30819647464b146b0cb7399b182566ba32f27232a"
+    },
+    {
+      "file": "report-frame3.svg",
+      "bytes": 274,
+      "sha256": "443d19c3df09e85ff095fc17deea264c5d10780921cc9a79b30b4a5d34cdef36"
+    },
+    {
+      "file": "report-frame2.svg",
+      "bytes": 273,
+      "sha256": "e045dce0f868c749111dfc91a0c21169cc978bc13e37af1e2d03400e05fd8493"
+    },
+    {
+      "file": "album-alert.svg",
+      "bytes": 376,
+      "sha256": "b01a5e7d478fa4226cd121ba4a9665f32067342ffdbe7b6f8e7efeb58f663cb6"
+    },
+    {
+      "file": "login-scan.svg",
+      "bytes": 402,
+      "sha256": "0ad7f59889ccdccefc7a45592d1b6243ae4922e5b33cfc088c0eb4b716add752"
+    },
+    {
+      "file": "album-check.svg",
+      "bytes": 373,
+      "sha256": "60c8730c8780b472c6191b8bc9c442f98fcd879dca78c49a8fd58d15845ae9be"
+    },
+    {
+      "file": "report-frame.svg",
+      "bytes": 271,
+      "sha256": "3f38674a39fee48d14084e4f3bf895c90ae9074ac4b769031ba46a1e82ebd80b"
+    }
+  ],
+  "note": "动态图像使用与Figma图像逐字节相同的仓库fixture，运行时通过照片上传保存。仅保留被代码引用的静态图标、正品图与编号引导线，未把整页截图作为界面。"
+}
