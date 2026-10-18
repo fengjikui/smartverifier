@@ -9,6 +9,27 @@ from smartverifier_focus.lmstudio_transport import LmStudioTransport, request_te
 
 
 class LmStudioTransportTests(unittest.IsolatedAsyncioTestCase):
+    async def test_live_events_and_schema_are_passed_without_mutating_schema_keys(self):
+        from lmstudio.json_api import PredictionFragmentEvent
+        from lmstudio._sdk_models import LlmPredictionFragment
+        events=[]
+        class Stream:
+            async def __aenter__(self):return self
+            async def __aexit__(self,*exc):pass
+            async def _iter_events(self):
+                yield PredictionFragmentEvent(LlmPredictionFragment(content='{"items":[]}',tokens_count=7,contains_drafted=False,reasoning_type='none'))
+            def result(self):return SimpleNamespace(content='{"items":[]}',stats=SimpleNamespace(to_dict=lambda:{'stopReason':'eosFound','predictedTokensCount':7}))
+        transport=object.__new__(LmStudioTransport);transport.history=AsyncMock(return_value='chat');transport.model=AsyncMock()
+        async def respond(*args,**kwargs):
+            kwargs['on_prompt_processing_progress'](.5);kwargs['on_first_token']();return Stream()
+        transport.model.respond_stream.side_effect=respond
+        transport.template,transport.template_sha256={'type':'jinja','jinjaPromptTemplate':{'template':'fixture'},'stopStrings':[]},'fixture'
+        schema={'type':'object','properties':{'rotation_degrees':{'type':'number'}}}
+        await transport.complete([],None,100,on_event=lambda kind,data:events.append((kind,data)),response_format=schema)
+        self.assertEqual(schema,transport.model.respond_stream.call_args.kwargs['response_format'])
+        self.assertEqual(['image_prepare_started','images_prepared','prediction_started','prefill_progress','first_token','fragment','generation_finished'],[kind for kind,_ in events])
+        self.assertEqual(0,events[-1][1]['reasoningTokens'])
+
     async def test_experiment_timeout_is_bounded_without_changing_the_default(self):
         transport=object.__new__(LmStudioTransport)
         for seconds in (0,181,float('inf')):

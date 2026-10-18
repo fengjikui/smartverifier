@@ -9,6 +9,7 @@ import asyncio
 import base64
 import hashlib
 import json
+import time
 from pathlib import Path
 from urllib.parse import urlparse
 import uuid
@@ -103,14 +104,20 @@ class LmStudioTransport:
             chat.add_entry(role, items)
         return chat
 
-    async def complete(self, messages: list[dict], tools: list[dict] | None, max_tokens: int, *, timeout_seconds: float = 55) -> dict:
+    async def complete(self, messages: list[dict], tools: list[dict] | None, max_tokens: int, *, timeout_seconds: float = 55, on_event=None, response_format: dict | None = None) -> dict:
         from lmstudio.json_api import PredictionFragmentEvent, PredictionToolCallEvent
         from lmstudio._sdk_models import LlmPredictionConfig
         from msgspec import convert
         if not 1 <= timeout_seconds <= 180:
             raise ValueError("Request timeout must be between 1 and 180 seconds")
+        started = time.monotonic()
+        def emit(kind, data=None):
+            if on_event:
+                on_event(kind, {"transportElapsedMs":round((time.monotonic()-started)*1000,2), **(data or {})})
         async with asyncio.timeout(timeout_seconds):
+            emit('image_prepare_started')
             chat = await self.history(messages)
+            emit('images_prepared')
             config = {"temperature": 0, "maxTokens": max_tokens, "promptTemplate": self.template,
                       "contextOverflowPolicy": "stopAtLimit",
                       "rawTools": {"type": "toolArray", "tools": tools} if tools else {"type": "none"}}
@@ -118,9 +125,15 @@ class LmStudioTransport:
             # conversion, corrupting JSON Schema property names such as
             # rotation_degrees. A typed struct preserves arbitrary JSON keys.
             config = convert(config, LlmPredictionConfig)
+            emit('prediction_started', {'maxTokens':max_tokens,'temperature':0,'enableThinking':False,
+                                      'responseFormat':'json-schema' if response_format else 'prompt-json',
+                                      'schema':response_format, 'templateSourceSha256':self.template_sha256})
             replies, fragments, tool_requests = [], [], []
             reasoning_tokens = 0
-            stream = await self.model.respond_stream(chat, config=config, on_message=lambda m: replies.append(m.to_dict()))
+            callbacks = {'on_first_token':lambda:emit('first_token'),
+                         'on_prompt_processing_progress':lambda value:emit('prefill_progress', {'progress':value})} if on_event else {}
+            stream = await self.model.respond_stream(chat, config=config, on_message=lambda m: replies.append(m.to_dict()),
+                                                    **({'response_format':response_format} if response_format else {}), **callbacks)
             async with stream:
                 # SDK 1.5.0's public fragment iterator DROPS tool events; its act()
                 # uses this event iterator too. Keep this version-pinned bridge
@@ -131,6 +144,7 @@ class LmStudioTransport:
                     elif isinstance(event, PredictionFragmentEvent):
                         fragment = event.arg
                         fragments.append(fragment.to_dict())
+                        emit('fragment', {'content':fragment.content,'tokensCount':fragment.tokens_count,'reasoningType':fragment.reasoning_type})
                         if fragment.reasoning_type != "none":
                             reasoning_tokens += fragment.tokens_count
                         if reasoning_tokens > 16:
@@ -146,7 +160,9 @@ class LmStudioTransport:
                       "maxPredictedTokensReached": "length"}.get(stop, "error")
             if reasoning_tokens > 16:
                 finish = "error"
-            return {"choices": [{"finish_reason": finish, "message": sdk_reply(replies, result.content)}],
+            message=sdk_reply(replies, result.content)
+            emit('generation_finished', {'finishReason':finish,'stats':stats,'reasoningTokens':reasoning_tokens,'output':message.get('content','')})
+            return {"choices": [{"finish_reason": finish, "message": message}],
                     "usage": {"prompt_tokens": stats.get("promptTokensCount"),
                               "completion_tokens": stats.get("predictedTokensCount"), "reasoning_tokens": reasoning_tokens},
                     "lmstudio": {"stats": stats, "messages": replies, "fragments": fragments,

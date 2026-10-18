@@ -9,6 +9,8 @@ import { z } from 'zod';
 import { ApiError, InspectionService, person } from './service.ts';
 import { LocalVisionPipeline } from './vision/local-pipeline.ts';
 import type { VisionPipeline } from './vision/local-pipeline.ts';
+import { TraceStore } from './vision/trace-store.ts';
+import { DebugRuns } from './vision/debug-runs.ts';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const revisionSchema = z.number().int().positive();
@@ -31,10 +33,12 @@ async function file(res: http.ServerResponse, filename: string, privateFile=fals
   const stream=createReadStream(filename); stream.on('error',()=>res.destroy()); stream.pipe(res);
 }
 
-export function startServer(options: { state?: string; port?: number; host?: string; delay?: number; vision?:VisionPipeline; real?:boolean } = {}) {
+export function startServer(options: { state?: string; port?: number; host?: string; delay?: number; vision?:VisionPipeline; real?:boolean;debug?:boolean } = {}) {
   const state=path.resolve(options.state ?? process.env.SV_NEXT_STATE_DIR ?? path.join(root,'outputs/next-state'));
   const staticDir=path.join(root,'outputs/next-web/dist');
-  const vision=options.vision??((options.real??process.env.SV_NEXT_RECOGNIZER==='lmstudio')?new LocalVisionPipeline(root,state):undefined);
+  const debug=options.debug??process.env.SV_MODEL_DEBUG==='1',traces=new TraceStore(path.join(state,'vision-traces'));
+  const vision=options.vision??((options.real??process.env.SV_NEXT_RECOGNIZER==='lmstudio')?new LocalVisionPipeline(root,state,debug?{traceDirectory:traces.directory}:{}):undefined);
+  const debugRuns=debug&&vision instanceof LocalVisionPipeline?new DebugRuns(vision,traces):undefined;
   const recognition=vision?{mode:'lmstudio' as const,model:vision.model}:{mode:'mock' as const};
   const service=new InspectionService(state,root,options.delay ?? Number(process.env.SV_NEXT_MOCK_DELAY_MS ?? 1200),vision);
   let uploads=0;
@@ -46,7 +50,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         const origin=req.headers.origin;
         if (origin && !['http://'+req.headers.host,'https://'+req.headers.host].includes(origin)) throw new ApiError(403,'请从本应用页面发起操作。');
       }
-      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1});
+      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1,modelDebug:debug});
       const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('sv_next_session='))?.slice('sv_next_session='.length);
       const session=token?service.store.db.prepare('SELECT person,expires FROM sessions WHERE token=?').get(token):null;
       if(pathname==='/api/session'&&req.method==='POST'){
@@ -59,6 +63,26 @@ export function startServer(options: { state?: string; port?: number; host?: str
       if(pathname.startsWith('/api/')){
         if(!session||Number(session.expires)<Date.now())throw new ApiError(401,'本地试用会话已过期，请重新进入，草稿已保留。');
         const actor=JSON.parse(String(session.person));
+        if(pathname.startsWith('/api/debug/')){
+          if(!debug)throw new ApiError(404,'本服务未启用模型调试窗口。');
+          if(!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress??''))throw new ApiError(403,'模型调试只允许在服务器本机查看。');
+          if(pathname==='/api/debug/traces'&&req.method==='GET')return send(res,{traces:await traces.list(),running:debugRuns?.running??false});
+          if(pathname==='/api/debug/samples'&&req.method==='POST'){
+            if(!debugRuns)throw new ApiError(409,'此服务没有可调用的本机视觉模型。');
+            if(service.worker||debugRuns.running)throw new ApiError(409,'当前有识别正在执行，请完成后再试，调试不会抢占检验任务。');
+            const input=z.object({mode:z.enum(['single','board4','board6']),format:z.enum(['prompt-json','json-schema'])}).strict().parse(await jsonBody(req));
+            return send(res,{id:debugRuns.start(input.mode,input.format,actor.id)},202);
+          }
+          const image=pathname.match(/^\/api\/debug\/traces\/([a-f0-9-]{36})\/images\/([0-9])\.png$/);
+          if(image&&req.method==='GET')return await file(res,path.join(traces.folder(image[1]),'image-'+image[2]+'.png'),true);
+          const trace=pathname.match(/^\/api\/debug\/traces\/([a-f0-9-]{36})$/);
+          if(trace&&req.method==='GET'){
+            const after=z.coerce.number().int().nonnegative().parse(url.searchParams.get('after')??'0');
+            let events;try{events=await traces.read(trace[1]);}catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT')throw new ApiError(404,'记录正在创建，稍后自动重试。');throw e;}
+            return send(res,{events:events.filter(e=>e.seq>after),next:events.at(-1)?.seq??0});
+          }
+          throw new ApiError(404,'调试接口不存在。');
+        }
         if(pathname==='/api/session'&&req.method==='DELETE'){
           service.store.db.prepare('DELETE FROM sessions WHERE token=?').run(token!);res.setHeader('Set-Cookie','sv_next_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,{ok:true});
         }
@@ -97,7 +121,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
           if(action==='remove')return send(res,service.remove(id,revision,z.string().parse(data.photoId),actor));
           if(action==='notes')return send(res,service.notes(id,revision,z.string().parse(data.instruction),actor));
           if(action==='review'){const input=z.object({componentId:z.string(),verdict:z.enum(['PASS','FAIL']),reason:z.string()}).parse(data);return send(res,service.review(id,revision,input.componentId,input.verdict,input.reason,actor));}
-          if(action==='analyze')return send(res,service.analyze(id,revision),202);
+          if(action==='analyze'){if(debugRuns?.running)throw new ApiError(409,'本机模型正在执行调试，请稍后开始检测。');return send(res,service.analyze(id,revision),202);}
           if(action==='submit')return send(res,service.submit(id,revision,actor,data.simulateFailure===true),202);
         }
         throw new ApiError(404,'接口不存在。');
