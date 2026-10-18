@@ -67,7 +67,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         }
         const fileMatch=pathname.match(/^\/api\/files\/([a-f0-9-]+\.(png|jpg|webp))$/);
         if(fileMatch&&req.method==='GET')return await file(res,path.join(state,'files',fileMatch[1]),true);
-        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|photos|remove|notes|review|analyze|submit|report\.md)$/);
+        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|sample-set|photos|remove|notes|review|analyze|submit|report\.md)$/);
         if(match){const [,id,action]=match;
           if(action==='report.md'&&req.method==='GET'){
             const round=service.round(id);res.writeHead(200,{'Content-Type':'text/markdown; charset=utf-8','Content-Disposition':`attachment; filename="${round.taskId}-R${round.number}.md"`,'Cache-Control':'private, no-store'});return res.end(service.report(round));
@@ -86,7 +86,8 @@ export function startServer(options: { state?: string; port?: number; host?: str
             } finally { uploads--; }
           }
           const data=await jsonBody(req),revision=revisionSchema.parse(data.revision);
-          if(action==='sample'){const input=z.object({sample:z.enum(['pass','fail','four','quality']),replaceId:z.string().optional()}).parse(data);return send(res,await service.addSample(id,revision,input.sample,input.replaceId,actor));}
+          if(action==='sample'){const input=z.object({sample:z.enum(['pass','fail','four','twenty','quality']),replaceId:z.string().optional()}).parse(data);return send(res,await service.addSample(id,revision,input.sample,input.replaceId,actor));}
+          if(action==='sample-set'){const input=z.object({clientId:z.string().min(1).max(100)}).parse(data);return send(res,await service.addTwentyPhotos(id,revision,input.clientId,actor));}
           if(action==='remove')return send(res,service.remove(id,revision,z.string().parse(data.photoId),actor));
           if(action==='notes')return send(res,service.notes(id,revision,z.string().parse(data.instruction),actor));
           if(action==='review'){const input=z.object({componentId:z.string(),verdict:z.enum(['PASS','FAIL']),reason:z.string()}).parse(data);return send(res,service.review(id,revision,input.componentId,input.verdict,input.reason,actor));}

@@ -1,15 +1,16 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { Store } from './store.ts';
 import { assertMutable, finalVerdict, summarize } from '../shared/domain.ts';
 import type { ComponentResult, Person, Photo, Round, SampleKind, Standard, Task, TaskListItem, TaskView, Verdict } from '../shared/types.ts';
+import { sampleBox, sampleCount, sampleFails, sampleLowConfidence, twentyFailures, twentySample } from '../shared/sample-presets.ts';
 
 export class ApiError extends Error { status: number; constructor(status: number, message: string) { super(message); this.status = status; } }
 export const person: Person = { id: 'QA018', name: '王敏' };
 const now = () => new Date().toISOString();
-const sampleFiles: Record<SampleKind, string> = { pass: 'reference.png', fail: 'mismatch.png', four: 'four-components.png', quality: 'reference.png' };
+const sampleFiles: Record<SampleKind, string> = { pass: 'reference.png', fail: 'mismatch.png', four: 'four-components.png', twenty: 'twenty-components.png', quality: 'reference.png' };
 const sampleHashes: Record<string, SampleKind> = {
   ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97: 'pass',
   b0926e327952e093b2895bfa852bacad76e47e03efe3c552b5a9d15d7b9d9afa: 'fail',
@@ -75,7 +76,35 @@ export class InspectionService {
   async addSample(id: string, revision: number, sample: SampleKind, replaceId: string | undefined, actor: Person) {
     if (!Object.hasOwn(sampleFiles, sample)) throw new ApiError(400, '请选择一种内置样例。');
     const bytes = await readFile(path.join(this.root, 'fixtures/inspection', sampleFiles[sample]));
-    return this.addPhoto(id, revision, { bytes, filename: '内置样例-' + sampleFiles[sample], width: 1536, height: 1024, sample, replaceId }, actor);
+    return this.addPhoto(id, revision, { bytes, filename: '内置样例-' + sampleFiles[sample], width: sample === 'twenty' ? twentySample.width : 1536, height: sample === 'twenty' ? twentySample.height : 1024, sample, replaceId }, actor);
+  }
+  async addTwentyPhotos(id: string, revision: number, clientId: string, actor: Person): Promise<TaskView> {
+    const prefix = 'sample-set:' + clientId + ':';
+    if (this.round(id).photos.some(p => p.uploadKey?.startsWith(prefix))) return this.view(this.round(id).taskId);
+    this.mutable(id, revision);
+    const pass = await readFile(path.join(this.root, 'fixtures/inspection/reference.png'));
+    const fail = await readFile(path.join(this.root, 'fixtures/inspection/mismatch.png'));
+    const photos: Photo[] = [], files: string[] = [];
+    await mkdir(path.join(this.directory, 'files'), { recursive: true, mode: 0o700 });
+    try {
+      for (let i = 0; i < 20; i++) {
+        const sample = twentyFailures.has(i) ? 'fail' : 'pass', bytes = sample === 'fail' ? fail : pass, file = randomUUID() + '.png';
+        files.push(file);
+        await writeFile(path.join(this.directory, 'files', file), bytes, { mode: 0o600 });
+        photos.push({ id:randomUUID(),uploadKey:prefix+i,sequence:0,filename:`内置20张照片样例-${String(i+1).padStart(2,'0')}.png`,file,url:'/api/files/'+file,hash:createHash('sha256').update(bytes).digest('hex'),width:1536,height:1024,sample,status:'pending',message:'',components:[] });
+      }
+      const round = this.mutable(id, revision);
+      for (const photo of photos) photo.sequence = round.nextPhotoSequence++;
+      round.photos.push(...photos);
+      this.store.transaction(() => {
+        this.store.audit(round, actor, 'sample.collection.add', {clientId, photoIds:photos.map(p=>p.id), synthetic:true});
+        this.saveMutation(round);
+      });
+      return this.view(round.taskId);
+    } catch (error) {
+      for (const file of files) await rm(path.join(this.directory, 'files', file), {force:true});
+      throw error;
+    }
   }
   remove(id: string, revision: number, photoId: string, actor: Person) { const r = this.mutable(id, revision); if (!r.photos.some(p => p.id === photoId)) throw new ApiError(404, '照片已被移除。'); r.photos = r.photos.filter(p => p.id !== photoId); this.store.audit(r, actor, 'photo.remove', { photoId }); return this.saveMutation(r); }
   notes(id: string, revision: number, instruction: string, actor: Person) {
@@ -122,15 +151,15 @@ export class InspectionService {
       if (!p.sample) { p.status = 'error'; p.message = '照片已保存。本阶段尚未接入真实模型，请使用内置样例体验检测；不会为这张照片伪造判定。'; }
       else if (p.sample === 'quality') { p.status = 'quality'; p.message = '图片质量过低，请重新拍照（内置质量反馈状态示例）。'; }
       else {
-        const count = p.sample === 'four' ? 4 : 1;
-        if (p.components.length !== count) p.components = Array.from({ length: count }, (_, index): ComponentResult => ({ id: randomUUID(), label: 'P' + String(p.sequence).padStart(3,'0') + '-' + String(index + 1).padStart(2,'0'), index, bbox: count === 4 ? [index % 2 * .5, Math.floor(index / 2) * .5, .5, .5] : [0,0,1,1], ai: null, aiHistory: [], review: null, reviewHistory: [] }));
+        const count = sampleCount(p.sample);
+        if (p.components.length !== count) p.components = Array.from({ length: count }, (_, index): ComponentResult => ({ id: randomUUID(), label: 'P' + String(p.sequence).padStart(3,'0') + '-' + String(index + 1).padStart(2,'0'), index, bbox: sampleBox(p.sample!, index), ai: null, aiHistory: [], review: null, reviewHistory: [] }));
         this.store.saveRound(r);
         for (const c of p.components) {
           if (this.closing) return;
           if (c.ai?.instructionVersion === r.instructionVersion) continue;
           await delay(this.interval); if(this.closing)return;
-          const fail = p.sample === 'fail' || (p.sample === 'four' && c.index === 2);
-          c.ai = { verdict: fail ? 'FAIL' : 'PASS', lines: [fail ? 'SV385' : 'SV358','A26','0147'], confidence: p.sample === 'four' && c.index === 1 ? .74 : .97, reason: fail ? '型号末两位顺序不同：实拍85，正品58。' : c.index === 1 && count === 4 ? '字形与正品一致，字符边缘反光，建议按需复核。' : '丝印文字、排列与正品样例一致。', instructionVersion: r.instructionVersion };
+          const fail = sampleFails(p.sample, c.index), low = sampleLowConfidence(p.sample, c.index);
+          c.ai = { verdict: fail ? 'FAIL' : 'PASS', lines: [fail ? 'SV385' : 'SV358','A26','0147'], confidence: low ? .74 : .97, reason: fail ? '型号末两位顺序不同：实拍85，正品58。' : low ? '字形与正品一致，字符边缘反光，建议按需复核。' : '丝印文字、排列与正品样例一致。', instructionVersion: r.instructionVersion };
           c.aiHistory.push(structuredClone(c.ai));
           r.revision++; this.store.saveRound(r);
         }

@@ -1,7 +1,7 @@
 export type Verdict = 'PASS' | 'FAIL';
 export type PhotoStatus = 'pending' | 'queued' | 'running' | 'ready' | 'quality' | 'error';
 export type RoundStatus = 'draft' | 'queued' | 'running' | 'ready' | 'submitting' | 'submitted' | 'submit_failed';
-export type SampleKind = 'pass' | 'fail' | 'four' | 'quality';
+export type SampleKind = 'pass' | 'fail' | 'four' | 'twenty' | 'quality';
 export interface Person { id: string; name: string }
 export interface Review { id: string; verdict: Verdict; reason: string; person: Person; at: string; instructionVersion: number }
 export interface AIJudgement { verdict: Verdict; lines: string[]; confidence: number; reason: string; instructionVersion: number }

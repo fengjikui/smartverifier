@@ -1,0 +1,72 @@
+.sv-density-toggle.sv-btn { min-height: 44px; font-size: 14px; gap: 8px; }
+.sv-density-toggle.sv-btn[aria-pressed="true"] { color: var(--brand); background: var(--brand-soft); border-color: oklch(.83 .055 20); }
+.sv-album-compact .sv-album-grid { grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; }
+.sv-album-compact .sv-photo-card { border-radius: 10px; }
+.sv-album-compact .sv-photo-open { padding: 8px 8px 0; gap: 8px; }
+.sv-album-compact .sv-photo-thumb { aspect-ratio: 2; border-radius: 7px; }
+.sv-album-compact .sv-photo-status { left: 5px; top: 5px; }
+.sv-album-compact .sv-photo-status .sv-pill { min-height: 27px; padding: 3px 7px; font-size: 12px; line-height: 18px; gap: 4px; }
+.sv-album-compact .sv-photo-status .sv-pill img, .sv-album-compact .sv-photo-status .sv-pill svg { width: 16px; height: 16px; }
+.sv-album-compact .sv-photo-caption { min-height: 52px; padding-bottom: 8px; }
+.sv-album-compact .sv-photo-caption h2 { font-size: 14px; line-height: 22px; }
+.sv-album-compact .sv-photo-caption p, .sv-album-compact .sv-photo-caption small { font-size: 12px; line-height: 18px; }
+.sv-album-compact .sv-photo-actions { padding: 0 4px 2px; }
+.sv-album-compact .sv-photo-actions .sv-btn { min-width: 44px; min-height: 44px; padding: 6px 8px; gap: 6px; font-size: 12px; }
+.sv-album-compact .sv-low-confidence { right: 5px; top: 5px; padding: 2px; }
+.sv-album-compact .sv-low-confidence img { width: 20px; height: 20px; }
+.sv-album-compact .sv-add-photo { min-height: 170px; font-size: 14px; gap: 8px; }
+.sv-component-tabs .sv-component-choice { position: relative; min-height: 44px; height: 44px; min-width: 44px; width: 44px; flex: 0 0 44px; padding: 0; font-size: 14px; font-variant-numeric: tabular-nums; border-color: transparent; }
+.sv-component-choice.is-pass { color: var(--success); background: var(--success-soft); }
+.sv-component-choice.is-fail { color: var(--brand); background: var(--brand-soft); }
+.sv-component-choice.is-pending { color: var(--muted); background: var(--paper); }
+.sv-component-tabs .sv-component-choice:hover:not(:disabled) { border-color: currentColor; }
+.sv-component-tabs .sv-component-choice.is-pass:hover:not(:disabled) { background: var(--success-soft); }
+.sv-component-tabs .sv-component-choice.is-fail:hover:not(:disabled) { background: var(--brand-soft); }
+.sv-component-tabs .sv-component-choice[aria-pressed="true"] { border-color: currentColor; box-shadow: 0 0 0 1px currentColor; font-weight: 600; }
+.sv-detail-nav, .sv-detail-nav.sv-detail-nav-many { flex-direction: column; align-items: stretch; gap: 8px; }
+.sv-detail-nav > span { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex: none; font-size: 14px; }
+.sv-detail-nav > span small { display: flex; gap: 12px; font-size: 12px; font-weight: 400; }
+.sv-component-legend-pass { color: var(--success); }
+.sv-component-legend-fail { color: var(--brand); }
+.sv-component-tabs, .sv-component-tabs.sv-component-tabs-many { display: flex; flex-wrap: wrap; gap: 6px; overflow: visible; width: 100%; flex: none; padding: 2px; }
+.sv-many-annotations { position: absolute; top: 12px; left: 12px; width: 626px; height: 310px; pointer-events: none; }
+.sv-many-annotations rect { fill: var(--paper); stroke-width: 2px; }
+.sv-many-annotations text { font-size: 72px; font-weight: 600; font-family: inherit; }
+.sv-many-annotations .is-pass rect { stroke: var(--success); }
+.sv-many-annotations .is-pass text { fill: var(--success); }
+.sv-many-annotations .is-fail rect { stroke: var(--brand); }
+.sv-many-annotations .is-fail text { fill: var(--brand); }
+.sv-report-collapsible { border: 1px solid var(--line); background: var(--paper); border-radius: 10px; padding: 0 16px; }
+.sv-report-collapsible > summary { display: flex; align-items: center; gap: 12px; min-height: 56px; cursor: pointer; list-style: none; }
+.sv-report-collapsible > summary::-webkit-details-marker { display: none; }
+.sv-report-collapsible > summary:focus-visible { outline: 3px solid oklch(.7 .12 20); outline-offset: 3px; border-radius: 6px; }
+.sv-report-collapsible > summary h3 { min-width: 92px; }
+.sv-report-collapsible > summary small { margin-left: auto; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+.sv-report-collapsible > summary small svg { transition: transform .16s; }
+.sv-report-collapsible[open] > summary small svg { transform: rotate(90deg); }
+.sv-report-collapsible[open] { padding-bottom: 16px; }
+.sv-report-collapsible .sv-diff { border: 0; border-radius: 0; padding: 8px 0; }
+.sv-report-collapsible .sv-review-record { margin-top: 8px; }
+.sv-sample-options .sv-sample-featured { border-color: oklch(.83 .055 20); background: var(--brand-soft); }
+@media (max-width: 1100px) {
+  .sv-album-toolbar > div { gap: 8px; }
+  .sv-album-compact .sv-album-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+  .sv-album-toolbar { flex-wrap: wrap; gap: 4px; }
+  .sv-album-toolbar > div { margin-left: auto; gap: 8px; }
+  .sv-album-toolbar .sv-density-toggle.sv-btn { min-height: 44px; padding: 6px 8px; font-size: 13px; }
+  .sv-album-compact .sv-album-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+  .sv-album-compact .sv-photo-open { padding: 5px 5px 0; gap: 6px; }
+  .sv-album-compact .sv-photo-status { left: 2px; top: 2px; }
+  .sv-album-compact .sv-photo-status .sv-pill { font-size: 11px; padding: 2px 4px; gap: 2px; min-height: 23px; }
+  .sv-album-compact .sv-photo-caption h2 { font-size: 12px; line-height: 20px; }
+  .sv-album-compact .sv-photo-caption p { font-size: 11px; line-height: 17px; }
+  .sv-album-compact .sv-photo-replace-label { display: none; }
+  .sv-album-compact .sv-photo-actions { padding: 0 2px 2px; }
+  .sv-album-compact .sv-add-photo { min-height: 150px; font-size: 12px; }
+  .sv-report-collapsible { padding-left: 12px; padding-right: 12px; }
+  .sv-report-collapsible > summary { gap: 8px; flex-wrap: wrap; }
+  .sv-report-collapsible > summary h3 { min-width: 70px; font-size: 14px; }
+}
+@media (max-width: 370px) { .sv-album-compact .sv-album-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }

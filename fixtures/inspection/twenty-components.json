@@ -1,0 +1,233 @@
+{
+  "synthetic": true,
+  "purpose": "仅验证20件的界面、编号、进度和预设结果，不证明批量识别可行",
+  "width": 2560,
+  "height": 1600,
+  "sha256": "49731b19cf53871cca0733801e6526c86471a4a05a7435bb2ab1c919f9ab0001",
+  "sources": {
+    "reference.png": "ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97",
+    "mismatch.png": "b0926e327952e093b2895bfa852bacad76e47e03efe3c552b5a9d15d7b9d9afa"
+  },
+  "components": [
+    {
+      "index": 0,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.0,
+        0.0,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 1,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.2,
+        0.0,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 2,
+      "source": "mismatch.png",
+      "expected": "FAIL",
+      "bbox": [
+        0.4,
+        0.0,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 3,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.6,
+        0.0,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 4,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.8,
+        0.0,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 5,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.0,
+        0.25,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 6,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.2,
+        0.25,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 7,
+      "source": "mismatch.png",
+      "expected": "FAIL",
+      "bbox": [
+        0.4,
+        0.25,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 8,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.6,
+        0.25,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 9,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.8,
+        0.25,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 10,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.0,
+        0.5,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 11,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.2,
+        0.5,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 12,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.4,
+        0.5,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 13,
+      "source": "mismatch.png",
+      "expected": "FAIL",
+      "bbox": [
+        0.6,
+        0.5,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 14,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.8,
+        0.5,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 15,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.0,
+        0.75,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 16,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.2,
+        0.75,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 17,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.4,
+        0.75,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 18,
+      "source": "mismatch.png",
+      "expected": "FAIL",
+      "bbox": [
+        0.6,
+        0.75,
+        0.2,
+        0.25
+      ]
+    },
+    {
+      "index": 19,
+      "source": "reference.png",
+      "expected": "PASS",
+      "bbox": [
+        0.8,
+        0.75,
+        0.2,
+        0.25
+      ]
+    }
+  ]
+}

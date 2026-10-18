@@ -1,0 +1,44 @@
+.sv-inspection-detail { gap: 12px; }
+.sv-detail-heading { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.5fr); gap: 24px; align-items: start; flex-shrink: 0; }
+.sv-detail-title { position: relative; min-height: 110px; padding-right: 88px; }
+.sv-detail-title > div:first-child { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.sv-detail-title h1 { font-size: 26px; line-height: 36px; }
+.sv-detail-title p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.sv-detail-step { display: flex; gap: 2px; position: absolute; right: 0; top: 0; }
+.sv-inspection-detail .sv-detail-nav { min-height: 0; max-height: 160px; overflow: auto; overscroll-behavior: contain; }
+.sv-inspection-detail .sv-compare { gap: 20px; }
+.sv-inspection-detail .sv-compare .sv-panel { padding: 12px; height: 200px; gap: 8px; }
+.sv-inspection-detail .sv-photo-stage, .sv-inspection-detail .sv-crop { height: 144px; }
+.sv-inspection-detail .sv-diff { padding: 12px 16px; gap: 4px; }
+.sv-detail-secondary { display: flex; align-items: start; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 13px; flex-shrink: 0; }
+.sv-detail-secondary > details { flex: 1; }
+.sv-detail-secondary summary { cursor: pointer; min-height: 44px; width: fit-content; align-content: center; }
+.sv-detail-secondary p { margin: 8px 0; max-width: 72ch; }
+.sv-detail-secondary summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.sv-detail-secondary > .sv-btn { font-size: 14px; }
+@media (max-width: 1100px) {
+  .sv-detail-heading { grid-template-columns: minmax(260px, .9fr) minmax(0, 1.1fr); gap: 16px; }
+  .sv-detail-title { padding-right: 0; }
+  .sv-detail-step { position: static; margin-top: 4px; }
+}
+@media (max-width: 900px) and (orientation: portrait) {
+  .sv-detail-heading { grid-template-columns: 1fr; gap: 8px; }
+  .sv-detail-title { min-height: 72px; padding-right: 96px; }
+  .sv-detail-step { position: absolute; margin: 0; }
+  .sv-inspection-detail .sv-compare .sv-panel { height: 250px; }
+  .sv-inspection-detail .sv-photo-stage, .sv-inspection-detail .sv-crop { height: 190px; }
+}
+@media (max-width: 600px) {
+  .sv-detail-heading { grid-template-columns: 1fr; gap: 8px; }
+  .sv-detail-title { padding-right: 88px; min-height: 82px; }
+  .sv-detail-title h1 { font-size: 24px; }
+  .sv-detail-title p { font-size: 12px; }
+  .sv-detail-step { position: absolute; margin: 0; }
+  .sv-inspection-detail .sv-detail-nav { max-height: 144px; }
+  .sv-inspection-detail .sv-compare { gap: 12px; }
+  .sv-inspection-detail .sv-compare .sv-panel { padding: 10px; height: 190px; }
+  .sv-inspection-detail .sv-photo-stage, .sv-inspection-detail .sv-crop { height: 134px; }
+  .sv-inspection-detail .sv-diff { padding: 12px; }
+  .sv-detail-secondary { flex-wrap: wrap; gap: 4px; }
+  .sv-detail-secondary > details { flex-basis: 100%; }
+}

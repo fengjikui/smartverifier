@@ -7,8 +7,11 @@
 | `reference.png` | 单个 SOIC-8 风格器件，三行 SV358 / A26 / 0147 | 正品参考占位 |
 | `mismatch.png` | 单件倾斜，三行 SV385 / A26 / 0147 | 末尾字符交换差异 |
 | `four-components.png` | 四件、各有倾斜；按阅读顺序第 3 件 SV385，其余 SV358，后两行均 A26 / 0147 | 多件定位、编号、三通过一异常 |
+| `twenty-components.png` | 2026-10-17 用前两张虚构样片拼接成 5 列×4 行；第 3、8、14、19 件为 SV385 | 20 件的布局、编号、详情和预设结果展示，不用于证明批量识别准确率 |
 
 `expected.json` 保存人工核对真值和源文件 SHA-256。实测记录在 `docs/validation/2026-10-01-qwen-synthetic.json`。测试不会在工作台普通启动时自动创建任务；只有点击“试用合成样例”才加载。
+
+`twenty-components.json` 另存 20 件样例的来源哈希、拼接坐标和预设结论。重建使用 `agent-tools/image-focus/.venv/bin/python scripts/generate-twenty-sample.py`（Pillow），不修改前三张源图。它只用于界面和流程演示；除下述原有图片外，本轮没有生成新的器件外观或调用模型识别。
 
 生成要求概要（不是模型测试真值）：
 

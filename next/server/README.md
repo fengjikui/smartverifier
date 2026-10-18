@@ -41,6 +41,7 @@ SQLite持有任务、轮次、会话、审计与回填回执；轮次JSON包含�
 | POST /api/tasks/:id/rounds | 成功提交后开始重检，reuse选择复用照片 |
 | POST /api/rounds/:id/photos | multipart上传原图，含revision、clientId、尺寸及可选replaceId |
 | POST /api/rounds/:id/sample | 添加或替换内置样例，仅本地模式 |
+| POST /api/rounds/:id/sample-set | 一次添加20张单件流程样例，clientId去重，整体保存 |
 | POST /api/rounds/:id/remove | 明确移除本轮草稿照片 |
 | POST /api/rounds/:id/notes | 更新现场说明，已有结果失效 |
 | POST /api/rounds/:id/review | 人工改判、原因及审计 |
