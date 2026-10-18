@@ -8,7 +8,7 @@ import { TraceStore } from './trace-store.ts';
 export class DebugRuns{
   pipeline:LocalVisionPipeline;store:TraceStore;running=false;
   constructor(pipeline:LocalVisionPipeline,store:TraceStore){this.pipeline=pipeline;this.store=store;}
-  start(mode:'single'|'board4'|'board6',format:'prompt-json'|'json-schema',actor:string){
+  start(mode:'single'|'board4'|'board6',format:'prompt-json'|'json-schema',actor:string,inputLayout:'legacy'|'prefix-first'='prefix-first'){
     if(this.running)throw new Error('已有调试请求正在执行');
     const id=randomUUID(),ids=mode==='single'?['C01']:mode==='board4'?['C02','C03','C04','C06']:['C01','C02','C03','C04','C05','C06'];
     const reference=path.join(this.pipeline.root,'fixtures/inspection/green-mat-v1/reference-crop.png');
@@ -17,7 +17,7 @@ export class DebugRuns{
     void(async()=>{
       try{
         const raw=await this.pipeline.worker({action:'recognize',componentId:ids[0],componentIds:ids,reference,sample,description:'',instruction:'',model:this.pipeline.model,endpoint:this.pipeline.endpoint,template:this.pipeline.template,
-          timeoutSeconds:110,maxTokens:220+280*ids.length,traceDirectory:this.store.directory,traceId:id,requireIdle:true,
+          timeoutSeconds:110,maxTokens:220+280*ids.length,traceDirectory:this.store.directory,traceId:id,requireIdle:true,inputLayout,
           traceMetadata:{source:'debug-sample',label:`${ids.length}件白板调试（模拟图）`,actor},...(format==='json-schema'?{responseSchema:replyJsonSchema(ids)}:{})},120000) as {response:{choices:{finish_reason:string;message:{content:string}}[]}};
         const choice=raw.response?.choices?.[0];if(choice?.finish_reason!=='stop')throw new Error('生成未完整结束');
         try{parseBatchReply(choice.message.content,ids);await this.store.finish(id,true,'完整JSON、字段与元件ID集合校验通过；这是调试记录，不提交MES。');}

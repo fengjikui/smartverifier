@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { InspectionService, person } from '../server/service.ts';
-import { instructionPriorityWarnings, parsePairReply, RecognitionProblem } from '../server/vision/local-pipeline.ts';
+import { LocalVisionPipeline, instructionPriorityWarnings, parsePairReply, RecognitionProblem } from '../server/vision/local-pipeline.ts';
 import type { VisionPipeline } from '../server/vision/local-pipeline.ts';
 import type { ComponentResult, Photo, Round } from '../shared/types.ts';
 
@@ -17,6 +17,22 @@ test('真实模型响应只接受完整JSON或一层围栏；串号、漏项、�
   for(const response of [good.replace('c1','c2'),JSON.stringify({items:[]}),'<think>猜测</think>'+good,good.replace('0.9','1.9'),good.slice(0,-1),JSON.stringify([item])])assert.throws(()=>parsePairReply(response,'c1'));
   const override=parsePairReply(JSON.stringify({items:[{...item,verdict:'PASS',differences:[{category:'text',message:'允许型号变化',lineIndex:0,referenceText:'SV358',sampleText:'SV385'}]}],instructionConflicts:[]}),'c1');
   assert.equal(instructionPriorityWarnings('允许型号变体',override).length,1);assert.equal(override.instructionConflicts.length,0,'保留模型实际漏报，系统提示另存');assert.equal(instructionPriorityWarnings('',override).length,0);
+});
+
+test('正常识别默认发送固定前缀与实际Schema，兼容显式旧配置且不默默降级',async t=>{
+  const root=fileURLToPath(new URL('../../',import.meta.url)),directory=await mkdtemp(path.join(tmpdir(),'sv-order-contract-'));
+  const pipeline=new LocalVisionPipeline(root,directory),service=new InspectionService(directory,root,1,pipeline);
+  t.after(async()=>{service.closing=true;service.store.close();await rm(directory,{recursive:true,force:true});});
+  let view=service.open('REALVISION1');view=await service.addRealTrial(view.round!.id,view.round!.revision,person);
+  const photo=view.round!.photos[0],component:ComponentResult={id:'c1',label:'P001-01',index:0,bbox:[0,0,1,1],ai:null,aiHistory:[],review:null,reviewHistory:[],crop:{assetId:photo.file,url:photo.url,width:photo.width,height:photo.height,rotation:0,qualityReasons:[]}};
+  let request:Record<string,unknown>={};
+  pipeline.worker=async input=>{request=input;return {model:'fixture',elapsedMs:1,promptVersion:'test',response:{choices:[{finish_reason:'stop',message:{content:JSON.stringify({items:[item],instructionConflicts:[]})}}]}};};
+  await pipeline.recognize(view.round!,photo,component);
+  assert.equal(request.inputLayout,'prefix-first');assert.deepEqual((request.responseSchema as {properties:{items:{items:{properties:{componentId:{enum:string[]}}}}}}).properties.items.items.properties.componentId.enum,['c1']);
+  pipeline.inputLayout='legacy';pipeline.structured=false;await pipeline.recognize(view.round!,photo,component);
+  assert.equal(request.inputLayout,'legacy');assert.equal('responseSchema' in request,false);
+  pipeline.worker=async()=>{throw new RecognitionProblem('error','Schema请求失败');};
+  pipeline.structured=true;await assert.rejects(pipeline.recognize(view.round!,photo,component),/Schema请求失败/);
 });
 
 test('接入真实管线的业务状态：增量、质量、失败重试、说明重判、原判追溯及提交阻断',async t=>{

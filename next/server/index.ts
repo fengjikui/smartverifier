@@ -50,7 +50,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         const origin=req.headers.origin;
         if (origin && !['http://'+req.headers.host,'https://'+req.headers.host].includes(origin)) throw new ApiError(403,'请从本应用页面发起操作。');
       }
-      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1,modelDebug:debug});
+      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1,modelDebug:debug,...(vision instanceof LocalVisionPipeline?{visionConfiguration:{inputLayout:vision.inputLayout,outputFormat:vision.structured?'json-schema':'prompt-json'}}:{})});
       const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('sv_next_session='))?.slice('sv_next_session='.length);
       const session=token?service.store.db.prepare('SELECT person,expires FROM sessions WHERE token=?').get(token):null;
       if(pathname==='/api/session'&&req.method==='POST'){
@@ -70,8 +70,8 @@ export function startServer(options: { state?: string; port?: number; host?: str
           if(pathname==='/api/debug/samples'&&req.method==='POST'){
             if(!debugRuns)throw new ApiError(409,'此服务没有可调用的本机视觉模型。');
             if(service.worker||debugRuns.running)throw new ApiError(409,'当前有识别正在执行，请完成后再试，调试不会抢占检验任务。');
-            const input=z.object({mode:z.enum(['single','board4','board6']),format:z.enum(['prompt-json','json-schema'])}).strict().parse(await jsonBody(req));
-            return send(res,{id:debugRuns.start(input.mode,input.format,actor.id)},202);
+            const input=z.object({mode:z.enum(['single','board4','board6']),format:z.enum(['prompt-json','json-schema']),inputLayout:z.enum(['legacy','prefix-first']).default('prefix-first')}).strict().parse(await jsonBody(req));
+            return send(res,{id:debugRuns.start(input.mode,input.format,actor.id,input.inputLayout)},202);
           }
           const image=pathname.match(/^\/api\/debug\/traces\/([a-f0-9-]{36})\/images\/([0-9])\.png$/);
           if(image&&req.method==='GET')return await file(res,path.join(traces.folder(image[1]),'image-'+image[2]+'.png'),true);

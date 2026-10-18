@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { imageSchema, modelReplySchema } from './contracts.ts';
 import { validateReplyItems, validateSeparation } from './validation.ts';
 import { TraceStore } from './trace-store.ts';
+import { replyJsonSchema } from './reply-json-schema.ts';
 import type { AIJudgement, ComponentResult, Photo, Preparation, Round } from '../../shared/types.ts';
 
 const preparedSchema=z.object({version:z.string(),width:z.number().int().positive(),height:z.number().int().positive(),originalWidth:z.number().int().positive(),originalHeight:z.number().int().positive(),originalToUpright:z.array(z.number()).length(9),upright:imageSchema,annotated:imageSchema,sheet:imageSchema,
@@ -25,13 +26,15 @@ export class RecognitionProblem extends Error { kind:'quality'|'error'; construc
 
 /** 单个工作队列串行调用；所有图片均来自本系统文件区，不接收任意路径或远程图。 */
 export class LocalVisionPipeline implements VisionPipeline {
-  root:string;directory:string;python:string;model:string;endpoint:string;template:string;traceDirectory?:string;
+  root:string;directory:string;python:string;model:string;endpoint:string;template:string;traceDirectory?:string;inputLayout:'legacy'|'prefix-first';structured:boolean;
   children=new Set<ChildProcess>();
-  constructor(root:string,directory:string,options:{python?:string;model?:string;endpoint?:string;template?:string;traceDirectory?:string}={}){
+  constructor(root:string,directory:string,options:{python?:string;model?:string;endpoint?:string;template?:string;traceDirectory?:string;inputLayout?:'legacy'|'prefix-first';structured?:boolean}={}){
     this.root=root;this.directory=directory;this.python=options.python??process.env.SV_VISION_PYTHON??path.join(root,'agent-tools/image-focus/.venv/bin/python');
     this.model=options.model??process.env.SV_LM_MODEL??'hr-qwen';this.endpoint=options.endpoint??process.env.SV_LM_ENDPOINT??'http://127.0.0.1:1234/v1';
     this.template=options.template??process.env.SV_LM_TEMPLATE??path.join(os.homedir(),'.lmstudio/models/lmstudio-community/Qwen3.8-27B-MLX-4bit/chat_template.jinja');
     this.traceDirectory=options.traceDirectory;
+    this.inputLayout=z.enum(['legacy','prefix-first']).parse(options.inputLayout??process.env.SV_VISION_INPUT_LAYOUT??'prefix-first');
+    this.structured=options.structured??process.env.SV_VISION_SCHEMA!=='0';
     const url=new URL(this.endpoint);if(url.protocol!=='http:'||!['localhost','127.0.0.1'].includes(url.hostname)||url.username||url.password)throw new Error('本机识别只允许回环 LM Studio 地址。');
   }
   async worker(request:Record<string,unknown>,timeout:number):Promise<unknown>{
@@ -77,6 +80,7 @@ export class LocalVisionPipeline implements VisionPipeline {
     const traceId=randomUUID(),traces=this.traceDirectory?new TraceStore(this.traceDirectory):null;
     let raw;
     try{raw=await this.worker({action:'recognize',componentId:c.id,reference:this.reference(round),sample:this.filename(c.crop.assetId),description:round.standard.description,instruction:round.instruction,endpoint:this.endpoint,model:this.model,template:this.template,
+      inputLayout:this.inputLayout,...(this.structured?{responseSchema:replyJsonSchema([c.id])}:{}),
       ...(traces?{traceDirectory:this.traceDirectory,traceId,traceMetadata:{taskId:round.taskId,roundId:round.id,photoId:photo.id,label:round.taskId+' · '+c.label,sourceHash:photo.hash,standardVersion:round.standard.version,instructionVersion:round.instructionVersion}}:{})},65000) as {response:{choices:{finish_reason:string;message:{content:string}}[]};elapsedMs:number;model:string;promptVersion:string};}
     catch(error){if(traces)await traces.failure(traceId,(error as Error).message,{source:'inspection',model:this.model,componentIds:[c.id],taskId:round.taskId});throw error;}
     const record=await this.record('recognition',{taskId:round.taskId,roundId:round.id,photoId:photo.id,sourceHash:photo.hash,componentId:c.id,standardId:round.standard.id,standardVersion:round.standard.version,standardDescription:round.standard.description,instructionVersion:round.instructionVersion,onsiteInstruction:round.instruction,...raw});

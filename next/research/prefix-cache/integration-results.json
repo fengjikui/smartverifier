@@ -1,0 +1,564 @@
+{
+  "experiment": "EXP-008",
+  "syntheticOnly": true,
+  "submittedToMes": false,
+  "profile": {
+    "inputLayout": "prefix-first",
+    "schema": true
+  },
+  "summary": {
+    "total": 2,
+    "completed": 2,
+    "pass": 1,
+    "fail": 1,
+    "lowConfidence": 0,
+    "modified": 0,
+    "pendingPhotos": 0,
+    "qualityPhotos": 0,
+    "failedPhotos": 0,
+    "canSubmit": true,
+    "verdict": "FAIL"
+  },
+  "baseline": [
+    {
+      "id": "16bd58c4-4099-4972-b0f6-b67458090878",
+      "label": "P001-01",
+      "ai": {
+        "verdict": "PASS",
+        "lines": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "confidence": 1,
+        "reason": "待检元件丝印三行文字“SV358”、“A26”、“0147”与正品参照图完全一致，字符顺序及内容无误。封装形式、引脚数量（8脚）以及左下角的圆形凹点标记位置均与正品相符，未见明显差异。",
+        "instructionVersion": 1,
+        "source": "lmstudio",
+        "model": "hr-qwen",
+        "elapsedMs": 11837,
+        "promptVersion": "silkscreen-prefix-first-v1",
+        "rawRecord": "ea6a88f4-2f00-4490-8dec-160eaed9dbf2.json",
+        "features": [
+          "SOP-8封装",
+          "黑色方形塑封体",
+          "左下角有圆形凹点标记",
+          "银色引脚"
+        ],
+        "differences": [],
+        "instructionConflicts": [],
+        "instructionWarnings": []
+      }
+    },
+    {
+      "id": "0c5057d7-561f-493f-9e7a-b6137f8d0d94",
+      "label": "P001-02",
+      "ai": {
+        "verdict": "FAIL",
+        "lines": [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        "confidence": 0.95,
+        "reason": "待检品第一行丝印型号为SV385，与正品标准SV358不符（数字5和8不同），判定为FAIL。",
+        "instructionVersion": 1,
+        "source": "lmstudio",
+        "model": "hr-qwen",
+        "elapsedMs": 12773,
+        "promptVersion": "silkscreen-prefix-first-v1",
+        "rawRecord": "3f282c14-a161-4fdd-b446-ba94bdca2cf8.json",
+        "features": [
+          "黑色方形封装",
+          "8引脚SOIC-8",
+          "左下角有圆形凹点标记"
+        ],
+        "differences": [
+          {
+            "category": "text",
+            "message": "第一行型号不一致，正品为SV358，待检品为SV385",
+            "lineIndex": 0,
+            "referenceText": "SV358",
+            "sampleText": "SV385"
+          }
+        ],
+        "instructionConflicts": [],
+        "instructionWarnings": []
+      }
+    }
+  ],
+  "onsiteInstruction": "本次允许第一行SV385作为SV358的可接受变体；其余丝印、标志和封装仍须一致。",
+  "override": {
+    "verdict": "PASS",
+    "lines": [
+      "SV385",
+      "A26",
+      "0147"
+    ],
+    "confidence": 0.95,
+    "reason": "待检元件第一行丝印为SV385，与正品参照SV358不一致；但现场说明明确允许第一行SV385作为SV358的可接受变体。第二、三行丝印A26和0147与正品一致，封装形状及引脚1标记位置也一致。",
+    "instructionVersion": 2,
+    "source": "lmstudio",
+    "model": "hr-qwen",
+    "elapsedMs": 14714,
+    "promptVersion": "silkscreen-prefix-first-v1",
+    "rawRecord": "e57e3c97-4bb1-4cee-9b75-eb6fb18d5390.json",
+    "features": [
+      "黑色方形SOP-8封装",
+      "左下角有圆形引脚1标记",
+      "三行居中丝印"
+    ],
+    "differences": [
+      {
+        "category": "text",
+        "message": "第一行型号字符不同，待检为SV385，正品参照为SV358；依据现场说明该差异作为可接受变体处理。",
+        "lineIndex": 0,
+        "referenceText": "SV358",
+        "sampleText": "SV385"
+      }
+    ],
+    "instructionConflicts": [],
+    "instructionWarnings": [
+      "系统提示（非模型原文）：存在可见差异但结论为合格，且本次设置了优先现场说明。请核对现场说明与正品标准的关系；本次已按现场说明执行。"
+    ]
+  },
+  "resources": [
+    {
+      "availableGiB": 18.02,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 11.2,
+      "load": [
+        3.75390625,
+        3.2861328125,
+        2.69384765625
+      ]
+    },
+    {
+      "availableGiB": 17.73,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 7,
+      "load": [
+        3.75390625,
+        3.2861328125,
+        2.69384765625
+      ]
+    },
+    {
+      "availableGiB": 18.62,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 5.9,
+      "load": [
+        3.693359375,
+        3.28125,
+        2.6953125
+      ]
+    },
+    {
+      "availableGiB": 18.44,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 9.4,
+      "load": [
+        3.693359375,
+        3.28125,
+        2.6953125
+      ]
+    },
+    {
+      "availableGiB": 18.15,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 9.4,
+      "load": [
+        3.6376953125,
+        3.2763671875,
+        2.69677734375
+      ]
+    },
+    {
+      "availableGiB": 17.38,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 0,
+      "load": [
+        3.50634765625,
+        3.2548828125,
+        2.6923828125
+      ]
+    },
+    {
+      "availableGiB": 16.73,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 10.3,
+      "load": [
+        3.50634765625,
+        3.2548828125,
+        2.6923828125
+      ]
+    },
+    {
+      "availableGiB": 18.16,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 9.7,
+      "load": [
+        3.46533203125,
+        3.25048828125,
+        2.69384765625
+      ]
+    },
+    {
+      "availableGiB": 17.74,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 10.4,
+      "load": [
+        3.46533203125,
+        3.25048828125,
+        2.69384765625
+      ]
+    },
+    {
+      "availableGiB": 18.5,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 16.4,
+      "load": [
+        3.34765625,
+        3.2294921875,
+        2.689453125
+      ]
+    },
+    {
+      "availableGiB": 17.09,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 10.2,
+      "load": [
+        3.6396484375,
+        3.2919921875,
+        2.71435546875
+      ]
+    },
+    {
+      "availableGiB": 17.93,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 0,
+      "load": [
+        3.6396484375,
+        3.2919921875,
+        2.71435546875
+      ]
+    },
+    {
+      "availableGiB": 17.77,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 14.6,
+      "load": [
+        3.58837890625,
+        3.287109375,
+        2.7158203125
+      ]
+    },
+    {
+      "availableGiB": 17.9,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 14.2,
+      "load": [
+        3.58837890625,
+        3.287109375,
+        2.7158203125
+      ]
+    }
+  ],
+  "rawRecognition": [
+    {
+      "kind": "recognition",
+      "at": "2026-10-18T03:58:51.558Z",
+      "data": {
+        "taskId": "REALVISION2",
+        "roundId": "c2b9d4a8-3c72-43aa-a067-cf721f5d85b5",
+        "photoId": "2d91a445-34a2-45ae-bd04-82792b959598",
+        "sourceHash": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+        "componentId": "16bd58c4-4099-4972-b0f6-b67458090878",
+        "standardId": "STD-SYN-GREEN-1",
+        "standardVersion": 1,
+        "standardDescription": "严格核对各行丝印字符与顺序、标志和封装特征。允许正常拍照光照及角度差异。虚构样本只验证技术链路，不能据此认定真伪。",
+        "instructionVersion": 1,
+        "onsiteInstruction": "",
+        "response": {
+          "choices": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"instructionConflicts\": [], \"items\": [{\"componentId\": \"16bd58c4-4099-4972-b0f6-b67458090878\", \"confidence\": 1.0, \"differences\": [], \"features\": [\"SOP-8封装\", \"黑色方形塑封体\", \"左下角有圆形凹点标记\", \"银色引脚\"], \"lines\": [\"SV358\", \"A26\", \"0147\"], \"reason\": \"待检元件丝印三行文字“SV358”、“A26”、“0147”与正品参照图完全一致，字符顺序及内容无误。封装形式、引脚数量（8脚）以及左下角的圆形凹点标记位置均与正品相符，未见明显差异。\", \"status\": \"decided\", \"verdict\": \"PASS\"}]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 489,
+            "completion_tokens": 195,
+            "reasoning_tokens": 0
+          },
+          "lmstudio": {
+            "stats": {
+              "stopReason": "eosFound",
+              "tokensPerSecond": 30.88169842104546,
+              "numGpuLayers": -1,
+              "timeToFirstTokenSec": 5.298,
+              "promptTokensCount": 489,
+              "predictedTokensCount": 195,
+              "totalTokensCount": 684
+            },
+            "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+            "enable_thinking": false
+          }
+        },
+        "elapsedMs": 11837,
+        "model": "hr-qwen",
+        "promptVersion": "silkscreen-prefix-first-v1",
+        "inputLayout": "prefix-first",
+        "outputFormat": "json-schema",
+        "inputMetrics": [
+          {
+            "inputIndex": 0,
+            "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+            "sentWidth": 431,
+            "sentHeight": 419,
+            "encodedBytes": 335565,
+            "effectiveWidth": null,
+            "effectiveHeight": null
+          },
+          {
+            "inputIndex": 1,
+            "sha256": "cf53ffd1f59143c023b044e5d2323f34e07a5d9d235c62e9bf90f36db829b8c0",
+            "sentWidth": 448,
+            "sentHeight": 537,
+            "encodedBytes": 475643,
+            "effectiveWidth": null,
+            "effectiveHeight": null
+          }
+        ],
+        "traceId": "d81f8ced-621f-4999-92e3-b6288676404f",
+        "resourcesBefore": {
+          "availableGiB": 19.25,
+          "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+          "cpuThreads": 2,
+          "cpuPercent": 10.9,
+          "load": [
+            3.75390625,
+            3.2861328125,
+            2.69384765625
+          ]
+        },
+        "resourcesAfter": {
+          "availableGiB": 17.6,
+          "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+          "cpuThreads": 2,
+          "cpuPercent": 10.1,
+          "load": [
+            3.6376953125,
+            3.2763671875,
+            2.69677734375
+          ]
+        },
+        "workerPeakRssMiB": 61.14
+      }
+    },
+    {
+      "kind": "recognition",
+      "at": "2026-10-18T03:59:04.843Z",
+      "data": {
+        "taskId": "REALVISION2",
+        "roundId": "c2b9d4a8-3c72-43aa-a067-cf721f5d85b5",
+        "photoId": "2d91a445-34a2-45ae-bd04-82792b959598",
+        "sourceHash": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+        "componentId": "0c5057d7-561f-493f-9e7a-b6137f8d0d94",
+        "standardId": "STD-SYN-GREEN-1",
+        "standardVersion": 1,
+        "standardDescription": "严格核对各行丝印字符与顺序、标志和封装特征。允许正常拍照光照及角度差异。虚构样本只验证技术链路，不能据此认定真伪。",
+        "instructionVersion": 1,
+        "onsiteInstruction": "",
+        "response": {
+          "choices": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"instructionConflicts\": [], \"items\": [{\"componentId\": \"0c5057d7-561f-493f-9e7a-b6137f8d0d94\", \"confidence\": 0.95, \"differences\": [{\"category\": \"text\", \"lineIndex\": 0, \"message\": \"第一行型号不一致，正品为SV358，待检品为SV385\", \"referenceText\": \"SV358\", \"sampleText\": \"SV385\"}], \"features\": [\"黑色方形封装\", \"8引脚SOIC-8\", \"左下角有圆形凹点标记\"], \"lines\": [\"SV385\", \"A26\", \"0147\"], \"reason\": \"待检品第一行丝印型号为SV385，与正品标准SV358不符（数字5和8不同），判定为FAIL。\", \"status\": \"decided\", \"verdict\": \"FAIL\"}]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 491,
+            "completion_tokens": 220,
+            "reasoning_tokens": 0
+          },
+          "lmstudio": {
+            "stats": {
+              "stopReason": "eosFound",
+              "tokensPerSecond": 30.861451112832462,
+              "numGpuLayers": -1,
+              "timeToFirstTokenSec": 5.451,
+              "promptTokensCount": 491,
+              "predictedTokensCount": 220,
+              "totalTokensCount": 711
+            },
+            "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+            "enable_thinking": false
+          }
+        },
+        "elapsedMs": 12773,
+        "model": "hr-qwen",
+        "promptVersion": "silkscreen-prefix-first-v1",
+        "inputLayout": "prefix-first",
+        "outputFormat": "json-schema",
+        "inputMetrics": [
+          {
+            "inputIndex": 0,
+            "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+            "sentWidth": 431,
+            "sentHeight": 419,
+            "encodedBytes": 335565,
+            "effectiveWidth": null,
+            "effectiveHeight": null
+          },
+          {
+            "inputIndex": 1,
+            "sha256": "26bdb05242fe26efa36c9257b35914f30a8ede8759b74d810b26b0c778b8ce64",
+            "sentWidth": 481,
+            "sentHeight": 541,
+            "encodedBytes": 451037,
+            "effectiveWidth": null,
+            "effectiveHeight": null
+          }
+        ],
+        "traceId": "33d9da5f-f62b-40b6-b125-337fe68922fd",
+        "resourcesBefore": {
+          "availableGiB": 18.14,
+          "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+          "cpuThreads": 2,
+          "cpuPercent": 7.5,
+          "load": [
+            3.6376953125,
+            3.2763671875,
+            2.69677734375
+          ]
+        },
+        "resourcesAfter": {
+          "availableGiB": 18.17,
+          "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+          "cpuThreads": 2,
+          "cpuPercent": 7,
+          "load": [
+            3.34765625,
+            3.2294921875,
+            2.689453125
+          ]
+        },
+        "workerPeakRssMiB": 63.78
+      }
+    },
+    {
+      "kind": "recognition",
+      "at": "2026-10-18T03:59:20.086Z",
+      "data": {
+        "taskId": "REALVISION2",
+        "roundId": "c2b9d4a8-3c72-43aa-a067-cf721f5d85b5",
+        "photoId": "2d91a445-34a2-45ae-bd04-82792b959598",
+        "sourceHash": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+        "componentId": "0c5057d7-561f-493f-9e7a-b6137f8d0d94",
+        "standardId": "STD-SYN-GREEN-1",
+        "standardVersion": 1,
+        "standardDescription": "严格核对各行丝印字符与顺序、标志和封装特征。允许正常拍照光照及角度差异。虚构样本只验证技术链路，不能据此认定真伪。",
+        "instructionVersion": 2,
+        "onsiteInstruction": "本次允许第一行SV385作为SV358的可接受变体；其余丝印、标志和封装仍须一致。",
+        "response": {
+          "choices": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"instructionConflicts\": [], \"items\": [{\"componentId\": \"0c5057d7-561f-493f-9e7a-b6137f8d0d94\", \"confidence\": 0.95, \"differences\": [{\"category\": \"text\", \"lineIndex\": 0, \"message\": \"第一行型号字符不同，待检为SV385，正品参照为SV358；依据现场说明该差异作为可接受变体处理。\", \"referenceText\": \"SV358\", \"sampleText\": \"SV385\"}], \"features\": [\"黑色方形SOP-8封装\", \"左下角有圆形引脚1标记\", \"三行居中丝印\"], \"lines\": [\"SV385\", \"A26\", \"0147\"], \"reason\": \"待检元件第一行丝印为SV385，与正品参照SV358不一致；但现场说明明确允许第一行SV385作为SV358的可接受变体。第二、三行丝印A26和0147与正品一致，封装形状及引脚1标记位置也一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 519,
+            "completion_tokens": 275,
+            "reasoning_tokens": 0
+          },
+          "lmstudio": {
+            "stats": {
+              "stopReason": "eosFound",
+              "tokensPerSecond": 30.950135974487267,
+              "numGpuLayers": -1,
+              "timeToFirstTokenSec": 5.641,
+              "promptTokensCount": 519,
+              "predictedTokensCount": 275,
+              "totalTokensCount": 794
+            },
+            "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+            "enable_thinking": false
+          }
+        },
+        "elapsedMs": 14714,
+        "model": "hr-qwen",
+        "promptVersion": "silkscreen-prefix-first-v1",
+        "inputLayout": "prefix-first",
+        "outputFormat": "json-schema",
+        "inputMetrics": [
+          {
+            "inputIndex": 0,
+            "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+            "sentWidth": 431,
+            "sentHeight": 419,
+            "encodedBytes": 335565,
+            "effectiveWidth": null,
+            "effectiveHeight": null
+          },
+          {
+            "inputIndex": 1,
+            "sha256": "26bdb05242fe26efa36c9257b35914f30a8ede8759b74d810b26b0c778b8ce64",
+            "sentWidth": 481,
+            "sentHeight": 541,
+            "encodedBytes": 451037,
+            "effectiveWidth": null,
+            "effectiveHeight": null
+          }
+        ],
+        "traceId": "a9248fd9-bbf4-4be6-a26f-d7fa0c6b77c0",
+        "resourcesBefore": {
+          "availableGiB": 18.59,
+          "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+          "cpuThreads": 2,
+          "cpuPercent": 8.3,
+          "load": [
+            3.34765625,
+            3.2294921875,
+            2.689453125
+          ]
+        },
+        "resourcesAfter": {
+          "availableGiB": 17.86,
+          "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+          "cpuThreads": 2,
+          "cpuPercent": 10.6,
+          "load": [
+            4.181640625,
+            3.4150390625,
+            2.76416015625
+          ]
+        },
+        "workerPeakRssMiB": 61.48
+      }
+    }
+  ]
+}

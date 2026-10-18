@@ -1,0 +1,33 @@
+{
+  "runtimeVersion": "1.11.0",
+  "engineCommit": "ec2f585",
+  "vendorPackage": "app-mlx-generate-mac14-arm64@34",
+  "modelType": "qwen3_5",
+  "attentionTypes": [
+    "full_attention",
+    "linear_attention"
+  ],
+  "sourceFiles": [
+    {
+      "relativePath": "batch_generator.py",
+      "sha256": "32694762164d75e585e5b816502cf17ff0d2651126f4658c64ebe8bd1db57cce"
+    },
+    {
+      "relativePath": "prompt_cache/coordinator.py",
+      "sha256": "6796115d9286e864c3a3adee51fe66651b2df4b90218d28693c50c7d8cf36fae"
+    },
+    {
+      "relativePath": "prompt_cache/restore_planner.py",
+      "sha256": "d800fc97de010be75133442fd3423496767b2a7f75871d5bd392fee917ad268d"
+    },
+    {
+      "relativePath": "prompt_cache/chunks.py",
+      "sha256": "797b4f35466144625899c02e8ffcb3c42bcf8a1288fb7d45a19b5c5090c57198"
+    },
+    {
+      "relativePath": "prompt_cache/image_spans.py",
+      "sha256": "25eaa7254ad641171eafd014363e70f2f7e004ea587be3af965b51dab3e5f611"
+    }
+  ],
+  "interpretation": "本机已安装源码表明：分块图片哈希参与缓存匹配，ArraysCache需精确检查点；仅提供零命中的机制解释候选，没有修改运行时或证明唯一根因。"
+}
