@@ -37,9 +37,9 @@ export function startServer(options: { state?: string; port?: number; host?: str
   const state=path.resolve(options.state ?? process.env.SV_NEXT_STATE_DIR ?? path.join(root,'outputs/next-state'));
   const staticDir=path.join(root,'outputs/next-web/dist');
   const debug=options.debug??process.env.SV_MODEL_DEBUG==='1',traces=new TraceStore(path.join(state,'vision-traces'));
-  const vision=options.vision??((options.real??process.env.SV_NEXT_RECOGNIZER==='lmstudio')?new LocalVisionPipeline(root,state,debug?{traceDirectory:traces.directory}:{}):undefined);
+  const vision=options.vision??((options.real??['vlm','lmstudio'].includes(process.env.SV_NEXT_RECOGNIZER??''))?new LocalVisionPipeline(root,state,debug?{traceDirectory:traces.directory}:{}):undefined);
   const debugRuns=debug&&vision instanceof LocalVisionPipeline?new DebugRuns(vision,traces):undefined;
-  const recognition=vision?{mode:'lmstudio' as const,model:vision.model}:{mode:'mock' as const};
+  const recognition=vision?{mode:'vlm' as const,model:vision.model,...(vision instanceof LocalVisionPipeline?{provider:vision.provider}:{})}:{mode:'mock' as const};
   const service=new InspectionService(state,root,options.delay ?? Number(process.env.SV_NEXT_MOCK_DELAY_MS ?? 1200),vision);
   let uploads=0;
   const server=http.createServer(async(req,res)=>{
@@ -68,7 +68,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
           if(!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress??''))throw new ApiError(403,'模型调试只允许在服务器本机查看。');
           if(pathname==='/api/debug/traces'&&req.method==='GET')return send(res,{traces:await traces.list(),running:debugRuns?.running??false});
           if(pathname==='/api/debug/samples'&&req.method==='POST'){
-            if(!debugRuns)throw new ApiError(409,'此服务没有可调用的本机视觉模型。');
+            if(!debugRuns)throw new ApiError(409,'此服务没有配置可调用的VLM。');
             if(service.worker||debugRuns.running)throw new ApiError(409,'当前有识别正在执行，请完成后再试，调试不会抢占检验任务。');
             const input=z.object({mode:z.enum(['single','board4','board6']),format:z.enum(['prompt-json','json-schema']),inputLayout:z.enum(['legacy','prefix-first']).default('prefix-first')}).strict().parse(await jsonBody(req));
             return send(res,{id:debugRuns.start(input.mode,input.format,actor.id,input.inputLayout)},202);
@@ -142,7 +142,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
   server.requestTimeout=120000;server.headersTimeout=15000;
   server.listen(options.port ?? Number(process.env.SV_NEXT_PORT??5190),options.host??process.env.SV_NEXT_HOST??'0.0.0.0',()=>{
     const addr=server.address();if(!addr||typeof addr==='string')return;
-    console.log(`新版平板工作台（${vision?'LM Studio真实识别，MES模拟':'本地模拟'}）：http://127.0.0.1:${addr.port}`);
+    console.log(`新版平板工作台（${vision?'VLM真实识别，MES模拟':'本地模拟'}）：http://127.0.0.1:${addr.port}`);
     for(const entries of Object.values(os.networkInterfaces()))for(const entry of entries??[])if(entry.family==='IPv4'&&!entry.internal&&/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(entry.address))console.log(`局域网试用：http://${entry.address}:${addr.port}`);
   });
   return {server,service};

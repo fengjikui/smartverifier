@@ -3,7 +3,7 @@ import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { Store } from './store.ts';
-import { assertMutable, finalVerdict, summarize } from '../shared/domain.ts';
+import { assertMutable, finalVerdict, summarize, isVlmJudgement } from '../shared/domain.ts';
 import type { ComponentResult, Person, Photo, Round, SampleKind, Standard, Task, TaskListItem, TaskView, Verdict } from '../shared/types.ts';
 import { sampleBox, sampleCount, sampleFails, sampleLowConfidence, twentyFailures, twentySample } from '../shared/sample-presets.ts';
 import { RecognitionProblem } from './vision/local-pipeline.ts';
@@ -227,8 +227,8 @@ export class InspectionService {
     this.store.transaction(() => { this.store.db.prepare('INSERT OR IGNORE INTO receipts VALUES(?,?)').run(transfer.key, JSON.stringify({ receipt, roundId: id, verdict: summarize(r).verdict, badCount: summarize(r).fail })); this.store.saveRound(r); this.store.saveTask(t); this.store.audit(r, r.submittedBy!, 'mes.mock.saved', { key: transfer.key, receipt }); });
   }
   report(r: Round): string {
-    const real=r.photos.some(p=>p.components.some(c=>c.ai?.source==='lmstudio'));
-    const s = summarize(r), lines = [real?'# 丝印检测报告（本机真实识别）':'# 丝印检测报告（本地模拟）', '', real?'> 结果来源按元件标明，可能同时包含真实模型与内置预设。身份及MES仍为本地模拟，未接通公司系统。带“模拟拍摄”名称的照片由图像生成模型生成，不用于评估现场准确率。':'> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- 检验单号：${r.taskId}`, `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (r.submittedBy ? `${r.submittedBy.name} ${r.submittedBy.id}` : '尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', real?'现场说明已随真实双图一起发送给模型；内置预设不执行自然语言要求。':'说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
+    const real=r.photos.some(p=>p.components.some(c=>isVlmJudgement(c.ai)));
+    const s = summarize(r), lines = [real?'# 丝印检测报告（VLM真实识别）':'# 丝印检测报告（本地模拟）', '', real?'> 结果来源按元件标明，可能同时包含真实模型与内置预设。身份及MES仍为本地模拟，未接通公司系统。带“模拟拍摄”名称的照片由图像生成模型生成，不用于评估现场准确率。':'> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- 检验单号：${r.taskId}`, `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (r.submittedBy ? `${r.submittedBy.name} ${r.submittedBy.id}` : '尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', real?'现场说明已随真实双图一起发送给模型；内置预设不执行自然语言要求。':'说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
     const conflicts=[...new Set(r.photos.flatMap(p=>p.components.flatMap(c=>[...(c.ai?.instructionConflicts??[]),...(c.ai?.instructionWarnings??[])])))];
     if(conflicts.length)lines.splice(4,0,'## 重要：现场说明优先及与标准的关系','本次按现场检验人员指示进行检测。',...conflicts.map(escapeMarkdown),'');
     for (const p of r.photos) {
@@ -238,9 +238,9 @@ export class InspectionService {
         lines.push(`### ${c.label} · ${finalVerdict(c) === 'PASS' ? '合格' : finalVerdict(c) === 'FAIL' ? '不合格' : '未完成'}`, '', '| 行 | 实拍识别原文 | 正品原文 |', '| --- | --- | --- |');
         for (let i = 0; i < Math.max(c.ai?.lines.length ?? 0, r.standard.lines.length); i++) lines.push(`| ${i+1} | ${escapeMarkdown(c.ai?.lines[i] ?? '')} | ${escapeMarkdown(r.standard.lines[i] ?? '')} |`);
         lines.push('', escapeMarkdown(c.ai?.reason ?? p.message));
-        lines.push('结果来源：'+(c.ai?.source==='lmstudio'?'本机 LM Studio 真实识别':c.ai?'内置预设（非模型识别）':'尚未生成结论'));
+        lines.push('结果来源：'+(isVlmJudgement(c.ai)?'VLM真实识别':c.ai?'内置预设（非模型识别）':'尚未生成结论'));
         if(c.crop)lines.push(`![元件裁片 ${c.label}](${c.crop.url})`);
-        if(c.ai?.source==='lmstudio')lines.push(`模型：${escapeMarkdown(c.ai.model??'')}；${c.ai.elapsedMs} ms；判断把握：${c.ai.confidence}（模型自评，非校准概率）；提示词：${c.ai.promptVersion}；原始响应记录：${c.ai.rawRecord}`,...(c.ai.features??[]).map(f=>'外观：'+escapeMarkdown(f)),...(c.ai.differences??[]).map(d=>'差异：'+escapeMarkdown(d.message)));
+        if(isVlmJudgement(c.ai))lines.push(`模型：${escapeMarkdown(c.ai.model??'')}；${c.ai.elapsedMs} ms；判断把握：${c.ai.confidence}（模型自评，非校准概率）；提示词：${c.ai.promptVersion}；原始响应记录：${c.ai.rawRecord}`,...(c.ai.features??[]).map(f=>'外观：'+escapeMarkdown(f)),...(c.ai.differences??[]).map(d=>'差异：'+escapeMarkdown(d.message)));
         if (c.review) lines.push(`人工修正：${c.review.person.name} ${c.review.person.id}，${c.review.at}，原因：${escapeMarkdown(c.review.reason)}。AI原判${c.ai?.verdict}保留。`);
       }
     }

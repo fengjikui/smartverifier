@@ -3,12 +3,13 @@ import type { ChildProcess } from 'node:child_process';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
-import os from 'node:os';
 import { z } from 'zod';
 import { imageSchema, modelReplySchema } from './contracts.ts';
 import { validateReplyItems, validateSeparation } from './validation.ts';
 import { TraceStore } from './trace-store.ts';
 import { replyJsonSchema } from './reply-json-schema.ts';
+import { vlmConfig } from './vlm-config.ts';
+import type { VlmOptions, VlmProvider } from './vlm-config.ts';
 import type { AIJudgement, ComponentResult, Photo, Preparation, Round } from '../../shared/types.ts';
 
 const preparedSchema=z.object({version:z.string(),width:z.number().int().positive(),height:z.number().int().positive(),originalWidth:z.number().int().positive(),originalHeight:z.number().int().positive(),originalToUpright:z.array(z.number()).length(9),upright:imageSchema,annotated:imageSchema,sheet:imageSchema,
@@ -26,20 +27,19 @@ export class RecognitionProblem extends Error { kind:'quality'|'error'; construc
 
 /** 单个工作队列串行调用；所有图片均来自本系统文件区，不接收任意路径或远程图。 */
 export class LocalVisionPipeline implements VisionPipeline {
-  root:string;directory:string;python:string;model:string;endpoint:string;template:string;traceDirectory?:string;inputLayout:'legacy'|'prefix-first';structured:boolean;
+  root:string;directory:string;python:string;model:string;endpoint:string;template:string;provider:VlmProvider;apiKey:string;caFile:string;extraBody:Record<string,unknown>;timeoutSeconds:number;traceDirectory?:string;inputLayout:'legacy'|'prefix-first';structured:boolean;
   children=new Set<ChildProcess>();
-  constructor(root:string,directory:string,options:{python?:string;model?:string;endpoint?:string;template?:string;traceDirectory?:string;inputLayout?:'legacy'|'prefix-first';structured?:boolean}={}){
+  constructor(root:string,directory:string,options:VlmOptions&{python?:string;traceDirectory?:string;inputLayout?:'legacy'|'prefix-first';structured?:boolean}={}){
     this.root=root;this.directory=directory;this.python=options.python??process.env.SV_VISION_PYTHON??path.join(root,'agent-tools/image-focus/.venv/bin/python');
-    this.model=options.model??process.env.SV_LM_MODEL??'hr-qwen';this.endpoint=options.endpoint??process.env.SV_LM_ENDPOINT??'http://127.0.0.1:1234/v1';
-    this.template=options.template??process.env.SV_LM_TEMPLATE??path.join(os.homedir(),'.lmstudio/models/lmstudio-community/Qwen3.8-27B-MLX-4bit/chat_template.jinja');
+    const config=vlmConfig(options);this.model=config.model;this.endpoint=config.endpoint;this.template=config.template;
+    this.provider=config.provider;this.apiKey=config.apiKey;this.caFile=config.caFile;this.extraBody=config.extraBody;this.timeoutSeconds=config.timeoutSeconds;
     this.traceDirectory=options.traceDirectory;
     this.inputLayout=z.enum(['legacy','prefix-first']).parse(options.inputLayout??process.env.SV_VISION_INPUT_LAYOUT??'prefix-first');
     this.structured=options.structured??process.env.SV_VISION_SCHEMA!=='0';
-    const url=new URL(this.endpoint);if(url.protocol!=='http:'||!['localhost','127.0.0.1'].includes(url.hostname)||url.username||url.password)throw new Error('本机识别只允许回环 LM Studio 地址。');
   }
   async worker(request:Record<string,unknown>,timeout:number):Promise<unknown>{
     return await new Promise((resolve,reject)=>{
-      const child=spawn(this.python,[path.join(this.root,'next/server/vision/local_worker.py')],{stdio:['pipe','pipe','pipe'],env:{...process.env,OMP_NUM_THREADS:'2',OPENBLAS_NUM_THREADS:'2'}});
+      const child=spawn(this.python,[path.join(this.root,'next/server/vision/local_worker.py')],{stdio:['pipe','pipe','pipe'],env:{...process.env,OMP_NUM_THREADS:'2',OPENBLAS_NUM_THREADS:'2',SV_VLM_API_KEY:this.apiKey,SV_VLM_CA_FILE:this.caFile}});
       this.children.add(child);child.once('close',()=>this.children.delete(child));
       let out='',err='',settled=false;
       const fail=(error:Error)=>{if(settled)return;settled=true;clearTimeout(timer);reject(error);};
@@ -48,7 +48,7 @@ export class LocalVisionPipeline implements VisionPipeline {
       child.stdout.on('data',b=>{out+=b.toString();if(out.length>5*1024*1024){child.kill();fail(new Error('模型响应超出长度限制。'));}});
       child.stderr.on('data',b=>{err=(err+b.toString()).slice(-4000);});
       child.stdin.on('error',()=>{});
-      child.on('close',code=>{if(settled)return;clearTimeout(timer);try{const data=JSON.parse(out);if(code!==0||data.error){console.error('本机视觉处理失败',data.error??err);if(request.action==='separate'&&data.type==='ValueError')throw new RecognitionProblem('quality',data.error);throw new RecognitionProblem('error',String(data.error).startsWith('RESOURCE_PRESSURE:')?String(data.error).slice(18):data.type==='TimeoutError'?'模型本次未在55秒内完成，请重试或改用更小的模型。':'本机图像处理或模型调用失败，请检查 LM Studio 已加载模型与部署配置后重试。');}settled=true;resolve(data);}catch(e){fail(e instanceof RecognitionProblem?e:new RecognitionProblem('error','本机视觉服务未返回有效结果，请检查服务后重试。'));}});
+      child.on('close',code=>{if(settled)return;clearTimeout(timer);try{const data=JSON.parse(out);if(code!==0||data.error){console.error('VLM或图像处理失败',data.error??err);if(request.action==='separate'&&data.type==='ValueError')throw new RecognitionProblem('quality',data.error);throw new RecognitionProblem('error',String(data.error).startsWith('RESOURCE_PRESSURE:')?String(data.error).slice(18):data.type==='TimeoutError'?`VLM本次未在${request.timeoutSeconds??this.timeoutSeconds}秒内完成，请重试或联系管理员。`:data.type==='VlmHttpError'?data.error:'图像处理或VLM调用失败，请检查服务地址、模型及部署配置后重试。');}settled=true;resolve(data);}catch(e){fail(e instanceof RecognitionProblem?e:new RecognitionProblem('error','VLM服务未返回有效结果，请检查服务后重试。'));}});
       child.stdin.end(JSON.stringify(request));
     });
   }
@@ -80,8 +80,8 @@ export class LocalVisionPipeline implements VisionPipeline {
     const traceId=randomUUID(),traces=this.traceDirectory?new TraceStore(this.traceDirectory):null;
     let raw;
     try{raw=await this.worker({action:'recognize',componentId:c.id,reference:this.reference(round),sample:this.filename(c.crop.assetId),description:round.standard.description,instruction:round.instruction,endpoint:this.endpoint,model:this.model,template:this.template,
-      inputLayout:this.inputLayout,...(this.structured?{responseSchema:replyJsonSchema([c.id])}:{}),
-      ...(traces?{traceDirectory:this.traceDirectory,traceId,traceMetadata:{taskId:round.taskId,roundId:round.id,photoId:photo.id,label:round.taskId+' · '+c.label,sourceHash:photo.hash,standardVersion:round.standard.version,instructionVersion:round.instructionVersion}}:{})},65000) as {response:{choices:{finish_reason:string;message:{content:string}}[]};elapsedMs:number;model:string;promptVersion:string};}
+      inputLayout:this.inputLayout,provider:this.provider,extraBody:this.extraBody,timeoutSeconds:this.timeoutSeconds,...(this.structured?{responseSchema:replyJsonSchema([c.id])}:{}),
+      ...(traces?{traceDirectory:this.traceDirectory,traceId,traceMetadata:{taskId:round.taskId,roundId:round.id,photoId:photo.id,label:round.taskId+' · '+c.label,sourceHash:photo.hash,standardVersion:round.standard.version,instructionVersion:round.instructionVersion}}:{})},this.timeoutSeconds*1000+10000) as {response:{choices:{finish_reason:string;message:{content:string}}[]};elapsedMs:number;model:string;promptVersion:string};}
     catch(error){if(traces)await traces.failure(traceId,(error as Error).message,{source:'inspection',model:this.model,componentIds:[c.id],taskId:round.taskId});throw error;}
     const record=await this.record('recognition',{taskId:round.taskId,roundId:round.id,photoId:photo.id,sourceHash:photo.hash,componentId:c.id,standardId:round.standard.id,standardVersion:round.standard.version,standardDescription:round.standard.description,instructionVersion:round.instructionVersion,onsiteInstruction:round.instruction,...raw});
     const choice=raw.response?.choices?.[0];
@@ -91,7 +91,7 @@ export class LocalVisionPipeline implements VisionPipeline {
     if(reply.items.length!==1||reply.items[0].componentId!==c.id)throw new RecognitionProblem('error','模型返回的元件编号不匹配，已拒绝写入，请重试。');
     const item=reply.items[0];if(item.status==='unreadable')throw new RecognitionProblem('quality','图片质量过低，请重新拍照。'+item.reason);
     if(item.confidence===null||!item.lines.length)throw new RecognitionProblem('error','模型缺少丝印内容或判断把握，本件未生成明确结论，请重试。');
-    return {verdict:item.verdict,lines:item.lines,confidence:item.confidence,reason:item.reason,instructionVersion:round.instructionVersion,source:'lmstudio',model:raw.model,elapsedMs:raw.elapsedMs,promptVersion:raw.promptVersion,rawRecord:record,features:item.features,differences:item.differences,instructionConflicts:reply.instructionConflicts,instructionWarnings:instructionPriorityWarnings(round.instruction,reply)};
+    return {verdict:item.verdict,lines:item.lines,confidence:item.confidence,reason:item.reason,instructionVersion:round.instructionVersion,source:'vlm',provider:this.provider,model:raw.model,elapsedMs:raw.elapsedMs,promptVersion:raw.promptVersion,rawRecord:record,features:item.features,differences:item.differences,instructionConflicts:reply.instructionConflicts,instructionWarnings:instructionPriorityWarnings(round.instruction,reply)};
   }
 }
 

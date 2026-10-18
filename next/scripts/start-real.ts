@@ -4,6 +4,6 @@ import { fileURLToPath } from 'node:url';
 import { runStandalone } from '../server/index.ts';
 const config=fileURLToPath(new URL('../../.env.next.local',import.meta.url));
 if(existsSync(config))process.loadEnvFile(config);
-process.env.SV_NEXT_RECOGNIZER='lmstudio';
+process.env.SV_NEXT_RECOGNIZER='vlm';
 process.env.SV_MODEL_DEBUG??='1';
 runStandalone();

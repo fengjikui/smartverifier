@@ -3,7 +3,7 @@ import { Camera, ImagePlus, ChevronLeft, X, Info, AlertTriangle, LogOut } from '
 import { action, ApiError, imageSize, request } from './api';
 import { Btn, Modal, Pill, Spinner } from './ui';
 import { useRoute } from './use-route';
-import { finalVerdict } from '../../shared/domain';
+import { finalVerdict, hasRealRecognition } from '../../shared/domain';
 import { InspectionDetail } from './inspection-detail';
 import { useAlbumDensity } from './use-album-density';
 import { InspectionReport } from './inspection-report';
@@ -63,7 +63,7 @@ export function App(){
       const size=await imageSize(item.file),form=new FormData();form.set('photo',item.file);form.set('width',String(size.width));form.set('height',String(size.height));form.set('revision',String(view.round!.revision));form.set('clientId',item.key);if(item.replaceId)form.set('replaceId',item.replaceId);
       view=await request<TaskView>('/rounds/'+view.round!.id+'/photos',form);setData(view);setPendingFiles(items.slice(i+1));
     }
-    setDialog(null);overview();setNotice(boot?.recognition?.mode==='lmstudio'?'照片已保存，点击开始检测即可自动定位并与正品比对。':'照片已保存。当前服务未启用真实识别，可使用内置样例体验流程。');
+    setDialog(null);overview();setNotice(hasRealRecognition(boot?.recognition)?'照片已保存，点击开始检测即可自动定位并与正品比对。':'照片已保存。当前服务未启用真实识别，可使用内置样例体验流程。');
   }
   function filesPicked(files:FileList|null){if(!files?.length)return;const items=Array.from(files).slice(0,replace.current?1:undefined).map(file=>({file,key:uploadKey(),replaceId:replace.current}));replace.current=undefined;setPendingFiles(items);void run('正在保存照片…',()=>upload(items));}
   async function update(name:string,values:Record<string,unknown>={}){if(data){const next=await action(data,name,values);setData(next);if((filter==='fail'&&!next.summary?.fail)||(filter==='attention'&&!next.summary?.qualityPhotos&&!next.summary?.failedPhotos))setFilter('all');}}
@@ -75,13 +75,13 @@ export function App(){
     <section className="sv-login-brand"><img src="/assets/login-scan.svg" width="48" height="48" alt=""/><h1>观微</h1><h2>让每一次丝印检验，<br/>清楚、有据可查。</h2><div className="sv-login-spacer"/><p>拍照检测 / 自动比对 / MES 回填</p><small>丝印检测工作台</small></section>
     <section className="sv-login-content"><img src="/assets/login-shield.svg" width="36" height="36" alt=""/><h2>登录检验工作台</h2><p>从拍照到结果保存，在平板上轻松完成。</p><Pill tone="warning">本机开发试用</Pill>
       <Btn tone="primary" disabled={!!busy} onClick={()=>void run('正在进入…',async()=>{setBoot(await request<Bootstrap>('/session',{}));})}>{busy?<Spinner/>:null}进入本地试用</Btn>
-      <p className="sv-description">支持本机 LM Studio 识别。身份及MES仍为模拟，未连接公司系统；任务内会标明照片和结果来源。</p><hr/><small>华为平板 · 横屏优先 · 支持中途继续</small>{error?<p className="sv-error" role="alert">{error}</p>:null}
+      <p className="sv-description">支持配置的 VLM 服务识别。身份及MES仍为模拟，未连接公司系统；任务内会标明照片和结果来源。</p><hr/><small>华为平板 · 横屏优先 · 支持中途继续</small>{error?<p className="sv-error" role="alert">{error}</p>:null}
     </section>
   </div>;
 
   const mainView=route.view??'overview';
   return <div className="sv-app">
-    <header className="sv-header">{route.task?<Btn className="sv-back" onClick={mainView==='overview'?taskList:overview}><ChevronLeft size={18}/>返回</Btn>:<img src="/assets/tasks-scan.svg" width="30" height="30" alt=""/>}<strong className="sv-brand">观微</strong><span className="sv-product">丝印检测</span><span className="sv-location">{data?.task.number??'检验任务'}</span><Pill>{boot.recognition?.mode==='lmstudio'?'本机真实识别 · MES模拟':'本地流程试用'}</Pill><span className="sv-person">{boot.person.name} · {boot.person.id}</span><Btn tone="quiet" className="sv-icon-button" aria-label="退出本地试用" onClick={()=>void run('正在退出…',async()=>{await request('/session',{},'DELETE');setBoot(null);setData(null);navigate({},true);})}><LogOut size={18}/></Btn></header>
+    <header className="sv-header">{route.task?<Btn className="sv-back" onClick={mainView==='overview'?taskList:overview}><ChevronLeft size={18}/>返回</Btn>:<img src="/assets/tasks-scan.svg" width="30" height="30" alt=""/>}<strong className="sv-brand">观微</strong><span className="sv-product">丝印检测</span><span className="sv-location">{data?.task.number??'检验任务'}</span><Pill>{hasRealRecognition(boot.recognition)?'VLM真实识别 · MES模拟':'本地流程试用'}</Pill><span className="sv-person">{boot.person.name} · {boot.person.id}</span><Btn tone="quiet" className="sv-icon-button" aria-label="退出本地试用" onClick={()=>void run('正在退出…',async()=>{await request('/session',{},'DELETE');setBoot(null);setData(null);navigate({},true);})}><LogOut size={18}/></Btn></header>
     {error?<div className="sv-message error" role="alert"><AlertTriangle size={20}/><span>{error}</span><Btn tone="quiet" className="sv-icon-button" aria-label="关闭错误提示" onClick={()=>setError('')}><X size={18}/></Btn></div>:null}
     {notice?<div className="sv-message" role="status"><Info size={18}/><span>{notice}</span><Btn tone="quiet" className="sv-icon-button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={18}/></Btn></div>:null}
     {busy?<div className="sv-busy" role="status"><Spinner/>{busy}</div>:null}
@@ -98,7 +98,7 @@ export function App(){
       <InspectionReport key={round.id} round={round} summary={summary} task={data.task} person={boot.person} onOriginal={photo=>{setImageView('original');setDialog({type:'original',photo});}}/>
       <footer className="sv-footer"><FooterNote title={`本轮${summary?.total??0}件 · 不合格${summary?.fail??0}件`}/><Btn tone="primary" onClick={overview}>返回照片总览</Btn></footer>
     </>:<>
-      <InspectionOverview realEnabled={boot.recognition?.mode==='lmstudio'} onRealTrial={()=>void run('正在添加模拟拍摄照片…',()=>update('real-trial'))} data={data} working={working} busy={!!busy} compact={density.compact} filter={filter} onFilter={value=>{scroll.current=0;setFilter(value);}} onToggleDensity={density.toggle} gallery={gallery} onScroll={top=>{scroll.current=top;}} actions={{open:openPhoto,add:picker,replace:p=>picker('album',p.id),remove:p=>setDialog({type:'remove',photo:p}),notes:()=>{setInstruction(round.instruction);setDialog({type:'notes'});},report:()=>navigate({task:route.task,view:'report'}),samples:()=>setDialog({type:'samples'})}}/>
+      <InspectionOverview realEnabled={hasRealRecognition(boot.recognition)} onRealTrial={()=>void run('正在添加模拟拍摄照片…',()=>update('real-trial'))} data={data} working={working} busy={!!busy} compact={density.compact} filter={filter} onFilter={value=>{scroll.current=0;setFilter(value);}} onToggleDensity={density.toggle} gallery={gallery} onScroll={top=>{scroll.current=top;}} actions={{open:openPhoto,add:picker,replace:p=>picker('album',p.id),remove:p=>setDialog({type:'remove',photo:p}),notes:()=>{setInstruction(round.instruction);setDialog({type:'notes'});},report:()=>navigate({task:route.task,view:'report'}),samples:()=>setDialog({type:'samples'})}}/>
         {pendingFiles.length?<div className="sv-upload-retry" role="status">还有{pendingFiles.length}张照片未确认保存。<Btn disabled={!!busy} onClick={()=>void run('正在重试上传…',()=>upload(pendingFiles))}>重试保存</Btn><Btn tone="quiet" disabled={!!busy} onClick={()=>setPendingFiles([])}>取消待上传照片</Btn></div>:null}
       <footer className="sv-footer sv-workflow-footer"><FooterNote title={round.status==='submitted'?'本轮结果已保存':working?`${round.photos.length}张照片已保存`:summary?.canSubmit?`${summary.verdict==='PASS'?'合格':'不合格'} · 不良数${summary.fail}`:summary?.qualityPhotos||summary?.failedPhotos?`${(summary?.qualityPhotos??0)+(summary?.failedPhotos??0)}张照片需要处理`:round.photos.length?'照片已保存，可继续添加':'正品基准已关联 · '+data.task.material}/>
         {round.status==='submitted'?<Btn disabled={!!busy} onClick={()=>setDialog({type:'retest'})}>重新检测</Btn>:round.photos.length?<><Btn disabled={locked} onClick={()=>picker('camera')}><Camera size={20}/>继续拍照</Btn><Btn tone="quiet" disabled={locked} onClick={()=>picker('album')}><ImagePlus size={20}/>从相册添加</Btn></>:null}

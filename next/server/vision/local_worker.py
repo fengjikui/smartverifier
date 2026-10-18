@@ -1,4 +1,4 @@
-"""受约束绿色检验台的 CPU 分离器及本地 LM Studio 传输。stdout 只输出 JSON。"""
+"""绿色检验台CPU分离器与可配置VLM传输。stdout只输出JSON。"""
 from __future__ import annotations
 import asyncio
 import base64
@@ -170,11 +170,12 @@ def separate(req):
 
 
 async def recognize(req):
-    # 本适配器只访问回环 LM Studio，不继承桌面代理设置。
+    # 模型地址由服务端配置；不继承桌面代理，内网直连。
     for key in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"):
         os.environ.pop(key, None)
-    from smartverifier_focus.lmstudio_transport import LmStudioTransport
-    if req.get('requireIdle'):
+    provider=req.get('provider','lmstudio')
+    if provider not in ('lmstudio','openai-compatible'):raise ValueError('VLM协议配置无效')
+    if provider=='lmstudio' and req.get('requireIdle'):
         status=subprocess.check_output([str(Path.home()/'.lmstudio/bin/lms'),'ps'],text=True,timeout=5)
         row=next((line for line in status.splitlines() if line.split() and line.split()[0]==req['model']),'')
         if 'IDLE' not in row:raise RuntimeError('目标模型未空闲，未发起调试请求。')
@@ -207,17 +208,24 @@ async def recognize(req):
     if req.get('traceDirectory'):
         from smartverifier_focus.model_trace import TraceWriter
         trace=TraceWriter(req['traceDirectory'],{'model':req['model'],'source':'inspection',
-            'componentIds':req.get('componentIds') or [cid], 'inputLayout':layout, **req.get('traceMetadata',{})},messages,req.get('traceId'))
+            'componentIds':req.get('componentIds') or [cid], 'inputLayout':layout,'provider':provider, **req.get('traceMetadata',{})},messages,req.get('traceId'))
     start = time.monotonic()
     try:
-        async with LmStudioTransport(req["endpoint"],req["model"],req["template"]) as transport:
+        if provider=='lmstudio':
+            from smartverifier_focus.lmstudio_transport import LmStudioTransport
+            connection=LmStudioTransport(req['endpoint'],req['model'],req['template'])
+        else:
+            from smartverifier_focus.vlm_http_transport import VlmHttpTransport
+            connection=VlmHttpTransport(req['endpoint'],req['model'],api_key=os.environ.get('SV_VLM_API_KEY',''),
+                extra_body=req.get('extraBody'),ca_file=os.environ.get('SV_VLM_CA_FILE',''))
+        async with connection as transport:
             # 关闭thinking，不修改全局模板或模型加载状态。调试可显式试验Schema，不自动降级。
             response = await transport.complete(messages,None,req.get('maxTokens',1150),
                 timeout_seconds=req.get('timeoutSeconds',55),on_event=trace.observe if trace else None,
                 response_format=req.get('responseSchema'))
         return {"response":response,"elapsedMs":round((time.monotonic()-start)*1000),"model":req["model"],
                 "promptVersion":"silkscreen-prefix-first-v1" if layout=='prefix-first' else "silkscreen-controlled-layout-v1" if req.get('componentIds') else "silkscreen-pair-v1",
-                "inputLayout":layout,"outputFormat":"json-schema" if req.get('responseSchema') else "prompt-json",
+                "inputLayout":layout,"provider":provider,"outputFormat":"json-schema" if req.get('responseSchema') else "prompt-json",
                 "inputMetrics":metrics,"traceId":trace.id if trace else None}
     except BaseException as exc:
         if trace:trace.emit('error',{'message':str(exc),'errorType':type(exc).__name__})

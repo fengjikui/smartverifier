@@ -51,7 +51,7 @@ test('接入真实管线的业务状态：增量、质量、失败重试、说�
   assert.throws(()=>service.submit(view.round!.id,view.round!.revision,person),/不能部分提交/);
   failure='none';await analyze();assert.equal(calls,3);assert.equal(preparations,2,'重试复用裁片');assert.equal(view.summary!.total,2);
   view=service.notes(view.round!.id,view.round!.revision,'本次允许忽略型号',person);await analyze();assert.equal(view.summary!.fail,0);assert.equal(preparations,2);assert.equal(view.round!.photos[0].components[0].aiHistory.length,2);assert.equal(view.round!.photos[0].components[0].aiHistory[0].verdict,'FAIL');
-  assert.match(service.report(view.round!),/重要：现场说明/);assert.match(service.report(view.round!),/本机真实识别/);
+  assert.match(service.report(view.round!),/重要：现场说明/);assert.match(service.report(view.round!),/VLM真实识别/);
   view=service.notes(view.round!.id,view.round!.revision,'新说明',person);failure='quality';await analyze();assert.equal(view.summary!.qualityPhotos,2);assert.equal(view.summary!.canSubmit,false);assert.equal(view.summary!.completed,0);
   const sequence=view.round!.photos[0].sequence;view=await service.addPhoto(view.round!.id,view.round!.revision,{bytes:await readFile(path.join(root,'fixtures/inspection/green-mat-v1/single.png')),filename:'replacement.png',width:1536,height:1024,replaceId:view.round!.photos[0].id},person);assert.equal(view.round!.photos.length,2);assert.equal(view.round!.photos[0].sequence,sequence);
   failure='none';await analyze();service.submit(view.round!.id,view.round!.revision,person);while(service.view(view.task.id).round!.status==='submitting')await delay(5);

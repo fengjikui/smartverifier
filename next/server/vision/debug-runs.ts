@@ -17,8 +17,8 @@ export class DebugRuns{
     void(async()=>{
       try{
         const raw=await this.pipeline.worker({action:'recognize',componentId:ids[0],componentIds:ids,reference,sample,description:'',instruction:'',model:this.pipeline.model,endpoint:this.pipeline.endpoint,template:this.pipeline.template,
-          timeoutSeconds:110,maxTokens:220+280*ids.length,traceDirectory:this.store.directory,traceId:id,requireIdle:true,inputLayout,
-          traceMetadata:{source:'debug-sample',label:`${ids.length}件白板调试（模拟图）`,actor},...(format==='json-schema'?{responseSchema:replyJsonSchema(ids)}:{})},120000) as {response:{choices:{finish_reason:string;message:{content:string}}[]}};
+          provider:this.pipeline.provider,extraBody:this.pipeline.extraBody,timeoutSeconds:this.pipeline.timeoutSeconds,maxTokens:220+280*ids.length,traceDirectory:this.store.directory,traceId:id,requireIdle:true,inputLayout,
+          traceMetadata:{source:'debug-sample',label:`${ids.length}件白板调试（模拟图）`,actor},...(format==='json-schema'?{responseSchema:replyJsonSchema(ids)}:{})},this.pipeline.timeoutSeconds*1000+10000) as {response:{choices:{finish_reason:string;message:{content:string}}[]}};
         const choice=raw.response?.choices?.[0];if(choice?.finish_reason!=='stop')throw new Error('生成未完整结束');
         try{parseBatchReply(choice.message.content,ids);await this.store.finish(id,true,'完整JSON、字段与元件ID集合校验通过；这是调试记录，不提交MES。');}
         catch(error){await this.store.finish(id,false,(error as Error).message);}

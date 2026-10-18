@@ -46,3 +46,7 @@ export function alignText(expected: string, actual: string): AlignedCharacter[] 
   }
   return output.reverse();
 }
+
+/** 保留旧LM Studio记录的识别来源兼容性。 */
+export function isVlmJudgement<T extends {source?:string}>(ai:T|null|undefined):ai is T{return ai?.source==='vlm'||ai?.source==='lmstudio';}
+export function hasRealRecognition(status:{mode:string}|undefined){return status?.mode==='vlm'||status?.mode==='lmstudio';}

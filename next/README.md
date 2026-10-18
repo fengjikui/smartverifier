@@ -2,7 +2,10 @@
 
 ## 当前阶段
 
-**平板正常流程已接入本机LM Studio真实识别与OpenCV自动定位裁片；身份、任务和MES仍为模拟。**
+**平板正常流程已接入真实VLM与OpenCV自动定位裁片；支持本机LM Studio及服务端配置的公司兼容HTTP接口。身份、任务和MES仍为模拟，公司VLM尚未联调。**
+
+- [VLM服务配置与迁移](docs/VLM服务配置与迁移.md)：统一使用`SV_VLM_ENDPOINT`等变量，提供[可复制配置](config/vlm.env.example)，支持内网HTTP／HTTPS服务。
+- [试用演示基线与缺口清单](docs/试用演示基线与缺口清单.md)：当前闭环、下周试用准备、真实正品录入、平板验证和企业接口的实际缺口；当前暂停性能优化。
 
 - [打开真实识别试用](http://127.0.0.1:5190/tablet-preview?demo=real)：使用模拟拍摄照片 → 开始检测 → 查看真实比对。单件／双件／较暗三件均可从任务列表选择。
 - [真实识别试用与部署说明](docs/本机真实识别试用与部署.md)、[本轮调研与实测材料](research/real-vision/README.md)。启动真实模型使用 `npm run start:next:real`；普通 `start:next` 仍为离线模拟。

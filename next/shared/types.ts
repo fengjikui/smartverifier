@@ -5,7 +5,7 @@ export type SampleKind = 'pass' | 'fail' | 'four' | 'twenty' | 'quality';
 export interface Person { id: string; name: string }
 export interface Review { id: string; verdict: Verdict; reason: string; person: Person; at: string; instructionVersion: number }
 export interface AIJudgement { verdict: Verdict; lines: string[]; confidence: number; reason: string; instructionVersion: number;
-  source?: 'lmstudio'; model?: string; elapsedMs?: number; promptVersion?: string; rawRecord?: string;
+  source?: 'vlm'|'lmstudio'; provider?:'lmstudio'|'openai-compatible'; model?: string; elapsedMs?: number; promptVersion?: string; rawRecord?: string;
   features?: string[]; differences?: { category:string; message:string; lineIndex:number|null; referenceText:string|null; sampleText:string|null }[]; instructionConflicts?: string[]; instructionWarnings?:string[];
 }
 export interface ComponentResult {
@@ -39,5 +39,5 @@ export interface Summary {
 }
 export interface TaskListItem extends Task { status: string; summary: Summary | null }
 export interface TaskView { task: Task; round: Round | null; effective: Round | null; summary: Summary | null }
-export interface RecognitionStatus { mode:'mock'|'lmstudio'; model?:string }
+export interface RecognitionStatus { mode:'mock'|'vlm'|'lmstudio'; model?:string;provider?:'lmstudio'|'openai-compatible' }
 export interface Bootstrap { person: Person; mode: 'mock'; recognition?:RecognitionStatus; tasks: TaskListItem[] }

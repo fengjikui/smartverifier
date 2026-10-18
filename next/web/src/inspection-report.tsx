@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, Download } from 'lucide-react';
-import { finalVerdict } from '../../shared/domain';
+import { finalVerdict, isVlmJudgement } from '../../shared/domain';
 import { sampleMarker } from '../../shared/sample-presets';
 import type { ComponentResult, Person, Photo, Round, Summary, Task } from '../../shared/types';
 import { ComponentNavigator } from './component-navigator';
@@ -57,7 +57,7 @@ export function InspectionReport({round,summary,task,person,onOriginal}: {
 }
 
 function ReportEvidence({component,expected}:{component:ComponentResult;expected:string[]}) {
-  return <><DiffTable expected={expected} actual={component.ai!.lines} title="丝印文字对照" reason={component.review?'AI原识别差异保留；最终以人工核对结果为准。':component.ai!.reason}/><p className="sv-description">AI判断把握 {Math.round(component.ai!.confidence*100)}%{component.ai!.source==='lmstudio'?'（模型自评，非校准概率）':'（样例预设）'}</p>{component.ai!.source==='lmstudio'?<details className="sv-report-model-detail"><summary>模型与外观特征</summary><p>{component.ai!.model} · {((component.ai!.elapsedMs??0)/1000).toFixed(1)}秒</p><p>{component.ai!.features?.join('；')}</p></details>:null}{component.review?<p className="sv-review-record">{component.review.person.name} · {component.review.reason} · AI原判{component.ai!.verdict==='PASS'?'合格':'不合格'}保留</p>:null}</>;
+  return <><DiffTable expected={expected} actual={component.ai!.lines} title="丝印文字对照" reason={component.review?'AI原识别差异保留；最终以人工核对结果为准。':component.ai!.reason}/><p className="sv-description">AI判断把握 {Math.round(component.ai!.confidence*100)}%{isVlmJudgement(component.ai)?'（模型自评，非校准概率）':'（样例预设）'}</p>{isVlmJudgement(component.ai)?<details className="sv-report-model-detail"><summary>模型与外观特征</summary><p>{component.ai!.model} · {((component.ai!.elapsedMs??0)/1000).toFixed(1)}秒</p><p>{component.ai!.features?.join('；')}</p></details>:null}{component.review?<p className="sv-review-record">{component.review.person.name} · {component.review.reason} · AI原判{component.ai!.verdict==='PASS'?'合格':'不合格'}保留</p>:null}</>;
 }
 
 function ReportOriginal({photo,onOpen}:{photo:Photo;onOpen:()=>void}) {
