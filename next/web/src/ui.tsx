@@ -1,3 +1,4 @@
+import { assetPath } from '../../shared/paths';
 import type { ComponentProps, ReactNode } from 'react';
 import { X, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ export function Btn({tone='secondary',className='',...props}:ComponentProps<type
 export function Field(props:ComponentProps<typeof Input>){return <Input {...props} className={'sv-input '+(props.className??'')}/>;}
 export function Pill({tone='neutral',children}:{tone?:'neutral'|'success'|'warning'|'danger';children:ReactNode}){return <Badge variant="outline" className={'sv-pill '+tone}>{children}</Badge>;}
 export function Spinner(){return <LoaderCircle className="sv-spin" size={20} aria-hidden="true"/>;}
-export function VerdictPill({verdict}:{verdict:Verdict|null}){return <Pill tone={verdict==='PASS'?'success':verdict==='FAIL'?'danger':'neutral'}>{verdict==='PASS'?<><img src="/assets/album-check.svg" width="20" height="20" alt=""/>合格</>:verdict==='FAIL'?<><img src="/assets/album-frame.svg" width="20" height="20" alt=""/>不合格</>:'待检测'}</Pill>;}
+export function VerdictPill({verdict}:{verdict:Verdict|null}){return <Pill tone={verdict==='PASS'?'success':verdict==='FAIL'?'danger':'neutral'}>{verdict==='PASS'?<><img src={assetPath('album-check.svg')} width="20" height="20" alt=""/>合格</>:verdict==='FAIL'?<><img src={assetPath('album-frame.svg')} width="20" height="20" alt=""/>不合格</>:'待检测'}</Pill>;}
 export function PhotoPill({photo}:{photo:Photo}){
   if(photo.status==='running')return <Pill><Spinner/>正在检测</Pill>;
   if(photo.status==='queued')return <Pill>排队中</Pill>;

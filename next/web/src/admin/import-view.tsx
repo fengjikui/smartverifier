@@ -1,3 +1,4 @@
+import { apiPath } from '../../../shared/paths';
 import { useEffect, useRef, useState } from 'react';
 import { FileSpreadsheet, Upload, Download, Check } from 'lucide-react';
 import { Btn, Pill, Spinner } from '../ui';
@@ -15,7 +16,7 @@ export function ImportView({person,navigate,onError,onSaved}:{person:Person;navi
   async function validate(){setBusy(true);try{const form=new FormData();for(const f of files)form.append('files',f);const v=await request<ImportJob>('/admin/imports',form);setJob(v);localStorage.setItem(storage,v.id);}catch(e){onError(e);}finally{setBusy(false);}}
   const rows=job?.rows.filter(r=>filter==='all'||r.status===filter)??[];
   return <><Heading title="批量导入正品标准" description="先检查清单与图片，确认后写入。已有标准默认跳过，不覆盖。"/>
-    {!job?<><section className="adm-panel adm-import-guide"><div><FileSpreadsheet size={28}/><h2>1. 下载模板，整理资料</h2><p>Excel 适合人工整理；JSON 或完整 ZIP 适合已有资料转换。每批最多 2000 条，建议先用少量资料试导。</p></div><div className="adm-template-links"><a href="/api/admin/templates/xlsx" download><Download size={17}/>Excel 模板</a><a href="/api/admin/templates/json" download>JSON 模板</a><a href="/api/admin/templates/zip" download>含图片的 ZIP 示例</a><a href="/api/admin/templates/help" download>填写说明</a></div></section>
+    {!job?<><section className="adm-panel adm-import-guide"><div><FileSpreadsheet size={28}/><h2>1. 下载模板，整理资料</h2><p>Excel 适合人工整理；JSON 或完整 ZIP 适合已有资料转换。每批最多 2000 条，建议先用少量资料试导。</p></div><div className="adm-template-links"><a href={apiPath('/admin/templates/xlsx')} download><Download size={17}/>Excel 模板</a><a href={apiPath('/admin/templates/json')} download>JSON 模板</a><a href={apiPath('/admin/templates/zip')} download>含图片的 ZIP 示例</a><a href={apiPath('/admin/templates/help')} download>填写说明</a></div></section>
     <section className="adm-panel adm-import-guide"><h2>2. 选择清单与图片</h2><p>上传 Excel / JSON 清单后，再选择其中用到的图片。也可一次上传包含清单与图片的完整 ZIP。</p><div className="adm-import-choose"><Btn onClick={()=>manifest.current?.click()}><FileSpreadsheet size={18}/>选择清单</Btn><Btn onClick={()=>images.current?.click()}>添加图片</Btn><span>或</span><Btn onClick={()=>pack.current?.click()}><Upload size={18}/>上传完整 ZIP</Btn></div>
     <input hidden ref={manifest} type="file" accept=".xlsx,.json" onChange={e=>{const f=e.target.files?.[0];if(f)setFiles([f,...files.filter(x=>/\.(png|jpe?g|webp)$/i.test(x.name))]);e.target.value='';}}/>
     <input hidden ref={images} type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={e=>{if(e.target.files)setFiles([...files.filter(x=>/\.(xlsx|json)$/i.test(x.name)),...Array.from(e.target.files)]);e.target.value='';}}/>

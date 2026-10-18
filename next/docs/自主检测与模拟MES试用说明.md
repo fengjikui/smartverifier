@@ -4,8 +4,8 @@
 
 ## 推荐使用：自主检测
 
-1. 管理员先在 `/admin` 录入并启用正品标准。必需物料编号、供应商和正品图片，描述可以留空。
-2. 检验员打开 `/`，进入“自主检测”。电脑也可通过 `/tablet-preview` 按平板尺寸体验。
+1. 管理员先在 `/inspections/marking/admin/standards` 录入并启用正品标准。必需物料编号、供应商和正品图片，描述可以留空。
+2. 检验员打开 `/inspections/marking`，进入“自主检测”。电脑也可通过 `/inspections/marking/preview/tablet` 按平板尺寸体验。
 3. 输入完整或部分物料编号，按供应商筛选，点击“开始检测”。点击缩略图可先看完整正品图和说明。
 4. 拍照或从相册添加待检照片，确认后“开始检测”。图像会自动定位、裁剪与转正，再与所选正品一起交给配置的 VLM。
 5. 页面突出显示 **检验结论** 和 **不良数量**。检验员在电脑 MES 中手工填写这两项；本系统不会访问公司 MES 或上传附件。
@@ -48,11 +48,11 @@
 ## 数据与对接位置
 
 - 自主记录单独保存在 SQLite `standalone_inspections` 表中；检测轮次、照片、判断和审计沿用现有存储。不写入 MES `tasks` 任务表或 `receipts` 模拟回执。
-- 正品查询：`GET /api/standards?material=...&supplier=...&page=1`。
-- 开始自主检测：`POST /api/standalone`，参数 `standardId`、`version`、`clientId`；同一人员同一请求标识可安全重试。
-- 最近记录：`GET /api/standalone`，按当前人员返回最近 20 条。
-- 本系统内完成：`POST /api/rounds/{id}/complete`，携带当前 `revision`。
+- 正品查询：`GET /api/v1/inspections/marking/standards?material=...&supplier=...&page=1`。
+- 开始自主检测：`POST /api/v1/inspections/marking/checks`，参数 `standardId`、`version`、`clientId`；同一人员同一请求标识可安全重试。
+- 最近记录：`GET /api/v1/inspections/marking/checks`，按当前人员返回最近 20 条。
+- 本系统内完成：`POST /api/v1/inspections/marking/rounds/{id}/complete`，携带当前 `revision`。
 - 自主记录调用原 MES 提交接口会被服务端明确拒绝，不产生传输或回执。
-- 模拟任务查询：`GET /api/task-list?q=...&page=1`；模拟源集中在 `server/mes/mock.ts`，后续换接真实 MES 数据源，不需重做中间识别流程。
+- 模拟任务查询：`GET /api/v1/inspections/marking/tasks?q=...&page=1`；模拟源集中在 `server/mes/mock.ts`，后续换接真实 MES 数据源，不需重做中间识别流程。
 
 迁移到公司时，除代码外要迁移完整状态目录和原图。备份方式见《正品管理试用与数据维护》。

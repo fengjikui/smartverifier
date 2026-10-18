@@ -12,6 +12,7 @@ import type { VisionPipeline } from './vision/local-pipeline.ts';
 import { TraceStore } from './vision/trace-store.ts';
 import { adminRoutes } from './admin/http.ts';
 import { DebugRuns } from './vision/debug-runs.ts';
+import { MARKING_BASE, MARKING_API, apiPath, assetPath, canonicalPage, internalApiPath, publicLinkReplacer } from '../shared/paths.ts';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const revisionSchema = z.number().int().positive();
@@ -26,7 +27,7 @@ async function jsonBody(req: http.IncomingMessage): Promise<Record<string, unkno
   if (!req.headers['content-type']?.startsWith('application/json')) throw new ApiError(415,'请求需要JSON格式。');
   try { const data=JSON.parse((await body(req)).toString()); if (!data || typeof data!=='object' || Array.isArray(data)) throw new Error(); return data; } catch(e) { if(e instanceof ApiError)throw e; throw new ApiError(400,'请求内容不是有效的JSON对象。'); }
 }
-function send(res: http.ServerResponse, data: unknown, status=200) { res.writeHead(status, {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}); res.end(JSON.stringify(data)); }
+function send(res: http.ServerResponse, data: unknown, status=200) { res.writeHead(status, {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}); res.end(JSON.stringify(data,publicLinkReplacer)); }
 async function file(res: http.ServerResponse, filename: string, privateFile=false) {
   let info; try { info=await stat(filename); } catch { throw new ApiError(404,'文件不存在。'); }
   if (!info.isFile()) throw new ApiError(404,'文件不存在。');
@@ -47,7 +48,18 @@ export function startServer(options: { state?: string; port?: number; host?: str
   const server=http.createServer(async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','same-origin'); res.setHeader('X-Frame-Options','SAMEORIGIN');
     try {
-      const url=new URL(req.url ?? '/', 'http://localhost'), pathname=decodeURIComponent(url.pathname);
+      const url=new URL(req.url ?? '/', 'http://localhost');
+      const canonical=canonicalPage(url.pathname);
+      const legacyApi=url.pathname.startsWith('/api/')&&!url.pathname.startsWith('/api/v1/');
+      const legacyAsset=url.pathname.startsWith('/assets/');
+      if(['GET','HEAD'].includes(req.method??'')&&((canonical&&canonical!==url.pathname)||legacyApi||legacyAsset)){
+        const target=new URL(legacyApi?apiPath(url.pathname):legacyAsset?assetPath(url.pathname.slice(8)):canonical!,'http://localhost');
+        const defaults=new URLSearchParams(target.search);target.search=url.search;for(const [key,value]of defaults)target.searchParams.set(key,value);
+        res.writeHead(308,{Location:target.pathname+target.search,'Cache-Control':'no-store'});return res.end();
+      }
+      // 接口分发保留原路由，兼容旧脚本和历史图片；新入口统一走版本化前缀。
+      if(url.pathname===MARKING_API||url.pathname.startsWith(MARKING_API+'/'))url.pathname=internalApiPath(url.pathname);
+      const pathname=decodeURIComponent(url.pathname);
       if (req.method!=='GET'&&req.method!=='HEAD') {
         const origin=req.headers.origin;
         if (origin && !['http://'+req.headers.host,'https://'+req.headers.host].includes(origin)) throw new ApiError(403,'请从本应用页面发起操作。');
@@ -138,10 +150,12 @@ export function startServer(options: { state?: string; port?: number; host?: str
         throw new ApiError(404,'接口不存在。');
       }
       if(req.method!=='GET'&&req.method!=='HEAD')throw new ApiError(405,'请求方式不支持。');
-      const full=path.resolve(staticDir,'.'+pathname);
+      if(!pathname.startsWith(MARKING_BASE+'/')&&pathname!==MARKING_BASE)throw new ApiError(404,'页面不存在。');
+      const staticPath=pathname.slice(MARKING_BASE.length)||'/';
+      const full=path.resolve(staticDir,'.'+staticPath);
       if(full!==staticDir&&!full.startsWith(staticDir+path.sep))throw new ApiError(404,'文件不存在。');
       try { if((await stat(full)).isFile())return await file(res,full); } catch { /* Client routes use the application entry. */ }
-      if(path.extname(pathname))throw new ApiError(404,'文件不存在。');
+      if(path.extname(staticPath))throw new ApiError(404,'文件不存在。');
       return await file(res,path.join(staticDir,'index.html'));
     } catch(error){
       if(res.headersSent){res.destroy();return;}
@@ -153,8 +167,8 @@ export function startServer(options: { state?: string; port?: number; host?: str
   server.requestTimeout=120000;server.headersTimeout=15000;
   server.listen(options.port ?? Number(process.env.SV_NEXT_PORT??5190),options.host??process.env.SV_NEXT_HOST??'0.0.0.0',()=>{
     const addr=server.address();if(!addr||typeof addr==='string')return;
-    console.log(`新版平板工作台（${vision?'VLM真实识别，MES模拟':'本地模拟'}）：http://127.0.0.1:${addr.port}`);
-    for(const entries of Object.values(os.networkInterfaces()))for(const entry of entries??[])if(entry.family==='IPv4'&&!entry.internal&&/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(entry.address))console.log(`局域网试用：http://${entry.address}:${addr.port}`);
+    console.log(`新版平板工作台（${vision?'VLM真实识别，MES模拟':'本地模拟'}）：http://127.0.0.1:${addr.port}${MARKING_BASE}`);
+    for(const entries of Object.values(os.networkInterfaces()))for(const entry of entries??[])if(entry.family==='IPv4'&&!entry.internal&&/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(entry.address))console.log(`局域网试用：http://${entry.address}:${addr.port}${MARKING_BASE}`);
   });
   return {server,service,admin};
 }

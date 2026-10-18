@@ -1,3 +1,4 @@
+import { markingPaths } from '../../../shared/paths';
 import { useEffect, useState } from 'react';
 import { ExternalLink, RefreshCw, Search } from 'lucide-react';
 import { Btn, Field, Pill } from '../ui';
@@ -52,7 +53,7 @@ export function TaskList({onError,revision}:{onError:(e:unknown)=>void;revision:
           <td>{task.material}<small>{task.supplier}</small></td>
           <td>{task.standard?<Pill tone="success">已关联 · v{task.standard.version}</Pill>:<Pill tone="warning">缺少基准</Pill>}</td>
           <td>{task.status}</td>
-          <td><a className="adm-open-task" href={'/?task='+task.id} target="_blank" rel="noreferrer">
+          <td><a className="adm-open-task" href={markingPaths.workbench+'?task='+task.id} target="_blank" rel="noreferrer">
             打开检验 <ExternalLink size={15}/>
           </a></td>
         </tr>)}</tbody>

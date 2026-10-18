@@ -38,7 +38,7 @@ test('真实HTTP与SQLite：增量、改判、重新判定、质量替换、幂�
   await change('submit',{simulateFailure:true},202);await wait('submit_failed');assert.equal(view.effective,null);const key=view.round!.transfer!.key;
   await change('submit',{},202);await wait('submitted');assert.equal(view.round!.transfer!.key,key);assert.equal(view.effective!.id,view.round!.id);assert.equal(service.store.db.prepare('SELECT count(*) AS n FROM receipts').get()!.n,1);
   await call('/rounds/'+view.round!.id+'/submit',{revision:1},202);assert.equal(service.store.db.prepare('SELECT count(*) AS n FROM receipts').get()!.n,1);
-  const oldId=view.round!.id,oldRound=structuredClone(view.round!);
+  const oldId=view.round!.id,oldRound=structuredClone(service.store.round(view.round!.id)!);
   view=await call('/tasks/'+view.task.id+'/rounds',{reuse:true});assert.notEqual(view.round!.id,oldId);assert.equal(view.effective!.id,oldId);assert.equal(view.summary!.completed,0);
   await change('sample',{sample:'quality'});await change('analyze',{},202);await wait('draft');assert.equal(view.summary!.qualityPhotos,1);assert.equal(view.summary!.canSubmit,false);await change('submit',{},409);
   const quality=view.round!.photos.find(p=>p.status==='quality')!,oldSequence=quality.sequence;

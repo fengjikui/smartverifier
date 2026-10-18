@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
+import { MARKING_BASE } from './shared/paths.ts';
 export default defineConfig({
+  base: MARKING_BASE + '/',
   root: fileURLToPath(new URL('./web',import.meta.url)),
   publicDir: fileURLToPath(new URL('./web/public',import.meta.url)),
   plugins:[react()],

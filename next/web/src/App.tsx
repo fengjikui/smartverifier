@@ -1,3 +1,4 @@
+import { assetPath } from '../../shared/paths';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Camera, ImagePlus, ChevronLeft, X, Info, AlertTriangle, LogOut } from 'lucide-react';
 import { action, ApiError, imageSize, request } from './api';
@@ -77,8 +78,8 @@ export function App(){
 
   if(loading)return <div className="sv-loading"><Spinner/>正在打开检验工作台…</div>;
   if(!boot)return <div className="sv-login">
-    <section className="sv-login-brand"><img src="/assets/login-scan.svg" width="48" height="48" alt=""/><h1>观微</h1><h2>让每一次丝印检验，<br/>清楚、有据可查。</h2><div className="sv-login-spacer"/><p>拍照检测 / 自动比对 / MES 回填</p><small>丝印检测工作台</small></section>
-    <section className="sv-login-content"><img src="/assets/login-shield.svg" width="36" height="36" alt=""/><h2>登录检验工作台</h2><p>从拍照到结果保存，在平板上轻松完成。</p><Pill tone="warning">本机开发试用</Pill>
+    <section className="sv-login-brand"><img src={assetPath('login-scan.svg')} width="48" height="48" alt=""/><h1>观微</h1><h2>让每一次丝印检验，<br/>清楚、有据可查。</h2><div className="sv-login-spacer"/><p>拍照检测 / 自动比对 / MES 回填</p><small>丝印检测工作台</small></section>
+    <section className="sv-login-content"><img src={assetPath('login-shield.svg')} width="36" height="36" alt=""/><h2>登录检验工作台</h2><p>从拍照到结果保存，在平板上轻松完成。</p><Pill tone="warning">本机开发试用</Pill>
       <Btn tone="primary" disabled={!!busy} onClick={()=>void run('正在进入…',async()=>{setBoot(await request<Bootstrap>('/session',{}));})}>{busy?<Spinner/>:null}进入本地试用</Btn>
       <p className="sv-description">支持配置的 VLM 服务识别。身份及MES仍为模拟，未连接公司系统；任务内会标明照片和结果来源。</p><hr/><small>华为平板 · 横屏优先 · 支持中途继续</small>{error?<p className="sv-error" role="alert">{error}</p>:null}
     </section>
@@ -86,7 +87,7 @@ export function App(){
 
   const mainView=route.view??'overview';
   return <div className="sv-app">
-    <header className="sv-header">{route.task?<Btn className="sv-back" onClick={mainView==='overview'?taskList:overview}><ChevronLeft size={18}/>返回</Btn>:<img src="/assets/tasks-scan.svg" width="30" height="30" alt=""/>}<strong className="sv-brand">观微</strong><span className="sv-product">丝印检测</span><span className="sv-location">{data?.task.number??(route.entry==='tasks'?'模拟 MES 任务':'自主检测')}</span><Pill>{hasRealRecognition(boot.recognition)?(standalone||(!route.task&&route.entry!=='tasks'))?'VLM真实识别 · 手工录入MES':'VLM真实识别 · MES模拟':'本地流程试用'}</Pill><span className="sv-person">{boot.person.name} · {boot.person.id}</span><Btn tone="quiet" className="sv-icon-button" aria-label="退出本地试用" onClick={()=>void run('正在退出…',async()=>{await request('/session',{},'DELETE');setBoot(null);setData(null);navigate({},true);})}><LogOut size={18}/></Btn></header>
+    <header className="sv-header">{route.task?<Btn className="sv-back" onClick={mainView==='overview'?taskList:overview}><ChevronLeft size={18}/>返回</Btn>:<img src={assetPath('tasks-scan.svg')} width="30" height="30" alt=""/>}<strong className="sv-brand">观微</strong><span className="sv-product">丝印检测</span><span className="sv-location">{data?.task.number??(route.entry==='tasks'?'模拟 MES 任务':'自主检测')}</span><Pill>{hasRealRecognition(boot.recognition)?(standalone||(!route.task&&route.entry!=='tasks'))?'VLM真实识别 · 手工录入MES':'VLM真实识别 · MES模拟':'本地流程试用'}</Pill><span className="sv-person">{boot.person.name} · {boot.person.id}</span><Btn tone="quiet" className="sv-icon-button" aria-label="退出本地试用" onClick={()=>void run('正在退出…',async()=>{await request('/session',{},'DELETE');setBoot(null);setData(null);navigate({},true);})}><LogOut size={18}/></Btn></header>
     {error?<div className="sv-message error" role="alert"><AlertTriangle size={20}/><span>{error}</span><Btn tone="quiet" className="sv-icon-button" aria-label="关闭错误提示" onClick={()=>setError('')}><X size={18}/></Btn></div>:null}
     {notice?<div className="sv-message" role="status"><Info size={18}/><span>{notice}</span><Btn tone="quiet" className="sv-icon-button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={18}/></Btn></div>:null}
     {busy?<div className="sv-busy" role="status"><Spinner/>{busy}</div>:null}

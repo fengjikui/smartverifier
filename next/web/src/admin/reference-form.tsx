@@ -1,3 +1,4 @@
+import { apiPath } from '../../../shared/paths';
 import { useEffect, useRef, useState } from 'react';
 import { ImagePlus, Plus, Upload, Check } from 'lucide-react';
 import { Btn, Field, Pill, Spinner } from '../ui';
@@ -28,10 +29,10 @@ export function ReferenceForm({mode,id,person,navigate,onDirty,onSaved,onError}:
     {recovered?<div className="adm-notice" role="status">已恢复上次未保存的输入，请确认后保存。<button type="button" onClick={()=>{if(confirm('清除恢复的输入并重新填写？')){localStorage.removeItem(key);onDirty(false);navigate('references');}}}>放弃草稿</button></div>:null}
     {saveMessage?<div className="adm-notice" role="status"><Check size={18}/>{saveMessage}</div>:null}
     <div className="adm-two-columns"><section className="adm-panel adm-image-editor"><div className="adm-panel-heading"><h2>正品图片 <span className="adm-required">*</span></h2>{asset?<Pill tone="success">已添加 1 张</Pill>:null}</div>
-      {asset?<a className="adm-reference-image" href={'/api/reference-assets/'+asset.id} target="_blank" rel="noreferrer"><img src={'/api/reference-assets/'+asset.id} alt="当前正品原图"/></a>:<button type="button" className="adm-upload-zone" disabled={uploading} onClick={()=>picker.current?.click()}><ImagePlus size={34}/><strong>点击添加正品图片</strong><span>清晰展示丝印与器件外形</span><small>JPG / PNG / WebP · 单张最多 20MB</small></button>}
+      {asset?<a className="adm-reference-image" href={apiPath('/reference-assets/'+asset.id)} target="_blank" rel="noreferrer"><img src={apiPath('/reference-assets/'+asset.id)} alt="当前正品原图"/></a>:<button type="button" className="adm-upload-zone" disabled={uploading} onClick={()=>picker.current?.click()}><ImagePlus size={34}/><strong>点击添加正品图片</strong><span>清晰展示丝印与器件外形</span><small>JPG / PNG / WebP · 单张最多 20MB</small></button>}
       <input ref={picker} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{const f=e.target.files?.[0];if(f)void upload(f);e.target.value='';}}/>
       {uploading?<div className="adm-loading" role="status"><Spinner/>正在校验与保存原图…</div>:null}
-      <div className="adm-actions"><Btn disabled={uploading||busy} type="button" onClick={()=>picker.current?.click()}><Upload size={17}/>{asset?'更换图片':'选择图片'}</Btn>{asset?<a href={'/api/reference-assets/'+asset.id} target="_blank" rel="noreferrer">查看原图 ↗</a>:null}</div>
+      <div className="adm-actions"><Btn disabled={uploading||busy} type="button" onClick={()=>picker.current?.click()}><Upload size={17}/>{asset?'更换图片':'选择图片'}</Btn>{asset?<a href={apiPath('/reference-assets/'+asset.id)} target="_blank" rel="noreferrer">查看原图 ↗</a>:null}</div>
       {asset?<p className="adm-footnote">{asset.filename} · {asset.width} × {asset.height} · {(asset.bytes/1024/1024).toFixed(2)} MB</p>:null}<p className="adm-image-tip">建议一次拍摄一个器件，丝印清晰、角度端正。原图保留，列表仅使用缩略图。</p>
     </section><section className="adm-panel adm-form-fields"><h2>标准信息</h2><div className="adm-field-pair"><label>物料编号 <span className="adm-required">*</span><Field ref={material} required maxLength={160} value={input.material} onChange={e=>update({material:e.target.value})} placeholder="如 MAT-358-08" autoComplete="off"/></label><label>供应商名称 <span className="adm-required">*</span><Field required maxLength={160} value={input.supplier} onChange={e=>update({supplier:e.target.value})} placeholder="与任务中的名称保持一致"/></label></div>
       <p className="adm-footnote">物料编号与供应商共同唯一，保留前导零，区分大小写。</p><label>物料名称 <small>选填，方便检索</small><Field maxLength={200} value={input.name} onChange={e=>update({name:e.target.value})} placeholder="如 双运算放大器"/></label>

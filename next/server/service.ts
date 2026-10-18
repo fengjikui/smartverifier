@@ -1,3 +1,4 @@
+import { publicUrl } from '../shared/paths.ts';
 import { createHash, randomUUID } from 'node:crypto';
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
@@ -281,15 +282,15 @@ export class InspectionService {
     const conflicts=[...new Set(r.photos.flatMap(p=>p.components.flatMap(c=>[...(c.ai?.instructionConflicts??[]),...(c.ai?.instructionWarnings??[])])))];
     if(conflicts.length)lines.splice(4,0,'## 重要：现场说明优先及与标准的关系','本次按现场检验人员指示进行检测。',...conflicts.map(escapeMarkdown),'');
     for (const p of r.photos) {
-      lines.push(`## 照片 P${String(p.sequence).padStart(3,'0')}`, `![原始照片](${p.url})`, '', escapeMarkdown(p.filename));
-      if(p.preparation)lines.push('',`![定位编号（原图外侧引线）](${p.preparation.annotatedUrl})`,`![裁片白板（保持裁片像素）](${p.preparation.sheetUrl})`,`预处理：${p.preparation.version}；${p.preparation.elapsedMs} ms；原图SHA256：${p.hash}`,'');
+      lines.push(`## 照片 P${String(p.sequence).padStart(3,'0')}`, `![原始照片](${publicUrl(p.url)})`, '', escapeMarkdown(p.filename));
+      if(p.preparation)lines.push('',`![定位编号（原图外侧引线）](${publicUrl(p.preparation.annotatedUrl)})`,`![裁片白板（保持裁片像素）](${publicUrl(p.preparation.sheetUrl)})`,`预处理：${p.preparation.version}；${p.preparation.elapsedMs} ms；原图SHA256：${p.hash}`,'');
       for (const c of p.components) {
         lines.push(`### ${c.label} · ${finalVerdict(c) === 'PASS' ? '合格' : finalVerdict(c) === 'FAIL' ? '不合格' : '未完成'}`, '', '| 行 | 实拍识别原文 | 正品原文 |', '| --- | --- | --- |');
         if(!r.standard.lines.length)lines.push('| — | — | 未录入文字转写，以正品图片为准 |');
         for (let i = 0; i < Math.max(c.ai?.lines.length ?? 0, r.standard.lines.length); i++) lines.push(`| ${i+1} | ${escapeMarkdown(c.ai?.lines[i] ?? '')} | ${escapeMarkdown(r.standard.lines[i] ?? '')} |`);
         lines.push('', escapeMarkdown(c.ai?.reason ?? p.message));
         lines.push('结果来源：'+(isVlmJudgement(c.ai)?'VLM真实识别':c.ai?'内置预设（非模型识别）':'尚未生成结论'));
-        if(c.crop)lines.push(`![元件裁片 ${c.label}](${c.crop.url})`);
+        if(c.crop)lines.push(`![元件裁片 ${c.label}](${publicUrl(c.crop.url)})`);
         if(isVlmJudgement(c.ai))lines.push(`模型：${escapeMarkdown(c.ai.model??'')}；${c.ai.elapsedMs} ms；判断把握：${c.ai.confidence}（模型自评，非校准概率）；提示词：${c.ai.promptVersion}；原始响应记录：${c.ai.rawRecord}`,...(c.ai.features??[]).map(f=>'外观：'+escapeMarkdown(f)),...(c.ai.differences??[]).map(d=>'差异：'+escapeMarkdown(d.message)));
         if (c.review) lines.push(`人工修正：${c.review.person.name} ${c.review.person.id}，${c.review.at}，原因：${escapeMarkdown(c.review.reason)}。AI原判${c.ai?.verdict}保留。`);
       }

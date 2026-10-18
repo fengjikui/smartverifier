@@ -1,10 +1,12 @@
 # 丝印检测系统 · 新版工作区
 
+公共路径统一为 `/inspections/marking`，接口为 `/api/v1/inspections/marking`；旧地址兼容跳转。详见[路径与扩展约定](docs/统一路径与扩展约定.md)。
+
 ## MES 接通前的试用入口
 
-- [自主检测](http://127.0.0.1:5190/?entry=standards)：按物料查询、选择供应商及正品，上传照片后调用真实 VLM；展示结论与不良数量，供电脑 MES 手工填写。回填按钮禁用，照片和结果仅存本系统。
-- [平板模拟试用](http://127.0.0.1:5190/tablet-preview)：默认同样进入自主检测；真实平板直接打开网页即可。
-- [模拟 MES 任务](http://127.0.0.1:5190/?entry=tasks)：管理端新录入并启用的正品自动提供对应模拟任务，选择后自动关联图片与描述。任务列表仍只读。
+- [自主检测](http://127.0.0.1:5190/inspections/marking?entry=standards)：按物料查询、选择供应商及正品，上传照片后调用真实 VLM；展示结论与不良数量，供电脑 MES 手工填写。回填按钮禁用，照片和结果仅存本系统。
+- [平板模拟试用](http://127.0.0.1:5190/inspections/marking/preview/tablet)：默认同样进入自主检测；真实平板直接打开网页即可。
+- [模拟 MES 任务](http://127.0.0.1:5190/inspections/marking?entry=tasks)：管理端新录入并启用的正品自动提供对应模拟任务，选择后自动关联图片与描述。任务列表仍只读。
 - [试用说明](docs/自主检测与模拟MES试用说明.md)、[验证记录](docs/自主检测-交付及验证-2026-10-18.md)。MES 接口预计还需约两个月，本阶段不访问公司 MES，不上传附件。
 
 ## 当前阶段
@@ -14,16 +16,16 @@
 - [VLM服务配置与迁移](docs/VLM服务配置与迁移.md)：统一使用`SV_VLM_ENDPOINT`等变量，提供[可复制配置](config/vlm.env.example)，支持内网HTTP／HTTPS服务。
 - [试用演示基线与缺口清单](docs/试用演示基线与缺口清单.md)：当前闭环、下周试用准备、真实正品录入、平板验证和企业接口的实际缺口；当前暂停性能优化。
 
-- [打开真实识别试用](http://127.0.0.1:5190/tablet-preview?demo=real)：使用模拟拍摄照片 → 开始检测 → 查看真实比对。单件／双件／较暗三件均可从任务列表选择。
+- [打开真实识别试用](http://127.0.0.1:5190/inspections/marking/preview/tablet?demo=real)：使用模拟拍摄照片 → 开始检测 → 查看真实比对。单件／双件／较暗三件均可从任务列表选择。
 - [真实识别试用与部署说明](docs/本机真实识别试用与部署.md)、[本轮调研与实测材料](research/real-vision/README.md)。启动真实模型使用 `npm run start:next:real`；普通 `start:next` 仍为离线模拟。
 - [4／6件白板批量识别对照实验](research/whiteboard-batching/README.md)：同组裁片首次输入较逐件累计减少约28%耗时，本组文字与判定均正确；另含缓存与换位复核。尚未切换日常工作台的逐件队列。
-- [本机模型调试窗口](http://127.0.0.1:5190/debug/model)：查看实际图片、完整提示词、流式输出和逐件时间；默认固定前缀＋Schema，可切换旧输入顺序和提示词方式。见[使用说明](docs/模型调试窗口与耗时口径.md)，只限服务器本机访问。
+- [本机模型调试窗口](http://127.0.0.1:5190/inspections/marking/debug/model)：查看实际图片、完整提示词、流式输出和逐件时间；默认固定前缀＋Schema，可切换旧输入顺序和提示词方式。见[使用说明](docs/模型调试窗口与耗时口径.md)，只限服务器本机访问。
 - [固定前缀与Schema换图对照实验](research/prefix-cache/README.md)：实际渲染顺序、缓存命中、首字与总耗时、逐字和判定核验，保留新旧方式对照材料。
 
-- [打开新版试用](http://127.0.0.1:5190/)：进入本地试用 → 任务00016 → 用内置样例试一下 → 四个元件 → 开始检测。
-- [电脑平板模拟试用](http://127.0.0.1:5190/tablet-preview)：固定 1280 × 840 横屏视口，支持鼠标按住上下拖动、横竖屏、全屏及等比缩放；见[操作与验证说明](docs/平板模拟试用说明.md)。使用现有检验记录；真实识别模式取决于服务启动配置，旧内置流程样例与MES仍为模拟。
-- [体验20张照片](http://127.0.0.1:5190/tablet-preview?demo=photos)或[单图20件](http://127.0.0.1:5190/tablet-preview?demo=board)：标准／紧凑预览、元件状态按钮已实现；详见[交付与验证](docs/紧凑预览与20件样例-交付及验证.md)。样例结果均为虚构预设，可自行调整照片。
-- [体验统一元件详情](http://127.0.0.1:5190/tablet-preview?demo=photos)：点击任意照片，右上方按本轮编号切换元件；不再单设逐件报告页。[完整报告](http://127.0.0.1:5190/tablet-preview?demo=photos&view=report)默认收起元件导航，按需定位。详见[页面信息层级与统一元件详情](docs/页面信息层级与统一元件详情-交付及验证.md)。
+- [打开新版试用](http://127.0.0.1:5190/inspections/marking)：进入本地试用 → 任务00016 → 用内置样例试一下 → 四个元件 → 开始检测。
+- [电脑平板模拟试用](http://127.0.0.1:5190/inspections/marking/preview/tablet)：固定 1280 × 840 横屏视口，支持鼠标按住上下拖动、横竖屏、全屏及等比缩放；见[操作与验证说明](docs/平板模拟试用说明.md)。使用现有检验记录；真实识别模式取决于服务启动配置，旧内置流程样例与MES仍为模拟。
+- [体验20张照片](http://127.0.0.1:5190/inspections/marking/preview/tablet?demo=photos)或[单图20件](http://127.0.0.1:5190/inspections/marking/preview/tablet?demo=board)：标准／紧凑预览、元件状态按钮已实现；详见[交付与验证](docs/紧凑预览与20件样例-交付及验证.md)。样例结果均为虚构预设，可自行调整照片。
+- [体验统一元件详情](http://127.0.0.1:5190/inspections/marking/preview/tablet?demo=photos)：点击任意照片，右上方按本轮编号切换元件；不再单设逐件报告页。[完整报告](http://127.0.0.1:5190/inspections/marking/preview/tablet?demo=photos&view=report)默认收起元件导航，按需定位。详见[页面信息层级与统一元件详情](docs/页面信息层级与统一元件详情-交付及验证.md)。
 - 任务选择、照片总览、检测中和提交结果已按信息主次优化：辅助操作归入菜单，显示实际检测进度，保存凭证按需展开。已用隔离数据跑通横竖屏完整流程及质量替换、回填失败重试，见[四阶段交付与验证](docs/四个阶段信息层级优化-交付及验证.md)。
 - 真实上传、服务端草稿、增量检测、人工修正、逐字对照报告与模拟回填已跑通。启用LM Studio后，普通上传走真实模型；未启用时明确报未完成，不伪造判定。
 - [阶段一交付与验证记录](docs/阶段一交付与验证记录.md)说明已测内容与限制；[分阶段计划](docs/分阶段实施与试用计划.md)记录接真实模型和公司接口的后续顺序；[服务启动与API草案](server/README.md)提供开发配置。
@@ -39,7 +41,7 @@
 
 ## 正品数据库管理端（已实现）
 
-- [打开正品管理](http://127.0.0.1:5190/admin)：电脑录入为主，独立路径。当前试用账号 `admin`，密码 `admin123`，仅允许服务器本机登录；IDaaS 等待接入。
+- [打开正品管理](http://127.0.0.1:5190/inspections/marking/admin/standards)：电脑录入为主，独立路径。当前试用账号 `admin`，密码 `admin123`，仅允许服务器本机登录；IDaaS 等待接入。
 - 支持单条新增、保存后继续新增、编辑、复制、草稿、搜索分页、回收站和恢复、版本留痕与维护日志。
 - 批量导入支持 Excel / JSON 清单＋图片，或完整 ZIP。提供模板下载，先预检后确认；已有组合跳过，有错误则阻止写入，确认请求可幂等重试。
 - 检验任务由 MES 同步，本系统仅展示与选择，按物料编号＋供应商自动关联标准；不提供任务新增、修改、删除。MES 尚未接通，当前展示从可用正品标准自动关联的模拟任务及内置演示样例。
@@ -49,12 +51,12 @@
 
 - [体验独立管理端原型](https://www.figma.com/proto/6kmN9EjSyVpFuTQxC1NaBE?node-id=3909-465&starting-point-node-id=3909%3A465&scaling=contain)：用户已确认以电脑使用为主，按 1440 × 960 设计；评审修订后共 43 个页面／交互状态。导览可进入常用维护流程与边界场景。
 - [打开管理端 Figma 设计](https://www.figma.com/design/6kmN9EjSyVpFuTQxC1NaBE?page-id=3909%3A464&node-id=3909-468)：独立放在「03 · 正品管理 · 独立后台」。检验端不放管理入口；原型导览保留跳转，方便评审。
-- 实施建议为同站独立 `/admin` 路径，可单独收藏；复用公司 IDaaS，后台校验管理员身份。实际程序已按独立路径实现；公司 IDaaS 与正式授权仍待接入，当前使用本机临时账号。
+- 实施建议为同站独立 `/inspections/marking/admin/standards` 路径，可单独收藏；复用公司 IDaaS，后台校验管理员身份。实际程序已按独立路径实现；公司 IDaaS 与正式授权仍待接入，当前使用本机临时账号。
 - 日常使用按「查找 → 查看／编辑 → 保存」组织。支持图片与说明同页编辑、复制新增、组合重复提醒、可恢复删除、维护日志及改动对照；批量导入放在次要入口，先校验预览、重复默认跳过。
 - [设计资料](design/admin-v0.1/design-plan.json)、[画板映射](design/admin-v0.1/figma-node-map.json)、[验证记录](design/admin-v0.1/validation.json)、[列表预览](design/admin-v0.1/list.png)和[编辑预览](design/admin-v0.1/edit.png)已保存。已在 Chrome 点击验证编辑保存及最新版本详情、删除恢复、查询、新增成功；所有数据、登录、输入和上传均为静态样例模拟。
 - 报告内容详单与元件编号引导线另行细化，本轮未修改报告方案。
 - 评审修订：回收站「详情」打开已删除标准的只读内容，「恢复」独立进入确认；关闭原图返回刚才页面，替换图片不再误入新增页，维护日志按事件打开相应详情。非主示例数据改为明确说明，不再跳到另一条记录。
-- 批量导入已补充「下载模板」与 Excel／JSON 示例预览。实际模板位于 [templates/reference-import-v1](templates/reference-import-v1/填写说明.txt)，可取用 [Excel 模板](templates/reference-import-v1/正品标准导入模板.xlsx)、[JSON 清单](templates/reference-import-v1/standards.json)、[JSON 图片标准包示例](templates/reference-import-v1/JSON标准包示例.zip)或[模板资料总包](templates/reference-import-v1/模板资料总包.zip)。Figma 下载按钮仍是原型预览；实际 `/admin` 已支持模板下载、预检解析与确认导入。
+- 批量导入已补充「下载模板」与 Excel／JSON 示例预览。实际模板位于 [templates/reference-import-v1](templates/reference-import-v1/填写说明.txt)，可取用 [Excel 模板](templates/reference-import-v1/正品标准导入模板.xlsx)、[JSON 清单](templates/reference-import-v1/standards.json)、[JSON 图片标准包示例](templates/reference-import-v1/JSON标准包示例.zip)或[模板资料总包](templates/reference-import-v1/模板资料总包.zip)。Figma 下载按钮仍是原型预览；实际 `/inspections/marking/admin/standards` 已支持模板下载、预检解析与确认导入。
 
 新版从这里独立整理。当前需求依据是用户提供的 2026-10-13 会议方案 v0.3；整理日期为 2026-10-17。
 
