@@ -38,7 +38,7 @@ export function TabletSimulator() {
     return () => observer.disconnect();
   }, []);
   useEffect(() => {
-    document.title = reviewingLogin?'登录页布局与名称对照':'观微 · 平板模拟试用';
+    document.title = reviewingLogin?'登录页布局与名称对照':'鉴微 · 平板模拟试用';
     const listener = () => setFullscreen(document.fullscreenElement === host.current);
     document.addEventListener('fullscreenchange', listener);
     return () => { document.removeEventListener('fullscreenchange', listener); detach.current?.(); };
@@ -72,14 +72,14 @@ export function TabletSimulator() {
     </header>
     {reviewingLogin?<section className="sv-login-review-controls" aria-label="登录页设计对照">
       <div className="sv-login-review-layout"><span>布局</span><div className="sv-simulator-orientation" role="group" aria-label="登录布局"><button aria-pressed={loginLayout==='auto'} onClick={()=>setLoginLayout('auto')}>自动适配</button><button aria-pressed={loginLayout==='split'} onClick={()=>setLoginLayout('split')}>左右分布</button><button aria-pressed={loginLayout==='stacked'} onClick={()=>setLoginLayout('stacked')}>上下分布</button></div></div>
-      <label>名称<select aria-label="项目名称" value={brandId} onChange={e=>setBrandId(e.target.value)}>{loginBrands.map(item=><option value={item.id} key={item.id}>{item.name}{item.id==='guanwei'?'（现名）':'（候选）'}</option>)}</select></label>
-      <p>{brand.meaning}<span>候选名称仅供本页比较，正式名称待确认。</span></p>
+      <label>名称<select aria-label="项目名称" value={brandId} onChange={e=>setBrandId(e.target.value)}>{loginBrands.map(item=><option value={item.id} key={item.id}>{item.name}{item.id==='jianwei'?'（现名）':item.id==='guanwei'?'（原名）':'（候选）'}</option>)}</select></label>
+      <p>{brand.meaning}<span>正式名称已确定为“鉴微”，其他名称仅供方案对照。</span></p>
     </section>:null}
     <div className="sv-simulator-caption"><span>网页视口 <strong>{width} × {height}</strong><span className="sv-simulator-caption-extra"> · 原型约定尺寸，非屏幕物理像素</span></span><span>{Math.round(scale*100)}% 显示</span></div>
     <main className="sv-simulator-stage" ref={stage} aria-label="平板网页模拟区">
       <div className="sv-simulator-sized" style={{width:deviceWidth*scale,height:deviceHeight*scale}}>
         <div className="sv-simulator-device" style={{width:deviceWidth,height:deviceHeight,transform:`scale(${scale})`}}>
-          <iframe ref={frame} src={frameUrl} title={reviewingLogin?'登录页设计预览':'观微平板检验工作台'} width={width} height={height} allow="camera; fullscreen" onLoad={loaded}/>
+          <iframe ref={frame} src={frameUrl} title={reviewingLogin?'登录页设计预览':'鉴微平板检验工作台'} width={width} height={height} allow="camera; fullscreen" onLoad={loaded}/>
         </div>
       </div>
     </main>

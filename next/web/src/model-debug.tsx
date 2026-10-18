@@ -26,7 +26,7 @@ export function ModelDebug(){
   const wall=terminal?(generation??events.at(-1))?.elapsedMs:header?Math.max(events.at(-1)?.elapsedMs??0,now-header.at*1000+header.elapsedMs):null;
   const filtered=traces.filter(t=>(t.label+' '+t.model+' '+t.componentIds.join(' ')).toLowerCase().includes(search.trim().toLowerCase()));
 
-  useEffect(()=>{const before=document.title;document.title='观微 · 模型调试';return()=>{document.title=before;};},[]);
+  useEffect(()=>{const before=document.title;document.title='鉴微 · 模型调试';return()=>{document.title=before;};},[]);
   useEffect(()=>{let active=true;void request('/bootstrap').then(()=>{if(active)setAuthenticated(true);}).catch(e=>{if(active&&!(e instanceof ApiError&&e.status===401))setError((e as Error).message);}).finally(()=>{if(active)setReady(true);});return()=>{active=false;clearTimeout(copyTimer.current);};},[]);
   useEffect(()=>{
     if(!authenticated)return;let active=true;let timer:ReturnType<typeof setTimeout>;

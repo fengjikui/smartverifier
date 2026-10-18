@@ -1,4 +1,4 @@
-# 丝印检测系统 · 新版工作区
+# 鉴微 · 丝印检测系统新版工作区
 
 公共路径统一为 `/inspections/marking`，接口为 `/api/v1/inspections/marking`；旧地址已停用并返回 404。详见[路径与扩展约定](docs/统一路径与扩展约定.md)。
 
@@ -6,7 +6,7 @@
 
 ## MES 接通前的试用入口
 
-- [登录页布局与名称对照](http://127.0.0.1:5190/inspections/marking/preview/tablet?screen=login)：默认横屏左右、竖屏上下自动适配，也可手动切换布局与“观微、鉴微、明鉴”。正式名称待确认；[说明与验证](docs/登录布局与名称对照.md)。
+- [登录页布局与名称对照](http://127.0.0.1:5190/inspections/marking/preview/tablet?screen=login)：已定稿为“鉴微”，横屏左右、竖屏上下自动适配；仍可查看历史方案。[说明与验证](docs/登录布局与名称对照.md)。
 
 - [自主检测](http://127.0.0.1:5190/inspections/marking?entry=standards)：按物料查询、选择供应商及正品，上传照片后调用真实 VLM；展示结论与不良数量，供电脑 MES 手工填写。回填按钮禁用，照片和结果仅存本系统。
 - [平板模拟试用](http://127.0.0.1:5190/inspections/marking/preview/tablet)：默认同样进入自主检测；真实平板直接打开网页即可。

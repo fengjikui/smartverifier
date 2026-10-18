@@ -4,8 +4,8 @@ import { Btn, Pill, Spinner } from './ui';
 import './login-screen.css';
 
 export const loginBrands = [
-  { id:'guanwei', name:'观微', meaning:'观察细节，清楚留证' },
   { id:'jianwei', name:'鉴微', meaning:'细微之处，有据可鉴' },
+  { id:'guanwei', name:'观微', meaning:'观察细节，清楚留证' },
   { id:'mingjian', name:'明鉴', meaning:'让判断清楚，让依据可见' },
 ] as const;
 export type LoginLayout = 'auto' | 'split' | 'stacked';
@@ -13,7 +13,7 @@ export function loginLayout(value:string|null):LoginLayout{return value==='split
 export function loginBrand(id:string|null){return loginBrands.find(brand=>brand.id===id)??loginBrands[0];}
 
 /** 正常登录与设计对照共用同一组件，预览不绕过身份校验。 */
-export function LoginScreen({layout='auto',brand='观微',busy=false,error='',onEnter}:{layout?:LoginLayout;brand?:string;busy?:boolean;error?:string;onEnter:()=>void}){
+export function LoginScreen({layout='auto',brand=loginBrands[0].name,busy=false,error='',onEnter}:{layout?:LoginLayout;brand?:string;busy?:boolean;error?:string;onEnter:()=>void}){
   const [portrait,setPortrait]=useState(()=>window.matchMedia('(orientation: portrait)').matches);
   useEffect(()=>{
     const media=window.matchMedia('(orientation: portrait)');
