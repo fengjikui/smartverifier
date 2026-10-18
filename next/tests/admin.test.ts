@@ -14,6 +14,12 @@ import type { Task } from '../shared/types.ts';
 const root=path.resolve('.');
 const input={material:'00123',supplier:'测试供应商',name:'测试器件',description:'允许批次码变化。',lines:[],assetId:'',status:'active' as const};
 
+// 模拟 MES 已同步的数据，不通过应用提供手工维护入口。
+function seedMesTask(service:InspectionService,fields:{number:string;material:string;supplier:string}):Task {
+  const task:Task={...fields,id:'MESTEST001',origin:'mes',standard:null,roundId:null,effectiveRoundId:null};
+  service.store.saveTask(task);return task;
+}
+
 test('标准库：版本冲突、重复、任务自动绑定、软删除与历史快照保护，15000条分页查询',async t=>{
   const directory=await mkdtemp(path.join(tmpdir(),'sv-registry-')),service=new InspectionService(directory,root),r=service.registry;
   t.after(async()=>{service.store.close();await rm(directory,{recursive:true,force:true});});
@@ -21,7 +27,7 @@ test('标准库：版本冲突、重复、任务自动绑定、软删除与历�
   assert.throws(()=>r.save(input,person),/图片/);
   let standard=r.save({...input,assetId:asset.id},person);assert.equal(standard.material,'00123');
   assert.throws(()=>r.save({...input,assetId:asset.id},person),/已存在/);
-  const task=r.createTask({number:'本地试验单-001',material:input.material,supplier:input.supplier},person);assert.equal(service.task(task.id).standard!.id,standard.id);
+  const task=seedMesTask(service,{number:'MES-试验单-001',material:input.material,supplier:input.supplier});assert.equal(service.task(task.id).standard!.id,standard.id);
   const opened=service.open(task.id),snapshot=structuredClone(opened.round!.standard);
   standard=r.save({...input,assetId:asset.id,description:'更新后的说明'},person,standard.id,1);
   assert.throws(()=>r.save({...input,assetId:asset.id},person,standard.id,1),/更新/);
@@ -51,7 +57,11 @@ test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复
   const invalid=new FormData();invalid.set('image',new File([new Uint8Array([1,2,3])],'伪装.png'));await call('/admin/assets',invalid,400);
   let standard:ReferenceRecord=await call('/admin/references',{...input,assetId:asset.id},201);await call('/admin/references',{...input,assetId:asset.id},409);
   standard=await call('/admin/references/'+standard.id,{...input,assetId:asset.id,version:1,description:'更新'},200,'PUT');assert.equal(standard.version,2);
-  const created:Task=await call('/admin/tasks',{number:'TEST-001',material:input.material,supplier:input.supplier},201);await call('/admin/tasks',{number:'TEST-001',material:input.material,supplier:input.supplier},409);
+  const created=seedMesTask(service,{number:'MES-TEST-001',material:input.material,supplier:input.supplier});
+  const tasksBefore=service.store.tasks();
+  for(const [route,method] of [['/admin/tasks','POST'],['/admin/tasks/'+created.id,'POST'],['/admin/tasks/'+created.id,'PUT'],['/admin/tasks/'+created.id,'PATCH'],['/admin/tasks/'+created.id,'DELETE'],['/admin/tasks/T00000000000000000000000000000000','DELETE']])assert.match((await call(route,{number:'不得修改',material:'OTHER',supplier:'OTHER'},405,method)).message,/MES/);
+  assert.deepEqual(service.store.tasks(),tasksBefore,'管理接口不能增删改 MES 任务');
+  assert.ok((await call('/admin/tasks')).items.some((task:Task)=>task.id===created.id&&task.standard?.id===standard.id));
   assert.equal((await fetch(base+'/api/tasks/'+created.id+'/open',{method:'POST',headers:{Cookie:inspectionCookie,'Content-Type':'application/json'},body:'{}'}).then(r=>r.json())).round.standard.id,standard.id);
   for(const kind of ['xlsx','json','zip','help'])assert.equal((await fetch(base+'/api/admin/templates/'+kind,{headers:{Cookie:cookie}})).status,200);
   async function poll(id:string){for(let i=0;i<100;i++){const j:ImportJob=await call('/admin/imports/'+id);if(j.status!=='validating')return j;await delay(100);}throw Error('预检超时');}
@@ -69,7 +79,6 @@ test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复
   assert.equal(spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.load_workbook(sys.argv[1]);w.active.delete_rows(3,2);w.save(sys.argv[1])",generated]).status,0);
   const corrected=new FormData();corrected.append('files',new File([await readFile(generated)],'已修正.xlsx'));corrected.append('files',new File([bytes],'正品.png'));
   const clean=await poll((await call('/admin/imports',corrected,202)).id);assert.equal(clean.counts.error,0);assert.equal((await call('/admin/imports/'+clean.id+'/commit',{})).receipt.created,1);assert.equal((await call('/admin/references?q=000007')).items[0].material,'000007');
-  const editable=await call('/admin/tasks',{number:'EDIT-01',material:'000007',supplier:'Excel供应商'},201);await call('/admin/tasks/'+editable.id,{number:'EDIT-02',material:'000007',supplier:'Excel供应商'},200,'PUT');await call('/admin/tasks/'+editable.id,{},200,'DELETE');await call('/admin/tasks/'+created.id,{},409,'DELETE');
   const traversal=path.join(directory,'unsafe.zip');assert.equal(spawnSync(python,['-c',"import zipfile,sys;z=zipfile.ZipFile(sys.argv[1],'w');z.writestr('../escape.png',b'x');z.close()",traversal]).status,0);
   const malicious=new FormData();malicious.append('files',new File([await readFile(traversal)],'unsafe.zip'));const unsafe=await poll((await call('/admin/imports',malicious,202)).id);assert.equal(unsafe.status,'failed');assert.match(unsafe.message,/不安全/);
   await call('/admin/session',{},200,'DELETE');await call('/admin/references',undefined,401);

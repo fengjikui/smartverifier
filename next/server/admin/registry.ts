@@ -2,12 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { ApiError } from '../errors.ts';
 import type { Store } from '../store.ts';
-import type { Person, Standard, Task } from '../../shared/types.ts';
+import type { Person, Standard } from '../../shared/types.ts';
 import type { ReferenceRecord, ReferenceInput, ReferenceAsset, Page, MaintenanceEvent, ImportJob } from '../../shared/admin.ts';
 
 const text=(max:number)=>z.string().trim().max(max).transform(s=>s.normalize('NFC'));
 export const referenceInput=z.object({material:text(160).pipe(z.string().min(1)),supplier:text(160).pipe(z.string().min(1)),name:text(200).default(''),description:text(8000).default(''),lines:z.array(text(300)).max(50).default([]),assetId:z.string().max(100).default(''),status:z.enum(['active','draft']).default('active')}).strict();
-export const taskInput=z.object({number:text(100).pipe(z.string().min(1)),material:text(160).pipe(z.string().min(1)),supplier:text(160).pipe(z.string().min(1))}).strict();
 const stamp=()=>new Date().toISOString();
 const like=(s:string)=>'%'+s.replace(/[!%_]/g,c=>'!'+c)+'%';
 export class Registry {
@@ -66,11 +65,6 @@ export class Registry {
     });return result;
   }
   detail(id:string){const record=this.get(id);return {record,events:this.events('',1,100,id).items,tasks:this.store.tasks().filter(t=>(t.origin==='local'||t.origin==='mes')&&t.material===record.material&&t.supplier===record.supplier)};}
-  createTask(raw:unknown,actor:Person){const input=taskInput.parse(raw);let task!:Task;this.store.transaction(()=>{if(this.store.tasks().some(t=>t.number===input.number))throw new ApiError(409,'此任务单号已存在，请使用其他单号。');task={...input,id:'T'+randomUUID().replaceAll('-','').toUpperCase(),origin:'local',standard:null,roundId:null,effectiveRoundId:null};this.store.saveTask(task);this.event('task',task.id,'task.create',actor,null,task);});return task;}
-  updateTask(id:string,raw:unknown,actor:Person,remove=false){let result!:Task;this.store.transaction(()=>{const before=this.store.task(id);if(!before||before.origin!=='local')throw new ApiError(404,'仅能维护本系统创建的任务。');if(before.roundId||before.effectiveRoundId)throw new ApiError(409,'任务已开始检测，物料与供应商信息不能再修改或删除。');
-    if(remove){this.store.db.prepare('DELETE FROM tasks WHERE id=?').run(id);result=before;this.event('task',id,'task.delete',actor,before,null);return;}
-    const input=taskInput.parse(raw);if(this.store.tasks().some(t=>t.id!==id&&t.number===input.number))throw new ApiError(409,'任务单号已存在。');result={...before,...input,standard:null};this.store.saveTask(result);this.event('task',id,'task.update',actor,before,result);
-  });return result;}
   job(id:string,owner:string):ImportJob{const r=this.store.db.prepare('SELECT data FROM reference_imports WHERE id=? AND owner=?').get(id,owner);if(!r)throw new ApiError(404,'导入记录不存在或属于其他管理员。');return JSON.parse(String(r.data));}
   saveJob(job:ImportJob,owner:string){this.store.db.prepare('INSERT INTO reference_imports VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(job.id,owner,JSON.stringify(job));}
   commitJob(id:string,actor:Person){let job=this.job(id,actor.id);if(job.status==='committed')return job;if(job.status!=='preview'||job.counts.error)throw new ApiError(409,'请先处理导入错误，重新上传并通过预检。');

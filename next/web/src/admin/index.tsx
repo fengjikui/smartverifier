@@ -4,7 +4,7 @@ import { Btn, Field, Pill, Spinner } from '../ui';
 import { request, ApiError } from '../api';
 import { ReferenceList, ReferenceDetailView, AuditView } from './references';
 import { ReferenceForm } from './reference-form';
-import { TaskManager } from './tasks';
+import { TaskList } from './tasks';
 import { ImportView } from './import-view';
 import type { AdminSession } from '../../../shared/admin';
 import './style.css';
@@ -31,7 +31,7 @@ export function Admin(){
       {isForm?<ReferenceForm mode={kind} id={id} person={session.person} onDirty={v=>dirty.current=v} onSaved={saved} onError={failed} navigate={go}/>:
       kind==='detail'?<ReferenceDetailView id={id} navigate={go} onError={failed} onSaved={saved}/>:
       kind==='import'?<ImportView person={session.person} navigate={go} onError={failed} onSaved={saved}/>:
-      kind==='tasks'?<TaskManager onError={failed} onSaved={saved} revision={revision}/>:
+      kind==='tasks'?<TaskList onError={failed} revision={revision}/>:
       kind==='audit'?<AuditView onError={failed}/>:
       <ReferenceList trash={kind==='trash'} navigate={go} onError={failed} onSaved={saved} revision={revision}/>}
     </main></div>

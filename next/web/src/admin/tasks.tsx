@@ -1,20 +1,64 @@
 import { useEffect, useState } from 'react';
-import { Plus, Search, ExternalLink } from 'lucide-react';
-import { Btn, Field, Modal, Pill, Spinner } from '../ui';
+import { ExternalLink, RefreshCw, Search } from 'lucide-react';
+import { Btn, Field, Pill } from '../ui';
 import { request } from '../api';
 import { Empty, Heading, Loading, Pagination } from './common';
-import type { TaskListItem, Standard } from '../../../shared/types';
-export function TaskManager({onError,onSaved,revision}:{onError:(e:unknown)=>void;onSaved:(s:string)=>void;revision:number}){
-  const [tasks,setTasks]=useState<TaskListItem[]|null>(null),[q,setQ]=useState(''),[page,setPage]=useState(1),[editing,setEditing]=useState<string|null>(null),[removing,setRemoving]=useState<TaskListItem|null>(null),[adding,setAdding]=useState(false),[busy,setBusy]=useState(false),[input,setInput]=useState({number:'',material:'',supplier:''}),[match,setMatch]=useState<Standard|null>(null),[checking,setChecking]=useState(false),[formError,setFormError]=useState('');
-  useEffect(()=>{let active=true;void request<{items:TaskListItem[]}>('/admin/tasks').then(v=>{if(active)setTasks(v.items);}).catch(onError);return()=>{active=false;};},[revision]);
-  useEffect(()=>{setMatch(null);if(!input.material.trim()||!input.supplier.trim())return;let active=true;setChecking(true);const t=setTimeout(()=>void request<{standard:Standard|null}>(`/admin/match?material=${encodeURIComponent(input.material)}&supplier=${encodeURIComponent(input.supplier)}`).then(v=>{if(active)setMatch(v.standard);}).catch(onError).finally(()=>{if(active)setChecking(false);}),250);return()=>{active=false;clearTimeout(t);};},[input.material,input.supplier]);
-  const filtered=tasks?.filter(t=>[t.number,t.material,t.supplier].some(s=>s.toLocaleLowerCase().includes(q.toLocaleLowerCase())))??[];
-  return <><Heading title="检验任务" description="录入任务单号、物料与供应商，系统自动匹配已启用的正品标准。"><Btn tone="primary" onClick={()=>{setFormError('');setEditing(null);setInput({number:'',material:'',supplier:''});setAdding(true);}}><Plus size={18}/>新增任务</Btn></Heading>
-    <div className="adm-notice adm-neutral">当前为本地任务管理，尚未连接 MES。公司接口接入后，任务将由 MES 同步。</div>
-    <div className="adm-toolbar"><label className="adm-search">关键词查询<div><Search size={18}/><Field placeholder="搜索任务单号 / 物料编号 / 供应商" value={q} onChange={e=>{setQ(e.target.value);setPage(1);}}/></div></label></div>
-    <section className="adm-table-panel">{!tasks?<Loading/>:!filtered.length?<Empty title="暂无匹配的任务" description="新增任务后，检验员就能在平板工作台选择并开始检测。"/>:<div className="adm-table-scroll"><table className="adm-table"><thead><tr><th>任务单号</th><th>物料编号 / 供应商</th><th>正品标准</th><th>检测状态</th><th>操作</th></tr></thead><tbody>{filtered.slice((page-1)*25,page*25).map(t=><tr key={t.id}><td><strong>{t.number}</strong><small>{t.origin==='local'?'本地创建':'内置演示任务'}</small></td><td>{t.material}<small>{t.supplier}</small></td><td>{t.standard?<Pill tone="success">已关联 · v{t.standard.version}</Pill>:<Pill tone="warning">缺少基准</Pill>}</td><td>{t.status}</td><td><div className="adm-row-actions"><a className="adm-open-task" href={'/?task='+t.id} target="_blank" rel="noreferrer">打开检验 <ExternalLink size={15}/></a>{t.origin==='local'&&!t.roundId?<><Btn tone="quiet" onClick={()=>{setInput({number:t.number,material:t.material,supplier:t.supplier});setFormError('');setEditing(t.id);setAdding(true);}}>编辑</Btn><Btn tone="quiet" onClick={()=>{setFormError('');setRemoving(t);}}>删除</Btn></>:null}</div></td></tr>)}</tbody></table></div>}<Pagination page={page} total={filtered.length} onPage={setPage}/></section>
-    {adding?<Modal title={editing?'编辑检验任务':'新增检验任务'} description="按物料编号与供应商自动关联，无需手动选择正品图片。" onClose={()=>{if(!busy)setAdding(false);}}><form className="adm-task-form" onSubmit={e=>{e.preventDefault();setBusy(true);void request('/admin/tasks'+(editing?'/'+editing:''),input,editing?'PUT':'POST').then(()=>{setAdding(false);setInput({number:'',material:'',supplier:''});onSaved(editing?'任务信息已保存。':'任务已创建，平板检验工作台中可以选择。');}).catch(e=>setFormError((e as Error).message)).finally(()=>setBusy(false));}}><label>任务单号<Field required maxLength={100} value={input.number} onChange={e=>setInput({...input,number:e.target.value})} placeholder="如 IQCF26090500019"/></label><label>物料编号<Field required maxLength={160} value={input.material} onChange={e=>setInput({...input,material:e.target.value})}/></label><label>供应商名称<Field required maxLength={160} value={input.supplier} onChange={e=>setInput({...input,supplier:e.target.value})}/></label>
-      {input.material.trim()&&input.supplier.trim()?<div className={'adm-match '+(match?'matched':'')}>{checking?<><Spinner/>正在匹配标准…</>:match?<><img src={match.image} alt="匹配的正品图片"/><div><strong>已关联正品标准 · v{match.version}</strong><p>{match.material} · {match.supplier}</p></div></>:<p>未找到可用标准。可以先创建任务，补齐正品标准后再检测。</p>}</div>:null}{formError?<p className="adm-error" role="alert">{formError}</p>:null}<div className="sv-dialog-actions"><Btn type="button" disabled={busy} onClick={()=>setAdding(false)}>取消</Btn><Btn tone="primary" disabled={busy} type="submit">{busy?'正在保存…':editing?'保存任务':'创建任务'}</Btn></div></form></Modal>:null}
-    {removing?<Modal title="删除未开始的任务？" description={`${removing.number} 尚未开始检测。删除后可使用同一单号重新创建，操作日志保留。`} onClose={()=>{if(!busy)setRemoving(null);}} actions={<><Btn disabled={busy} onClick={()=>setRemoving(null)}>取消</Btn><Btn tone="danger" disabled={busy} onClick={()=>{setBusy(true);void request('/admin/tasks/'+removing.id,{},'DELETE').then(()=>{setRemoving(null);onSaved('未开始的任务已删除。');}).catch(e=>setFormError((e as Error).message)).finally(()=>setBusy(false));}}>确认删除</Btn></>}>{formError?<p className="adm-error" role="alert">{formError}</p>:null}</Modal>:null}
+import type { TaskListItem } from '../../../shared/types';
+
+export function TaskList({onError,revision}:{onError:(e:unknown)=>void;revision:number}) {
+  const [tasks,setTasks]=useState<TaskListItem[]|null>(null);
+  const [query,setQuery]=useState('');
+  const [page,setPage]=useState(1);
+  const [refresh,setRefresh]=useState(0);
+  const [loading,setLoading]=useState(true);
+
+  useEffect(()=>{
+    let active=true;
+    setLoading(true);
+    void request<{items:TaskListItem[]}>('/admin/tasks')
+      .then(value=>{if(active)setTasks(value.items);})
+      .catch(error=>{if(active)onError(error);})
+      .finally(()=>{if(active)setLoading(false);});
+    return()=>{active=false;};
+  },[revision,refresh]);
+
+  const keyword=query.trim().toLocaleLowerCase();
+  const filtered=tasks?.filter(task=>[task.number,task.material,task.supplier]
+    .some(value=>value.toLocaleLowerCase().includes(keyword)))??[];
+
+  return <>
+    <Heading title="检验任务" description="查看 MES 下发的任务及其正品标准关联情况。">
+      <Btn disabled={loading} onClick={()=>setRefresh(value=>value+1)}>
+        <RefreshCw size={17}/>{loading?'正在刷新…':'刷新列表'}
+      </Btn>
+    </Heading>
+    <div className="adm-notice adm-neutral">
+      任务由 MES 同步，本系统仅展示与选择。当前 MES 接口尚未接通，以下为演示数据。
+    </div>
+    <div className="adm-toolbar">
+      <label className="adm-search">关键词查询<div>
+        <Search size={18}/>
+        <Field placeholder="搜索任务单号 / 物料编号 / 供应商" value={query}
+          onChange={event=>{setQuery(event.target.value);setPage(1);}}/>
+      </div></label>
+    </div>
+    <section className="adm-table-panel" aria-busy={loading}>
+      {!tasks?<Loading/>:!filtered.length?<Empty
+        title={keyword?'没有找到匹配的任务':'暂无检验任务'}
+        description={keyword?'试试任务单号的一部分，或物料编号、供应商名称。':'任务将由 MES 提供，无需在这里手工录入。'}
+      />:<div className="adm-table-scroll"><table className="adm-table">
+        <thead><tr><th>任务单号</th><th>物料编号 / 供应商</th><th>正品标准</th><th>检测状态</th><th>操作</th></tr></thead>
+        <tbody>{filtered.slice((page-1)*25,page*25).map(task=><tr key={task.id}>
+          <td><strong>{task.number}</strong><small>{task.origin==='mes'?'MES 任务':task.origin==='local'?'历史试用任务':'内置演示任务'}</small></td>
+          <td>{task.material}<small>{task.supplier}</small></td>
+          <td>{task.standard?<Pill tone="success">已关联 · v{task.standard.version}</Pill>:<Pill tone="warning">缺少基准</Pill>}</td>
+          <td>{task.status}</td>
+          <td><a className="adm-open-task" href={'/?task='+task.id} target="_blank" rel="noreferrer">
+            打开检验 <ExternalLink size={15}/>
+          </a></td>
+        </tr>)}</tbody>
+      </table></div>}
+      <Pagination page={page} total={filtered.length} onPage={setPage}/>
+    </section>
   </>;
 }

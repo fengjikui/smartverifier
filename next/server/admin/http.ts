@@ -32,10 +32,10 @@ export function adminRoutes(service:InspectionService,root:string,directory:stri
     const record=p.match(/^\/api\/admin\/references\/([a-f0-9-]{36})(?:\/(trash|restore))?$/);
     if(record){const [,id,action]=record;if(!action&&method==='GET'){send(res,registry.detail(id));return true;}if(!action&&method==='PUT'){const {version,...input}=await json(req);send(res,registry.save(input,actor,id,z.number().int().positive().parse(version)));return true;}if(action&&method==='POST'){const {version}=z.object({version:z.number().int().positive()}).parse(await json(req));send(res,registry.trash(id,version,action==='restore',actor));return true;}}
     if(p==='/api/admin/events'&&method==='GET'){send(res,registry.events(z.string().max(200).parse(url.searchParams.get('q')??''),paging.parse(url.searchParams.get('page')??1)));return true;}
-    if(p==='/api/admin/match'&&method==='GET'){send(res,{standard:registry.match(url.searchParams.get('material')??'',url.searchParams.get('supplier')??'')});return true;}
     if(p==='/api/admin/tasks'&&method==='GET'){send(res,{items:service.list()});return true;}
-    if(p==='/api/admin/tasks'&&method==='POST'){send(res,registry.createTask(await json(req),actor),201);return true;}
-    const task=p.match(/^\/api\/admin\/tasks\/(T[A-F0-9]{32})$/);if(task&&['PUT','DELETE'].includes(method??'')){send(res,registry.updateTask(task[1],await json(req),actor,method==='DELETE'));return true;}
+    if((p==='/api/admin/tasks'||/^\/api\/admin\/tasks\/[^/]+$/.test(p))&&method!=='GET'){
+      req.resume();throw new ApiError(405,'检验任务由 MES 同步，本系统不提供新增、修改或删除任务的接口。');
+    }
     if(p==='/api/admin/imports'&&method==='POST'){const data=await form(req,202*1024*1024),uploads=data.getAll('files').filter((f):f is File=>f instanceof File);send(res,await files.start(uploads,actor),202);return true;}
     const job=p.match(/^\/api\/admin\/imports\/([a-f0-9-]{36})(?:\/(commit))?$/);
     if(job){if(method==='GET'&&!job[2]){send(res,registry.job(job[1],actor.id));return true;}if(method==='POST'&&job[2]){await json(req);send(res,registry.commitJob(job[1],actor));return true;}}
