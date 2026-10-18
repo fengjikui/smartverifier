@@ -32,7 +32,7 @@ export function adminRoutes(service:InspectionService,root:string,directory:stri
     const record=p.match(/^\/api\/admin\/references\/([a-f0-9-]{36})(?:\/(trash|restore))?$/);
     if(record){const [,id,action]=record;if(!action&&method==='GET'){send(res,registry.detail(id));return true;}if(!action&&method==='PUT'){const {version,...input}=await json(req);send(res,registry.save(input,actor,id,z.number().int().positive().parse(version)));return true;}if(action&&method==='POST'){const {version}=z.object({version:z.number().int().positive()}).parse(await json(req));send(res,registry.trash(id,version,action==='restore',actor));return true;}}
     if(p==='/api/admin/events'&&method==='GET'){send(res,registry.events(z.string().max(200).parse(url.searchParams.get('q')??''),paging.parse(url.searchParams.get('page')??1)));return true;}
-    if(p==='/api/admin/tasks'&&method==='GET'){send(res,{items:service.list()});return true;}
+    if(p==='/api/admin/tasks'&&method==='GET'){send(res,service.taskPage(z.string().max(200).parse(url.searchParams.get('q')??''),paging.parse(url.searchParams.get('page')??1)));return true;}
     if((p==='/api/admin/tasks'||/^\/api\/admin\/tasks\/[^/]+$/.test(p))&&method!=='GET'){
       req.resume();throw new ApiError(405,'检验任务由 MES 同步，本系统不提供新增、修改或删除任务的接口。');
     }

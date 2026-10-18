@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-export type Route = {task?:string;view?:'overview'|'detail'|'report'|'transfer';photo?:string;component?:string};
-function current():Route{const p=new URLSearchParams(location.search);return {task:p.get('task')??undefined,view:(p.get('view') as Route['view'])??'overview',photo:p.get('photo')??undefined,component:p.get('component')??undefined};}
+export type Route = {task?:string;entry?:'standards'|'tasks';view?:'overview'|'detail'|'report'|'transfer';photo?:string;component?:string};
+function current():Route{const p=new URLSearchParams(location.search);return {task:p.get('task')??undefined,entry:p.get('entry')==='tasks'?'tasks':'standards',view:(p.get('view') as Route['view'])??'overview',photo:p.get('photo')??undefined,component:p.get('component')??undefined};}
 export function useRoute(){
   const [route,setRoute]=useState<Route>(current);
   useEffect(()=>{const listener=()=>setRoute(current());window.addEventListener('popstate',listener);return()=>window.removeEventListener('popstate',listener);},[]);

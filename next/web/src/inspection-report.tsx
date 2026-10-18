@@ -37,7 +37,8 @@ export function InspectionReport({round,summary,task,person,onOriginal}: {
   },[articleNavigation]);
 
   return <main className="sv-main sv-report sv-inspection-report" ref={main}>
-    <div className="sv-heading"><h1>丝印检测报告</h1><p>{task.number} · 第{round.number}轮</p></div>
+    <div className="sv-heading"><h1>{task.origin==='standalone'?'自主检测记录':'丝印检测报告'}</h1><p>{task.number} · 第{round.number}轮</p></div>
+    {task.origin==='standalone'?<p className="sv-manual-report-note">本次未关联 MES 任务；结论与不良数量由人工填写到电脑 MES，未回填结果或上传附件。</p>:null}
     <section className="sv-panel sv-report-summary"><VerdictPill verdict={summary?.verdict??null}/><div><h2>已检测{summary?.completed??0}件 · 合格{summary?.pass??0}件 · 不合格{summary?.fail??0}件</h2></div><a className="sv-download" href={'/api/rounds/'+round.id+'/report.md'}><Download size={18}/>下载报告</a></section>
     {round.instruction||instructionNotices.length?<section className={instructionNotices.length?'sv-instruction-priority':'sv-panel sv-instruction-report'} role={instructionNotices.length?'status':undefined}><h2>{instructionNotices.length?'本次按现场检验人员指示检测':'现场检测说明（本次优先）'}</h2>{round.instruction?<p>{round.instruction}</p>:null}{instructionNotices.map((notice,i)=><p key={i}>{notice}</p>)}<small>现场说明优先于标准，随报告留档；内置预设样例仅演示流程。</small></section>:null}
     <div className="sv-report-navigation" ref={navigation}>

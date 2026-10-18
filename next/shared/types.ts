@@ -1,6 +1,6 @@
 export type Verdict = 'PASS' | 'FAIL';
 export type PhotoStatus = 'pending' | 'queued' | 'running' | 'ready' | 'quality' | 'error';
-export type RoundStatus = 'draft' | 'queued' | 'running' | 'ready' | 'submitting' | 'submitted' | 'submit_failed';
+export type RoundStatus = 'draft' | 'queued' | 'running' | 'ready' | 'submitting' | 'submitted' | 'submit_failed' | 'completed';
 export type SampleKind = 'pass' | 'fail' | 'four' | 'twenty' | 'quality';
 export interface Person { id: string; name: string }
 export interface Review { id: string; verdict: Verdict; reason: string; person: Person; at: string; instructionVersion: number }
@@ -26,12 +26,13 @@ export interface Transfer { id: string; key: string; revision: number; status: '
 export interface Round {
   id: string; taskId: string; number: number; revision: number; status: RoundStatus; createdAt: string;
   standard: Standard; instruction: string; instructionVersion: number; nextPhotoSequence: number; photos: Photo[];
-  transfer: Transfer | null; submittedBy?: Person;
+  transfer: Transfer | null; submittedBy?: Person; completedBy?:Person; completedAt?:string;
 }
 export interface Task {
   id: string; number: string; material: string; supplier: string; standard: Standard | null;
   roundId: string | null; effectiveRoundId: string | null;
-  origin?: 'local'|'mes'|'demo';
+  origin?: 'local'|'mes'|'demo'|'demo-mes'|'standalone';
+  referenceId?:string; ownerId?:string; clientId?:string; createdAt?:string;
   trialPhoto?: 'single'|'pair'|'dim-three';
 }
 export interface Summary {

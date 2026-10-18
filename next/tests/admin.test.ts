@@ -35,7 +35,7 @@ test('标准库：版本冲突、重复、任务自动绑定、软删除与历�
   const pipeline=new LocalVisionPipeline(root,directory);assert.equal(pipeline.reference(opened.round!),path.join(directory,'files',asset.id));
   standard=r.trash(standard.id,2,false,person);assert.equal(service.task(task.id).standard,null);assert.deepEqual(service.view(task.id).round!.standard,snapshot);
   const replacement=r.save({...input,assetId:asset.id},person);assert.throws(()=>r.trash(standard.id,3,true,person),/重复/);r.trash(replacement.id,1,false,person);standard=r.trash(standard.id,3,true,person);assert.equal(standard.version,4);
-  assert.equal(r.detail(standard.id).events.length,4);assert.equal(r.detail(standard.id).tasks[0].id,task.id);
+  assert.equal(r.detail(standard.id).events.length,4);assert.ok(r.detail(standard.id).tasks.some(item=>item.id===task.id));
   assert.equal(r.page('%').total,0,'LIKE通配符应按文字搜索');
   const started=performance.now();service.store.transaction(()=>{for(let i=0;i<15000;i++)r.saveWithinTransaction({...input,material:'PERF-'+String(i).padStart(5,'0'),assetId:asset.id},person);});
   const insertMs=performance.now()-started,queryAt=performance.now(),result=r.page('PERF-149','active',1,25),queryMs=performance.now()-queryAt;

@@ -12,16 +12,17 @@ export function InspectionOverview({data,working,busy,compact,filter,onFilter,on
   data:TaskView;working:boolean;busy:boolean;compact:boolean;filter:AlbumFilter;onFilter:(filter:AlbumFilter)=>void;onToggleDensity:()=>void;
   realEnabled?:boolean;onRealTrial:()=>void;gallery:RefObject<HTMLDivElement|null>;onScroll:(top:number)=>void;actions:OverviewActions;
 }) {
-  const round=data.round!,summary=data.summary!,editable=!['queued','running','submitting','submitted'].includes(round.status);
+  const round=data.round!,summary=data.summary!,editable=!['queued','running','submitting','submitted','completed'].includes(round.status);
   const attention=summary.qualityPhotos+summary.failedPhotos;
   const summaryTitle=working?(summary.total?`已定位${summary.total}件 · 已完成${summary.completed}件`:'正在定位元件'):summary.verdict?`${summary.completed}件检测完成`:attention&&!summary.pendingPhotos?`还有${attention}张照片需处理`:summary.completed?`${summary.completed}件已完成 · ${summary.pendingPhotos}张待检测`:`${round.photos.length}张照片 · ${summary.pendingPhotos}张待检测`;
   const visible=round.photos.filter(p=>filter==='all'||(filter==='fail'?p.components.some(c=>finalVerdict(c)==='FAIL'):['quality','error'].includes(p.status)));
-  const title=working?'正在检测':round.status==='submitted'?'结果已保存':!round.photos.length?'添加待检照片':'照片总览';
+  const title=working?'正在检测':round.status==='completed'?'本次检测结果':round.status==='submitted'?'结果已保存':!round.photos.length?'添加待检照片':'照片总览';
   const tools=[...(editable&&realEnabled&&data.task.trialPhoto?[{label:'添加模拟拍摄照片（真实识别）',onSelect:onRealTrial,disabled:busy}]:[]),...(round.photos.length?[{label:'查看完整报告',onSelect:actions.report}]:[]),...(editable?[{label:round.instruction?'修改本次检测说明':'补充本次检测说明',onSelect:actions.notes,disabled:busy},{label:'添加内置样例',onSelect:actions.samples,disabled:busy}]:[])];
   return <main className="sv-main sv-overview sv-inspection-overview">
-    <div className="sv-overview-heading"><div><h1>{title}</h1>{!round.photos.length?<p>拍清每个丝印，可分次添加照片。</p>:null}</div>{tools.length?<ActionMenu label="更多" items={tools}/>:null}</div>
+    <div className="sv-overview-heading"><div><h1>{title}</h1>{data.task.origin==='standalone'||data.task.origin==='demo-mes'?<p>{data.task.material} · {data.task.supplier}</p>:!round.photos.length?<p>拍清每个丝印，可分次添加照片。</p>:null}</div>{tools.length?<ActionMenu label="更多" items={tools}/>:null}</div>
     {data.effective&&round.id!==data.effective.id?<div className="sv-previous-notice">第{round.number}轮重检，上次成功结果仍然有效。</div>:null}
     {round.photos.length?<>
+      {data.task.origin==='standalone'&&summary.verdict?<section className="sv-manual-result" aria-label="供手工填写MES的检测结果"><div><span>检验结论</span><strong className={summary.verdict==='FAIL'?'sv-count-fail':'sv-count-pass'}>{summary.verdict==='PASS'?'合格':'不合格'}</strong><span>不良数量</span><strong>{summary.fail} 件</strong></div><p>请在电脑 MES 中手工填写这两项。本次未回填结果，也未上传附件。</p></section>:null}
       <section className={'sv-detection-summary'+(working?' is-running':'')} aria-live="polite" aria-atomic="true">
         <div className="sv-detection-summary-line"><strong>{summaryTitle}</strong><div>{summary.completed?<><span className="sv-count-pass">合格 {summary.pass}</span><span className={summary.fail?'sv-count-fail':''}>不合格 {summary.fail}</span></>:null}{round.instruction?<Pill>已补充检测说明</Pill>:null}</div></div>
         {working?<><progress aria-label="已定位元件的检测进度" max={summary.total||1} value={summary.total?summary.completed:undefined}/><p>逐件处理，已完成的结果可点开查看。</p></>:null}

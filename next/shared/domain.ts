@@ -16,13 +16,13 @@ export function summarize(round: Round): Summary {
     pendingPhotos: round.photos.filter(p => ['pending', 'queued', 'running'].includes(p.status)).length,
     qualityPhotos: round.photos.filter(p => p.status === 'quality').length,
     failedPhotos: round.photos.filter(p => p.status === 'error').length,
-    canSubmit: completed.length > 0 && !unresolved && !['queued', 'running', 'submitting', 'submitted'].includes(round.status),
+    canSubmit: completed.length > 0 && !unresolved && !['queued', 'running', 'submitting', 'submitted', 'completed'].includes(round.status),
     verdict: completed.length > 0 && !unresolved ? (fail ? 'FAIL' : 'PASS') : null,
   };
 }
 
 export function assertMutable(round: Round) {
-  if (['queued', 'running', 'submitting', 'submitted'].includes(round.status)) throw new Error('当前轮次正在处理或已经提交，请等待完成或开始重新检测。');
+  if (['queued', 'running', 'submitting', 'submitted', 'completed'].includes(round.status)) throw new Error('当前轮次正在处理或已经提交，请等待完成或开始重新检测。');
 }
 
 export interface AlignedCharacter { expected: string | null; actual: string | null; different: boolean; expectedIndex: number | null; actualIndex: number | null }

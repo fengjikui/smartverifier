@@ -5,6 +5,7 @@ import './inspection-density.css';
 import './inspection-report.css';
 import './inspection-detail.css';
 import './inspection-workflow.css';
+import './standalone.css';
 const root = createRoot(document.getElementById('root')!);
 if (location.pathname === '/admin' || location.pathname.startsWith('/admin/')) {
   void import('./admin/index').then(({Admin})=>root.render(<Admin/>));

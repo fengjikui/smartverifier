@@ -12,8 +12,10 @@ export function TabletSimulator() {
   const deviceWidth = width + 26, deviceHeight = height + 26;
   const fit = Math.max(.1, Math.min(1, (available.width - 48) / deviceWidth, (available.height - 48) / deviceHeight));
   const scale = actualSize ? 1 : fit;
-  const demo = new URLSearchParams(location.search).get('demo');
-  const initialTask = demo === 'photos' ? 'DEMO20PHOTOS' : demo === 'board' ? 'DEMO20BOARD' : demo === 'real' ? 'REALVISION2' : null;
+  const params=new URLSearchParams(location.search);
+  const demo=params.get('demo'),requestedTask=params.get('task');
+  const explicitTask=requestedTask&&/^[A-Z0-9]{1,100}$/.test(requestedTask)?requestedTask:null;
+  const initialTask = demo === 'photos' ? 'DEMO20PHOTOS' : demo === 'board' ? 'DEMO20BOARD' : demo === 'real' ? 'REALVISION2' : explicitTask;
   const initialReport = initialTask && new URLSearchParams(location.search).get('view') === 'report';
 
   useLayoutEffect(() => {

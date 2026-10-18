@@ -90,17 +90,24 @@ export function startServer(options: { state?: string; port?: number; host?: str
           service.store.db.prepare('DELETE FROM sessions WHERE token=?').run(token!);res.setHeader('Set-Cookie','sv_next_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,{ok:true});
         }
         if(pathname==='/api/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',recognition,tasks:service.list()});
+        if(pathname==='/api/task-list'&&req.method==='GET')return send(res,service.taskPage(z.string().max(200).parse(url.searchParams.get('q')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
+        if(pathname==='/api/standards'&&req.method==='GET')return send(res,service.registry.catalog(z.string().max(160).parse(url.searchParams.get('material')??''),z.string().max(160).parse(url.searchParams.get('supplier')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
+        if(pathname==='/api/standalone'&&req.method==='GET')return send(res,{items:service.standaloneRecent(actor)});
+        if(pathname==='/api/standalone'&&req.method==='POST'){
+          const input=z.object({standardId:z.string().uuid(),version:z.number().int().positive(),clientId:z.string().min(1).max(100)}).strict().parse(await jsonBody(req));
+          return send(res,service.startStandalone(input.standardId,input.version,input.clientId,actor),201);
+        }
         if(pathname==='/api/reference/green-mat-v1.png'&&req.method==='GET')return await file(res,path.join(root,'fixtures/inspection/green-mat-v1/reference-crop.png'),true);
         const taskMatch=pathname.match(/^\/api\/tasks\/([A-Z0-9]+)(?:\/(open|rounds))?$/);
-        if(taskMatch){const [,id,action]=taskMatch;
+        if(taskMatch){const [,id,action]=taskMatch;service.authorizeTask(id,actor);
           if(req.method==='GET'&&!action)return send(res,service.view(id));
           if(req.method==='POST'&&action==='open'){await jsonBody(req);return send(res,service.open(id));}
           if(req.method==='POST'&&action==='rounds'){const data=z.object({reuse:z.boolean()}).parse(await jsonBody(req));return send(res,service.newRound(id,data.reuse));}
         }
         const fileMatch=pathname.match(/^\/api\/files\/([a-f0-9-]+\.(png|jpg|webp))$/);
         if(fileMatch&&req.method==='GET')return await file(res,path.join(state,'files',fileMatch[1]),true);
-        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|sample-set|real-trial|photos|remove|notes|review|analyze|submit|report\.md)$/);
-        if(match){const [,id,action]=match;
+        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|sample-set|real-trial|photos|remove|notes|review|analyze|complete|submit|report\.md)$/);
+        if(match){const [,id,action]=match;service.authorizeTask(service.round(id).taskId,actor);
           if(action==='report.md'&&req.method==='GET'){
             const round=service.round(id);res.writeHead(200,{'Content-Type':'text/markdown; charset=utf-8','Content-Disposition':`attachment; filename="${round.taskId}-R${round.number}.md"`,'Cache-Control':'private, no-store'});return res.end(service.report(round));
           }
@@ -125,6 +132,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
           if(action==='notes')return send(res,service.notes(id,revision,z.string().parse(data.instruction),actor));
           if(action==='review'){const input=z.object({componentId:z.string(),verdict:z.enum(['PASS','FAIL']),reason:z.string()}).parse(data);return send(res,service.review(id,revision,input.componentId,input.verdict,input.reason,actor));}
           if(action==='analyze'){if(debugRuns?.running)throw new ApiError(409,'本机模型正在执行调试，请稍后开始检测。');return send(res,service.analyze(id,revision),202);}
+          if(action==='complete')return send(res,service.complete(id,revision,actor));
           if(action==='submit')return send(res,service.submit(id,revision,actor,data.simulateFailure===true),202);
         }
         throw new ApiError(404,'接口不存在。');
