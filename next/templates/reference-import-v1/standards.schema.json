@@ -1,26 +1,72 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "正品标准批量导入 v1",
-  "description": "模板协议草案。每条对应一个物料编号和供应商名称组合。",
+  "description": "每条对应一组物料编号与供应商名称，先预检后确认导入。",
   "type": "object",
-  "required": ["schemaVersion", "records"],
+  "required": [
+    "schemaVersion",
+    "records"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schemaVersion": {"const": "1.0"},
+    "schemaVersion": {
+      "const": "1.0"
+    },
     "records": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["materialCode", "supplierName", "imagePath"],
+        "required": [
+          "materialCode",
+          "supplierName",
+          "imagePath"
+        ],
         "additionalProperties": false,
         "properties": {
-          "materialCode": {"type": "string", "minLength": 1, "description": "保留前导零，与 MES 物料编号一致"},
-          "supplierName": {"type": "string", "minLength": 1, "description": "与 MES 供应商名称一致"},
-          "imagePath": {"type": "string", "minLength": 1, "description": "包内相对路径，例如 images/demo-reference.png"},
-          "description": {"type": "string", "description": "可选，自由文本检测指导，允许换行"}
+          "materialCode": {
+            "type": "string",
+            "minLength": 1,
+            "description": "保留前导零，与 MES 物料编号一致",
+            "maxLength": 160
+          },
+          "supplierName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "与 MES 供应商名称一致",
+            "maxLength": 160
+          },
+          "imagePath": {
+            "type": "string",
+            "minLength": 1,
+            "description": "包内相对路径，例如 images/demo-reference.png",
+            "maxLength": 500
+          },
+          "description": {
+            "type": "string",
+            "description": "可选，自由文本检测指导，允许换行",
+            "maxLength": 8000
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "可选物料名称"
+          },
+          "markingText": {
+            "type": "string",
+            "description": "可选，正品丝印逐行文字"
+          },
+          "markingLines": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "string",
+              "maxLength": 300
+            }
+          }
         }
-      }
+      },
+      "maxItems": 2000
     }
   }
 }

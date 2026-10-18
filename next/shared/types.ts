@@ -31,6 +31,7 @@ export interface Round {
 export interface Task {
   id: string; number: string; material: string; supplier: string; standard: Standard | null;
   roundId: string | null; effectiveRoundId: string | null;
+  origin?: 'local'|'mes'|'demo';
   trialPhoto?: 'single'|'pair'|'dim-three';
 }
 export interface Summary {

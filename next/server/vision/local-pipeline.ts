@@ -70,6 +70,7 @@ export class LocalVisionPipeline implements VisionPipeline {
       components:raw.components.map((c,index):ComponentResult=>({id:c.componentId,label:c.label,index,bbox:c.bbox,ai:null,aiHistory:[],review:null,reviewHistory:[],crop:{url:'/api/files/'+c.modelView.assetId,assetId:c.modelView.assetId,width:c.modelView.width,height:c.modelView.height,rotation:c.rotationClockwiseDegrees,qualityReasons:c.quality.reasons}}))};
   }
   reference(round:Round){
+    const registered=round.standard.image.match(/^\/api\/reference-assets\/([a-f0-9-]+\.(png|jpg|webp))$/);if(registered)return this.filename(registered[1]);
     if(round.standard.image==='/api/reference/green-mat-v1.png')return path.join(this.root,'fixtures/inspection/green-mat-v1/reference-crop.png');
     if(/^\/assets\/[a-zA-Z0-9_.-]+\.(png|jpg|webp)$/.test(round.standard.image))return path.join(this.root,'outputs/next-web/dist',round.standard.image);
     throw new RecognitionProblem('error','当前正品图片没有配置可读取的本地文件，请联系管理员。');

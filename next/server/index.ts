@@ -10,6 +10,7 @@ import { ApiError, InspectionService, person } from './service.ts';
 import { LocalVisionPipeline } from './vision/local-pipeline.ts';
 import type { VisionPipeline } from './vision/local-pipeline.ts';
 import { TraceStore } from './vision/trace-store.ts';
+import { adminRoutes } from './admin/http.ts';
 import { DebugRuns } from './vision/debug-runs.ts';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -41,6 +42,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
   const debugRuns=debug&&vision instanceof LocalVisionPipeline?new DebugRuns(vision,traces):undefined;
   const recognition=vision?{mode:'vlm' as const,model:vision.model,...(vision instanceof LocalVisionPipeline?{provider:vision.provider}:{})}:{mode:'mock' as const};
   const service=new InspectionService(state,root,options.delay ?? Number(process.env.SV_NEXT_MOCK_DELAY_MS ?? 1200),vision);
+  const admin=adminRoutes(service,root,state,{body,json:jsonBody,send,file});
   let uploads=0;
   const server=http.createServer(async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','same-origin'); res.setHeader('X-Frame-Options','SAMEORIGIN');
@@ -53,6 +55,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
       if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1,modelDebug:debug,...(vision instanceof LocalVisionPipeline?{visionConfiguration:{inputLayout:vision.inputLayout,outputFormat:vision.structured?'json-schema':'prompt-json'}}:{})});
       const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('sv_next_session='))?.slice('sv_next_session='.length);
       const session=token?service.store.db.prepare('SELECT person,expires FROM sessions WHERE token=?').get(token):null;
+      if(await admin.handle(req,res,url,!!session&&Number(session.expires)>Date.now()))return;
       if(pathname==='/api/session'&&req.method==='POST'){
         await jsonBody(req); const key=randomBytes(32).toString('hex');
         service.store.db.prepare('DELETE FROM sessions WHERE expires<?').run(Date.now());
@@ -145,13 +148,13 @@ export function startServer(options: { state?: string; port?: number; host?: str
     console.log(`新版平板工作台（${vision?'VLM真实识别，MES模拟':'本地模拟'}）：http://127.0.0.1:${addr.port}`);
     for(const entries of Object.values(os.networkInterfaces()))for(const entry of entries??[])if(entry.family==='IPv4'&&!entry.internal&&/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(entry.address))console.log(`局域网试用：http://${entry.address}:${addr.port}`);
   });
-  return {server,service};
+  return {server,service,admin};
 }
 
 export function runStandalone(){
-  const {server,service}=startServer();
+  const {server,service,admin}=startServer();
   for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>{
-    service.closing=true;service.vision?.close?.();server.closeAllConnections();server.close();
+    service.closing=true;admin.files.close();service.vision?.close?.();server.closeAllConnections();server.close();
     setTimeout(()=>{service.store.close();process.exit(0);},service.interval+100).unref();
   });
 }

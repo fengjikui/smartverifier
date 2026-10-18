@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-**平板正常流程已接入真实VLM与OpenCV自动定位裁片；支持本机LM Studio及服务端配置的公司兼容HTTP接口。身份、任务和MES仍为模拟，公司VLM尚未联调。**
+**平板正常流程已接入真实VLM与OpenCV自动定位裁片；支持本机LM Studio及服务端配置的公司兼容HTTP接口。正品管理、批量导入和本地任务管理已实现；身份与MES仍为模拟，公司VLM尚未联调。**
 
 - [VLM服务配置与迁移](docs/VLM服务配置与迁移.md)：统一使用`SV_VLM_ENDPOINT`等变量，提供[可复制配置](config/vlm.env.example)，支持内网HTTP／HTTPS服务。
 - [试用演示基线与缺口清单](docs/试用演示基线与缺口清单.md)：当前闭环、下周试用准备、真实正品录入、平板验证和企业接口的实际缺口；当前暂停性能优化。
@@ -30,16 +30,24 @@
 - 复用已有主题、组件和自有虚构元件照片，未使用 Figma AI 生图；画面由可编辑文字、组件、图片与自动布局组成。截图与结构检查记录保存在本机 `outputs/figma-tablet-v2/`。
 - 版本化设计资料位于 [design/tablet-v0.1](design/tablet-v0.1/design-plan.json)：包含画板映射、[原型验证记录](design/tablet-v0.1/validation.json)和[相册总览预览](design/tablet-v0.1/album-overview.png)。已在 Chrome 实际点击验证正常流程、可选修正、质量阻断、回填失败重试与新增 2 件的增量检测；本轮已补做相册滚动→详情→下一张→返回、异常筛选返回及六件结果改判→报告→提交的浏览器试用；全量连线检查通过，实际点击覆盖关键路径。尚未做目标平板真机或真实接口测试。
 
-## 正品数据库管理端原型
+## 正品数据库管理端（已实现）
+
+- [打开正品管理](http://127.0.0.1:5190/admin)：电脑录入为主，独立路径。当前试用账号 `admin`，密码 `admin123`，仅允许服务器本机登录；IDaaS 等待接入。
+- 支持单条新增、保存后继续新增、编辑、复制、草稿、搜索分页、回收站和恢复、版本留痕与维护日志。
+- 批量导入支持 Excel / JSON 清单＋图片，或完整 ZIP。提供模板下载，先预检后确认；已有组合跳过，有错误则阻止写入，确认请求可幂等重试。
+- “检验任务”可创建本地任务，按物料编号＋供应商自动关联标准；未开始的本地任务可以编辑／删除，已经开始的检测保持标准快照。
+- [正品管理试用与数据维护](docs/正品管理试用与数据维护.md)和[交付及验证记录](docs/正品管理-交付及验证-2026-10-18.md)。真实资料存入状态目录，不会随 Git 提交；迁移与备份须包含数据库和原图。
+
+### 原型设计依据（保留）
 
 - [体验独立管理端原型](https://www.figma.com/proto/6kmN9EjSyVpFuTQxC1NaBE?node-id=3909-465&starting-point-node-id=3909%3A465&scaling=contain)：用户已确认以电脑使用为主，按 1440 × 960 设计；评审修订后共 43 个页面／交互状态。导览可进入常用维护流程与边界场景。
 - [打开管理端 Figma 设计](https://www.figma.com/design/6kmN9EjSyVpFuTQxC1NaBE?page-id=3909%3A464&node-id=3909-468)：独立放在「03 · 正品管理 · 独立后台」。检验端不放管理入口；原型导览保留跳转，方便评审。
-- 实施建议为同站独立 `/admin` 路径，可单独收藏；复用公司 IDaaS，后台校验管理员身份。路径、授权和保存目前仅为原型方案，尚未部署真实管理程序。
+- 实施建议为同站独立 `/admin` 路径，可单独收藏；复用公司 IDaaS，后台校验管理员身份。实际程序已按独立路径实现；公司 IDaaS 与正式授权仍待接入，当前使用本机临时账号。
 - 日常使用按「查找 → 查看／编辑 → 保存」组织。支持图片与说明同页编辑、复制新增、组合重复提醒、可恢复删除、维护日志及改动对照；批量导入放在次要入口，先校验预览、重复默认跳过。
 - [设计资料](design/admin-v0.1/design-plan.json)、[画板映射](design/admin-v0.1/figma-node-map.json)、[验证记录](design/admin-v0.1/validation.json)、[列表预览](design/admin-v0.1/list.png)和[编辑预览](design/admin-v0.1/edit.png)已保存。已在 Chrome 点击验证编辑保存及最新版本详情、删除恢复、查询、新增成功；所有数据、登录、输入和上传均为静态样例模拟。
 - 报告内容详单与元件编号引导线另行细化，本轮未修改报告方案。
 - 评审修订：回收站「详情」打开已删除标准的只读内容，「恢复」独立进入确认；关闭原图返回刚才页面，替换图片不再误入新增页，维护日志按事件打开相应详情。非主示例数据改为明确说明，不再跳到另一条记录。
-- 批量导入已补充「下载模板」与 Excel／JSON 示例预览。实际模板位于 [templates/reference-import-v1](templates/reference-import-v1/填写说明.txt)，可取用 [Excel 模板](templates/reference-import-v1/正品标准导入模板.xlsx)、[JSON 清单](templates/reference-import-v1/standards.json)、[JSON 图片标准包示例](templates/reference-import-v1/JSON标准包示例.zip)或[模板资料总包](templates/reference-import-v1/模板资料总包.zip)。Figma 下载按钮仍是原型预览，尚未实现浏览器下载或导入解析。
+- 批量导入已补充「下载模板」与 Excel／JSON 示例预览。实际模板位于 [templates/reference-import-v1](templates/reference-import-v1/填写说明.txt)，可取用 [Excel 模板](templates/reference-import-v1/正品标准导入模板.xlsx)、[JSON 清单](templates/reference-import-v1/standards.json)、[JSON 图片标准包示例](templates/reference-import-v1/JSON标准包示例.zip)或[模板资料总包](templates/reference-import-v1/模板资料总包.zip)。Figma 下载按钮仍是原型预览；实际 `/admin` 已支持模板下载、预检解析与确认导入。
 
 新版从这里独立整理。当前需求依据是用户提供的 2026-10-13 会议方案 v0.3；整理日期为 2026-10-17。
 

@@ -35,6 +35,7 @@ export function PhotoCrop({photo,component}:{photo:Photo;component:ComponentResu
   return <div className="sv-crop" style={{aspectRatio:`${photo.width*w}/${photo.height*h}`}}><img src={photo.url} alt={'元件 '+component.label+' 的图像'} style={{width:100/w+'%',height:100/h+'%',left:-100*x/w+'%',top:-100*y/h+'%'}}/></div>;
 }
 export function DiffTable({expected,actual,title='丝印逐行对照',reason}:{expected:string[];actual:string[];title?:string;reason?:string}){
+  if(!expected.length)return <section className="sv-panel sv-diff"><h2>实拍丝印识别</h2>{actual.map((line,i)=><p key={i}><code>{line}</code></p>)}<p className="sv-description">正品未录入文字转写，本次依据正品图片比对。</p>{reason?<p>{reason}</p>:null}</section>;
   const lines=Array.from({length:Math.max(expected.length,actual.length)},(_,i)=>{
     const a=expected[i]??'',b=actual[i]??'';
     return {index:i,aligned:alignText(a,b),different:a!==b};

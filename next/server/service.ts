@@ -9,7 +9,9 @@ import { sampleBox, sampleCount, sampleFails, sampleLowConfidence, twentyFailure
 import { RecognitionProblem } from './vision/local-pipeline.ts';
 import type { VisionPipeline } from './vision/local-pipeline.ts';
 
-export class ApiError extends Error { status: number; constructor(status: number, message: string) { super(message); this.status = status; } }
+import { ApiError } from './errors.ts';
+export { ApiError } from './errors.ts';
+import { Registry } from './admin/registry.ts';
 export const person: Person = { id: 'QA018', name: '王敏' };
 const now = () => new Date().toISOString();
 const sampleFiles: Record<SampleKind, string> = { pass: 'reference.png', fail: 'mismatch.png', four: 'four-components.png', twenty: 'twenty-components.png', quality: 'reference.png' };
@@ -17,9 +19,9 @@ const standard: Standard = { id: 'STD-358', version: 1, material: 'MAT-358-08', 
 function escapeMarkdown(s: string) { return s.replace(/[\\`*_{}\[\]<>#!|]/g, '\\$&'); }
 
 export class InspectionService {
-  store: Store; directory: string; root: string; interval: number; queue: string[] = []; worker = false; closing = false; vision?:VisionPipeline;
+  store: Store; registry: Registry; directory: string; root: string; interval: number; queue: string[] = []; worker = false; closing = false; vision?:VisionPipeline;
   constructor(directory: string, root: string, interval = 1200, vision?:VisionPipeline) {
-    this.directory = directory; this.root = root; this.interval = interval; this.store = new Store(directory);
+    this.directory = directory; this.root = root; this.interval = interval; this.store = new Store(directory); this.registry = new Registry(this.store);
     this.vision=vision;
     if (!this.store.tasks().length) for (const [id, material, supplier] of [['IQCF26090500016', 'MAT-358-08', '华信电子'], ['IQCF26090500017', 'MAT-358-08', '华信电子'], ['IQCF26090500018', 'MAT-725-16', '远成电子']]) this.store.saveTask({ id, number: id, material, supplier, standard: material === 'MAT-358-08' ? standard : null, roundId: null, effectiveRoundId: null });
     if(vision)for(const [i,trialPhoto,title] of [[1,'single','单件'],[2,'pair','双件 · 含字符差异'],[3,'dim-three','三件 · 较暗光照']] as const){
@@ -36,10 +38,10 @@ export class InspectionService {
       }
     }
   }
-  task(id: string) { const t = this.store.task(id); if (!t) throw new ApiError(404, '没有找到这项检验任务。'); return t; }
+  task(id: string) { const t = this.store.task(id); if (!t) throw new ApiError(404, '没有找到这项检验任务。'); if(t.origin==='local'||t.origin==='mes')t.standard=this.registry.match(t.material,t.supplier);return t; }
   round(id: string) { const r = this.store.round(id); if (!r) throw new ApiError(404, '没有找到本轮检测记录。'); return r; }
   view(id: string): TaskView { const task = this.task(id), round = task.roundId ? this.store.round(task.roundId) : null; return { task, round, effective: task.effectiveRoundId ? this.store.round(task.effectiveRoundId) : null, summary: round ? summarize(round) : null }; }
-  list(): TaskListItem[] { return this.store.tasks().map(t => { const round = t.roundId ? this.store.round(t.roundId) : null; return { ...t, status: !t.standard ? '缺少基准' : t.effectiveRoundId ? (round?.status === 'submitted' ? '已有结果' : '重检草稿') : round ? (['queued', 'running'].includes(round.status) ? '检测中' : '未提交') : '未检测', summary: round ? summarize(round) : null }; }); }
+  list(): TaskListItem[] { return this.store.tasks().map(stored => { const t=this.task(stored.id); const round = t.roundId ? this.store.round(t.roundId) : null; return { ...t, status: !t.standard&&!round?.standard ? '缺少基准' : t.effectiveRoundId ? (round?.status === 'submitted' ? '已有结果' : '重检草稿') : round ? (['queued', 'running'].includes(round.status) ? '检测中' : '未提交') : '未检测', summary: round ? summarize(round) : null }; }); }
   open(id: string) { const t = this.task(id); if (!t.roundId && t.standard) this.newRound(id, false); return this.view(id); }
   newRound(id: string, reuse: boolean): TaskView {
     const t = this.task(id); if (!t.standard) throw new ApiError(409, '缺少正品基准，请联系管理员');
@@ -227,8 +229,9 @@ export class InspectionService {
     this.store.transaction(() => { this.store.db.prepare('INSERT OR IGNORE INTO receipts VALUES(?,?)').run(transfer.key, JSON.stringify({ receipt, roundId: id, verdict: summarize(r).verdict, badCount: summarize(r).fail })); this.store.saveRound(r); this.store.saveTask(t); this.store.audit(r, r.submittedBy!, 'mes.mock.saved', { key: transfer.key, receipt }); });
   }
   report(r: Round): string {
+    const taskNumber=this.store.task(r.taskId)?.number??r.taskId;
     const real=r.photos.some(p=>p.components.some(c=>isVlmJudgement(c.ai)));
-    const s = summarize(r), lines = [real?'# 丝印检测报告（VLM真实识别）':'# 丝印检测报告（本地模拟）', '', real?'> 结果来源按元件标明，可能同时包含真实模型与内置预设。身份及MES仍为本地模拟，未接通公司系统。带“模拟拍摄”名称的照片由图像生成模型生成，不用于评估现场准确率。':'> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- 检验单号：${r.taskId}`, `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (r.submittedBy ? `${r.submittedBy.name} ${r.submittedBy.id}` : '尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', real?'现场说明已随真实双图一起发送给模型；内置预设不执行自然语言要求。':'说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
+    const s = summarize(r), lines = [real?'# 丝印检测报告（VLM真实识别）':'# 丝印检测报告（本地模拟）', '', real?'> 结果来源按元件标明，可能同时包含真实模型与内置预设。身份及MES仍为本地模拟，未接通公司系统。带“模拟拍摄”名称的照片由图像生成模型生成，不用于评估现场准确率。':'> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- 检验单号：${escapeMarkdown(taskNumber)}`, `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (r.submittedBy ? `${r.submittedBy.name} ${r.submittedBy.id}` : '尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', real?'现场说明已随真实双图一起发送给模型；内置预设不执行自然语言要求。':'说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
     const conflicts=[...new Set(r.photos.flatMap(p=>p.components.flatMap(c=>[...(c.ai?.instructionConflicts??[]),...(c.ai?.instructionWarnings??[])])))];
     if(conflicts.length)lines.splice(4,0,'## 重要：现场说明优先及与标准的关系','本次按现场检验人员指示进行检测。',...conflicts.map(escapeMarkdown),'');
     for (const p of r.photos) {
@@ -236,6 +239,7 @@ export class InspectionService {
       if(p.preparation)lines.push('',`![定位编号（原图外侧引线）](${p.preparation.annotatedUrl})`,`![裁片白板（保持裁片像素）](${p.preparation.sheetUrl})`,`预处理：${p.preparation.version}；${p.preparation.elapsedMs} ms；原图SHA256：${p.hash}`,'');
       for (const c of p.components) {
         lines.push(`### ${c.label} · ${finalVerdict(c) === 'PASS' ? '合格' : finalVerdict(c) === 'FAIL' ? '不合格' : '未完成'}`, '', '| 行 | 实拍识别原文 | 正品原文 |', '| --- | --- | --- |');
+        if(!r.standard.lines.length)lines.push('| — | — | 未录入文字转写，以正品图片为准 |');
         for (let i = 0; i < Math.max(c.ai?.lines.length ?? 0, r.standard.lines.length); i++) lines.push(`| ${i+1} | ${escapeMarkdown(c.ai?.lines[i] ?? '')} | ${escapeMarkdown(r.standard.lines[i] ?? '')} |`);
         lines.push('', escapeMarkdown(c.ai?.reason ?? p.message));
         lines.push('结果来源：'+(isVlmJudgement(c.ai)?'VLM真实识别':c.ai?'内置预设（非模型识别）':'尚未生成结论'));

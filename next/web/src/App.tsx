@@ -86,7 +86,7 @@ export function App(){
     {notice?<div className="sv-message" role="status"><Info size={18}/><span>{notice}</span><Btn tone="quiet" className="sv-icon-button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={18}/></Btn></div>:null}
     {busy?<div className="sv-busy" role="status"><Spinner/>{busy}</div>:null}
     {!route.task?<TaskSelection tasks={boot.tasks} search={search} onSearch={setSearch} onOpen={id=>navigate({task:id})} busy={!!busy}/>
-    :!data?<main className="sv-main sv-loading"><Spinner/>正在读取检验任务…</main>:!data.task.standard?<>
+    :!data?<main className="sv-main sv-loading"><Spinner/>正在读取检验任务…</main>:!data.task.standard&&!round?.standard?<>
       <main className="sv-main sv-centered"><AlertTriangle size={40} className="sv-warning-icon"/><h1>缺少正品基准，请联系管理员</h1><p>{data.task.material} · {data.task.supplier}</p><p className="sv-description">管理员补齐对应标准后即可继续，检验员无需上传正品图片。</p></main><footer className="sv-footer"><FooterNote title="本任务暂时不能检测"/><Btn tone="primary" onClick={taskList}>返回任务列表</Btn></footer>
     </>:!round?<main className="sv-main sv-loading"><Spinner/>正在准备本轮检测…</main>:mainView==='transfer'?<>
       <InspectionTransfer data={data} person={boot.person}/>
