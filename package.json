@@ -17,6 +17,8 @@
     "lan": "npm run build:lan && npm run start:lan",
     "build:next": "vite build --config next/vite.config.ts",
     "start:next": "node next/server/index.ts",
+    "start:next:real": "node next/scripts/start-real.ts",
+    "probe:next:real": "node next/scripts/probe-real-vision.ts",
     "check:next": "tsc -p next/tsconfig.json",
     "test:next": "node --test --test-concurrency=1 next/tests/*.test.ts"
   },

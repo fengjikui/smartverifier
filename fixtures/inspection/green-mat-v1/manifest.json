@@ -1,0 +1,92 @@
+{
+  "synthetic": true,
+  "createdFor": "EXP-006，2026-10-18本机接入测试",
+  "generator": "内置imagegen，非实拍",
+  "originalPhotoSize": [
+    1536,
+    1024
+  ],
+  "tabletReferenceLimit": [
+    4160,
+    3120
+  ],
+  "groundTruthMethod": "查看生成后的实际像素，检查丝印行和元件数；提示词不直接当真值",
+  "expected": {
+    "single": [
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ]
+    ],
+    "pair": [
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ],
+      [
+        "SV385",
+        "A26",
+        "0147"
+      ]
+    ],
+    "dim-three": [
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ],
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ],
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ]
+    ]
+  },
+  "generationInstructionsSummary": {
+    "common": "Ordinary top-down handheld tablet factory inspection photo. Green textured anti-static ESD mat, black SOIC-8 packages, four silver pins on each side, pin-one dot, all pins in frame. 1536x1024, no border or watermark. No PCB, labels, hands or decorative objects. Natural sensor noise and soft shadows, not a pristine product render.",
+    "single": "Exactly one chip occupying about30percent image width, about18degrees clockwise; gray laser text three rows SV358 / A26 / 0147, neutral fluorescent light.",
+    "pair": "Exactly two separated chips, different tilts about+12 and-25degrees; left SV358/A26/0147, right SV385/A26/0147, slightly uneven fluorescent lighting.",
+    "dim-three": "Exactly three separated chips upper-left, upper-right, lower-center, rotations about-20,+15,+35degrees; all SV358/A26/0147; dim uneven light, broad shadow over lower chip, mild glare/noise, at least two chips readable at native resolution."
+  },
+  "files": [
+    {
+      "file": "single.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "8746e51737508b03bdb7e96d3e2a80870fd7ef2cdf83b83096d1daff8b9841da",
+      "bytes": 2698930,
+      "description": "正常工厂照明、单个元件、约18度倾斜"
+    },
+    {
+      "file": "pair.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+      "bytes": 3005938,
+      "description": "两个分开摆放的元件、光照不均、其中型号错序"
+    },
+    {
+      "file": "dim-three.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "96fed1baf208dcaadbb9d5a33c6e4925fc6688d5e2402106d65560a7cd41aae3",
+      "bytes": 2627204,
+      "description": "三个分开摆放的元件、较暗光照和较弱细节"
+    },
+    {
+      "file": "reference-crop.png",
+      "width": 431,
+      "height": 419,
+      "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+      "bytes": 335565,
+      "description": "从single裁剪、旋转得到的正品参考；不作为独立真实标准"
+    }
+  ]
+}

@@ -7,6 +7,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { ApiError, InspectionService, person } from './service.ts';
+import { LocalVisionPipeline } from './vision/local-pipeline.ts';
+import type { VisionPipeline } from './vision/local-pipeline.ts';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const revisionSchema = z.number().int().positive();
@@ -29,10 +31,12 @@ async function file(res: http.ServerResponse, filename: string, privateFile=fals
   const stream=createReadStream(filename); stream.on('error',()=>res.destroy()); stream.pipe(res);
 }
 
-export function startServer(options: { state?: string; port?: number; host?: string; delay?: number } = {}) {
+export function startServer(options: { state?: string; port?: number; host?: string; delay?: number; vision?:VisionPipeline; real?:boolean } = {}) {
   const state=path.resolve(options.state ?? process.env.SV_NEXT_STATE_DIR ?? path.join(root,'outputs/next-state'));
   const staticDir=path.join(root,'outputs/next-web/dist');
-  const service=new InspectionService(state,root,options.delay ?? Number(process.env.SV_NEXT_MOCK_DELAY_MS ?? 1200));
+  const vision=options.vision??((options.real??process.env.SV_NEXT_RECOGNIZER==='lmstudio')?new LocalVisionPipeline(root,state):undefined);
+  const recognition=vision?{mode:'lmstudio' as const,model:vision.model}:{mode:'mock' as const};
+  const service=new InspectionService(state,root,options.delay ?? Number(process.env.SV_NEXT_MOCK_DELAY_MS ?? 1200),vision);
   let uploads=0;
   const server=http.createServer(async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','same-origin'); res.setHeader('X-Frame-Options','SAMEORIGIN');
@@ -42,7 +46,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         const origin=req.headers.origin;
         if (origin && !['http://'+req.headers.host,'https://'+req.headers.host].includes(origin)) throw new ApiError(403,'请从本应用页面发起操作。');
       }
-      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',schemaVersion:1});
+      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1});
       const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('sv_next_session='))?.slice('sv_next_session='.length);
       const session=token?service.store.db.prepare('SELECT person,expires FROM sessions WHERE token=?').get(token):null;
       if(pathname==='/api/session'&&req.method==='POST'){
@@ -50,7 +54,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         service.store.db.prepare('DELETE FROM sessions WHERE expires<?').run(Date.now());
         service.store.db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(key,JSON.stringify(person),Date.now()+24*60*60*1000);
         res.setHeader('Set-Cookie',`sv_next_session=${key}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
-        return send(res,{person,mode:'mock',tasks:service.list()});
+        return send(res,{person,mode:'mock',recognition,tasks:service.list()});
       }
       if(pathname.startsWith('/api/')){
         if(!session||Number(session.expires)<Date.now())throw new ApiError(401,'本地试用会话已过期，请重新进入，草稿已保留。');
@@ -58,7 +62,8 @@ export function startServer(options: { state?: string; port?: number; host?: str
         if(pathname==='/api/session'&&req.method==='DELETE'){
           service.store.db.prepare('DELETE FROM sessions WHERE token=?').run(token!);res.setHeader('Set-Cookie','sv_next_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,{ok:true});
         }
-        if(pathname==='/api/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',tasks:service.list()});
+        if(pathname==='/api/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',recognition,tasks:service.list()});
+        if(pathname==='/api/reference/green-mat-v1.png'&&req.method==='GET')return await file(res,path.join(root,'fixtures/inspection/green-mat-v1/reference-crop.png'),true);
         const taskMatch=pathname.match(/^\/api\/tasks\/([A-Z0-9]+)(?:\/(open|rounds))?$/);
         if(taskMatch){const [,id,action]=taskMatch;
           if(req.method==='GET'&&!action)return send(res,service.view(id));
@@ -67,7 +72,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         }
         const fileMatch=pathname.match(/^\/api\/files\/([a-f0-9-]+\.(png|jpg|webp))$/);
         if(fileMatch&&req.method==='GET')return await file(res,path.join(state,'files',fileMatch[1]),true);
-        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|sample-set|photos|remove|notes|review|analyze|submit|report\.md)$/);
+        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|sample-set|real-trial|photos|remove|notes|review|analyze|submit|report\.md)$/);
         if(match){const [,id,action]=match;
           if(action==='report.md'&&req.method==='GET'){
             const round=service.round(id);res.writeHead(200,{'Content-Type':'text/markdown; charset=utf-8','Content-Disposition':`attachment; filename="${round.taskId}-R${round.number}.md"`,'Cache-Control':'private, no-store'});return res.end(service.report(round));
@@ -86,6 +91,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
             } finally { uploads--; }
           }
           const data=await jsonBody(req),revision=revisionSchema.parse(data.revision);
+          if(action==='real-trial')return send(res,await service.addRealTrial(id,revision,actor));
           if(action==='sample'){const input=z.object({sample:z.enum(['pass','fail','four','twenty','quality']),replaceId:z.string().optional()}).parse(data);return send(res,await service.addSample(id,revision,input.sample,input.replaceId,actor));}
           if(action==='sample-set'){const input=z.object({clientId:z.string().min(1).max(100)}).parse(data);return send(res,await service.addTwentyPhotos(id,revision,input.clientId,actor));}
           if(action==='remove')return send(res,service.remove(id,revision,z.string().parse(data.photoId),actor));
@@ -112,16 +118,17 @@ export function startServer(options: { state?: string; port?: number; host?: str
   server.requestTimeout=120000;server.headersTimeout=15000;
   server.listen(options.port ?? Number(process.env.SV_NEXT_PORT??5190),options.host??process.env.SV_NEXT_HOST??'0.0.0.0',()=>{
     const addr=server.address();if(!addr||typeof addr==='string')return;
-    console.log(`新版平板工作台（本地模拟）：http://127.0.0.1:${addr.port}`);
+    console.log(`新版平板工作台（${vision?'LM Studio真实识别，MES模拟':'本地模拟'}）：http://127.0.0.1:${addr.port}`);
     for(const entries of Object.values(os.networkInterfaces()))for(const entry of entries??[])if(entry.family==='IPv4'&&!entry.internal&&/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(entry.address))console.log(`局域网试用：http://${entry.address}:${addr.port}`);
   });
   return {server,service};
 }
 
-if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
+export function runStandalone(){
   const {server,service}=startServer();
   for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>{
-    service.closing=true;server.closeAllConnections();server.close();
+    service.closing=true;service.vision?.close?.();server.closeAllConnections();server.close();
     setTimeout(()=>{service.store.close();process.exit(0);},service.interval+100).unref();
   });
 }
+if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href)runStandalone();

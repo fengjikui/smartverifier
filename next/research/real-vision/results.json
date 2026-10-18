@@ -1,0 +1,862 @@
+{
+  "experiment": "EXP-006",
+  "date": "2026-10-18",
+  "syntheticOnly": true,
+  "limitations": [
+    "没有目标平板真机照片",
+    "正品裁片来自single.png，单件非独立比对",
+    "仅6件生成样本，不等于业务准确率",
+    "模型置信度未校准",
+    "YOLO未训练及实测",
+    "白板只生成留档，未批量送模型"
+  ],
+  "environment": {
+    "hardware": "Apple M2 Ultra",
+    "unifiedMemoryGiB": 64,
+    "modelIdentifier": "hr-qwen",
+    "loadedModel": "qwen3.8-27b-mlx",
+    "lmStudioReportedModelSizeGB": 16.08,
+    "lmStudioSdk": "1.5.0",
+    "python": "3.13.12",
+    "opencv": "4.14.0",
+    "pillow": "12.3.0",
+    "node": "24.14.0",
+    "opencvThreads": 2,
+    "modelConcurrency": 1
+  },
+  "baseline": [
+    {
+      "caseId": "REALVISION1",
+      "scope": "baseline",
+      "sourceSha256": "8746e51737508b03bdb7e96d3e2a80870fd7ef2cdf83b83096d1daff8b9841da",
+      "photoStatus": "ready",
+      "preparation": {
+        "version": "green-contours-v1",
+        "sourceHash": "8746e51737508b03bdb7e96d3e2a80870fd7ef2cdf83b83096d1daff8b9841da",
+        "uprightUrl": "/api/files/5c5a4c16-f5dd-43ba-8b6c-26b37acabae3.png",
+        "annotatedUrl": "/api/files/062561af-4787-4591-b906-23bb1e617f6e.png",
+        "sheetUrl": "/api/files/2cb88c29-2cee-488f-9b42-768c4c182d79.png",
+        "width": 1536,
+        "height": 1024,
+        "elapsedMs": 233,
+        "coverage": "complete",
+        "issues": []
+      },
+      "elapsedMs": 11097,
+      "summary": {
+        "total": 1,
+        "completed": 1,
+        "pass": 1,
+        "fail": 0,
+        "lowConfidence": 0,
+        "modified": 0,
+        "pendingPhotos": 0,
+        "qualityPhotos": 0,
+        "failedPhotos": 0,
+        "canSubmit": true,
+        "verdict": "PASS"
+      },
+      "resourceCheckBefore": {
+        "availableGiB": 19.64,
+        "cpuPercent": 11.3,
+        "load": [
+          3.83154296875,
+          3.12890625,
+          2.6611328125
+        ]
+      },
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+      "localEvidenceDir": "outputs/real-vision-20261018/state-3Mwqmz",
+      "components": [
+        {
+          "label": "P001-01",
+          "expectedLines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "PASS",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.95,
+            "reason": "待检元件的三行丝印文字（SV358, A26, 0147）与正品标准完全一致，字符顺序、字形及位置均无差异。封装形状（SOP-8）及左下角的圆形定位点特征也与标准图相符，未发现异常。",
+            "instructionVersion": 1,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 10420,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "b46d0612-6f67-41e6-9db4-b5d4687cf5c0.json",
+            "features": [
+              "SOP-8封装",
+              "黑色塑封体",
+              "左下角圆形定位点标记"
+            ],
+            "differences": [],
+            "instructionConflicts": []
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/2d44fd12-83a7-40c0-a167-ac8f3a2830d4.png",
+            "assetId": "2d44fd12-83a7-40c0-a167-ac8f3a2830d4.png",
+            "width": 431,
+            "height": 419,
+            "rotation": 14.181112289428711,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "```json\n{\"items\":[{\"componentId\":\"895c256c-14d5-45fa-bcee-cae72ea96a32\",\"status\":\"decided\",\"verdict\":\"PASS\",\"lines\":[\"SV358\",\"A26\",\"0147\"],\"confidence\":0.95,\"reason\":\"待检元件的三行丝印文字（SV358, A26, 0147）与正品标准完全一致，字符顺序、字形及位置均无差异。封装形状（SOP-8）及左下角的圆形定位点特征也与标准图相符，未发现异常。\",\"features\":[\"SOP-8封装\",\"黑色塑封体\",\"左下角圆形定位点标记\"],\"differences\":[]}],\"instructionConflicts\":[]}\n```"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 454,
+            "completion_tokens": 171,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.37508115358409,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 4.848,
+            "promptTokensCount": 454,
+            "predictedTokensCount": 171,
+            "totalTokensCount": 625
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": null
+        }
+      ]
+    },
+    {
+      "caseId": "REALVISION2",
+      "scope": "baseline",
+      "sourceSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+      "photoStatus": "ready",
+      "preparation": {
+        "version": "green-contours-v1",
+        "sourceHash": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+        "uprightUrl": "/api/files/01ee1628-de1e-402e-9345-e530bf8c5fe8.png",
+        "annotatedUrl": "/api/files/760b54e5-9131-4b15-ab49-402733a0f376.png",
+        "sheetUrl": "/api/files/ded973cd-25e9-4af5-9e06-8f9dbaa75357.png",
+        "width": 1536,
+        "height": 1024,
+        "elapsedMs": 298,
+        "coverage": "complete",
+        "issues": []
+      },
+      "elapsedMs": 26462,
+      "summary": {
+        "total": 2,
+        "completed": 2,
+        "pass": 1,
+        "fail": 1,
+        "lowConfidence": 0,
+        "modified": 0,
+        "pendingPhotos": 0,
+        "qualityPhotos": 0,
+        "failedPhotos": 0,
+        "canSubmit": true,
+        "verdict": "FAIL"
+      },
+      "resourceCheckBefore": {
+        "availableGiB": 18.59,
+        "cpuPercent": 11.5,
+        "load": [
+          4.27001953125,
+          3.24072265625,
+          2.7060546875
+        ]
+      },
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+      "localEvidenceDir": "outputs/real-vision-20261018/state-3Mwqmz",
+      "components": [
+        {
+          "label": "P001-01",
+          "expectedLines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "PASS",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.95,
+            "reason": "待检元件三行丝印逐字符与正品一致：第一行SV358、第二行A26、第三行0147，字符顺序与字形匹配；左下角圆点标记位置一致；封装为8引脚方形贴片，引脚数量与排布一致。未见文字、Logo或形状差异，光照角度不同属正常拍照差异。",
+            "instructionVersion": 1,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 11296,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "b5f4b49c-b6ee-4277-a12d-553b9a882b7f.json",
+            "features": [
+              "8引脚方形贴片封装",
+              "黑色塑封体",
+              "左下角圆形凹点标记",
+              "三行浅色丝印文字"
+            ],
+            "differences": [],
+            "instructionConflicts": []
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/7d56738f-d079-458c-bd30-32b41ede5d02.png",
+            "assetId": "7d56738f-d079-458c-bd30-32b41ede5d02.png",
+            "width": 448,
+            "height": 537,
+            "rotation": 13.36693000793457,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"items\":[{\"componentId\":\"4d5dcc53-37be-4571-b27d-4839043d9cec\",\"status\":\"decided\",\"verdict\":\"PASS\",\"lines\":[\"SV358\",\"A26\",\"0147\"],\"confidence\":0.95,\"reason\":\"待检元件三行丝印逐字符与正品一致：第一行SV358、第二行A26、第三行0147，字符顺序与字形匹配；左下角圆点标记位置一致；封装为8引脚方形贴片，引脚数量与排布一致。未见文字、Logo或形状差异，光照角度不同属正常拍照差异。\",\"features\":[\"8引脚方形贴片封装\",\"黑色塑封体\",\"左下角圆形凹点标记\",\"三行浅色丝印文字\"],\"differences\":[]}],\"instructionConflicts\":[]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 456,
+            "completion_tokens": 186,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.119971666745045,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 5.29,
+            "promptTokensCount": 456,
+            "predictedTokensCount": 186,
+            "totalTokensCount": 642
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": null
+        },
+        {
+          "label": "P001-02",
+          "expectedLines": [
+            "SV385",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "FAIL",
+          "ai": {
+            "verdict": "FAIL",
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.95,
+            "reason": "逐行比对：第一行正品为“SV358”，待检为“SV385”，字符顺序与内容不一致（正品第4位为5、第5位为8；待检第4位为8、第5位为5），属型号不符。第二行“ A26”与第三行“ 0147”两图一致。封装均为8引脚方形贴片，左下角有圆点标记，外观特征一致；差异集中在型号文字。",
+            "instructionVersion": 1,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 14376,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "8510d7c2-431d-40ff-9771-26d54b156d89.json",
+            "features": [
+              "8引脚方形贴片封装",
+              "黑色塑封体",
+              "左下角圆形定位点标记",
+              "三行丝印：SV385 / A26 / 0147"
+            ],
+            "differences": [
+              {
+                "category": "text",
+                "message": "第一行型号不一致：正品为SV358，待检为SV385（第4、5位数字顺序不同）",
+                "lineIndex": 0,
+                "referenceText": "SV358",
+                "sampleText": "SV385"
+              }
+            ],
+            "instructionConflicts": []
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/db77aa3f-111d-4a5a-b560-48600056914e.png",
+            "assetId": "db77aa3f-111d-4a5a-b560-48600056914e.png",
+            "width": 481,
+            "height": 541,
+            "rotation": -19.04662322998047,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"items\":[{\"componentId\":\"b550d075-0b97-4434-a171-6bac97240885\",\"status\":\"decided\",\"verdict\":\"FAIL\",\"lines\":[\"SV385\",\"A26\",\"0147\"],\"confidence\":0.95,\"reason\":\"逐行比对：第一行正品为“SV358”，待检为“SV385”，字符顺序与内容不一致（正品第4位为5、第5位为8；待检第4位为8、第5位为5），属型号不符。第二行“ A26”与第三行“ 0147”两图一致。封装均为8引脚方形贴片，左下角有圆点标记，外观特征一致；差异集中在型号文字。\",\"features\":[\"8引脚方形贴片封装\",\"黑色塑封体\",\"左下角圆形定位点标记\",\"三行丝印：SV385 / A26 / 0147\"],\"differences\":[{\"category\":\"text\",\"message\":\"第一行型号不一致：正品为SV358，待检为SV385（第4、5位数字顺序不同）\",\"lineIndex\":0,\"referenceText\":\"SV358\",\"sampleText\":\"SV385\"}]}],\"instructionConflicts\":[]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 462,
+            "completion_tokens": 286,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.12727342935475,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 5.256,
+            "promptTokensCount": 462,
+            "predictedTokensCount": 286,
+            "totalTokensCount": 748
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": null
+        }
+      ]
+    },
+    {
+      "caseId": "REALVISION3",
+      "scope": "baseline",
+      "sourceSha256": "96fed1baf208dcaadbb9d5a33c6e4925fc6688d5e2402106d65560a7cd41aae3",
+      "photoStatus": "ready",
+      "preparation": {
+        "version": "green-contours-v1",
+        "sourceHash": "96fed1baf208dcaadbb9d5a33c6e4925fc6688d5e2402106d65560a7cd41aae3",
+        "uprightUrl": "/api/files/1a0bcf7a-ab01-40c3-a86c-b289df917af1.png",
+        "annotatedUrl": "/api/files/084b23a2-0b5d-4e90-8338-4698f8e0c173.png",
+        "sheetUrl": "/api/files/04445ee1-0e05-49b6-a5ac-2605e1e1cddb.png",
+        "width": 1536,
+        "height": 1024,
+        "elapsedMs": 258,
+        "coverage": "complete",
+        "issues": []
+      },
+      "elapsedMs": 33275,
+      "summary": {
+        "total": 3,
+        "completed": 3,
+        "pass": 3,
+        "fail": 0,
+        "lowConfidence": 0,
+        "modified": 0,
+        "pendingPhotos": 0,
+        "qualityPhotos": 0,
+        "failedPhotos": 0,
+        "canSubmit": true,
+        "verdict": "PASS"
+      },
+      "resourceCheckBefore": {
+        "availableGiB": 18.33,
+        "cpuPercent": 10.3,
+        "load": [
+          3.982421875,
+          3.2529296875,
+          2.72509765625
+        ]
+      },
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+      "localEvidenceDir": "outputs/real-vision-20261018/state-3Mwqmz",
+      "components": [
+        {
+          "label": "P001-01",
+          "expectedLines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "PASS",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.95,
+            "reason": "待检元件三行丝印逐行与正品一致：第一行SV358、第二行A26、第三行0147，字符顺序与字形匹配；左下角圆点标记位置一致；封装为8引脚方形贴片，引脚数量与排布一致。未见文字缺失、错位或明显颜色异常，允许拍照角度差异。",
+            "instructionVersion": 1,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 10355,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "786796a0-3367-4d5f-858a-3385f3aab7d2.json",
+            "features": [
+              "黑色方形8引脚贴片封装",
+              "左下角圆形标记点",
+              "三行浅色丝印文字"
+            ],
+            "differences": [],
+            "instructionConflicts": []
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/48aabfbb-339d-4377-9db4-da33d41c23e2.png",
+            "assetId": "48aabfbb-339d-4377-9db4-da33d41c23e2.png",
+            "width": 299,
+            "height": 300,
+            "rotation": 18.23940086364746,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"items\":[{\"componentId\":\"1d12da06-744a-4d98-bd35-d036e99709fe\",\"status\":\"decided\",\"verdict\":\"PASS\",\"lines\":[\"SV358\",\"A26\",\"0147\"],\"confidence\":0.95,\"reason\":\"待检元件三行丝印逐行与正品一致：第一行SV358、第二行A26、第三行0147，字符顺序与字形匹配；左下角圆点标记位置一致；封装为8引脚方形贴片，引脚数量与排布一致。未见文字缺失、错位或明显颜色异常，允许拍照角度差异。\",\"features\":[\"黑色方形8引脚贴片封装\",\"左下角圆形标记点\",\"三行浅色丝印文字\"],\"differences\":[]}],\"instructionConflicts\":[]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 460,
+            "completion_tokens": 182,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.23359533232943,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 4.512,
+            "promptTokensCount": 460,
+            "predictedTokensCount": 182,
+            "totalTokensCount": 642
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": null
+        },
+        {
+          "label": "P001-02",
+          "expectedLines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "PASS",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.95,
+            "reason": "待检元件三行丝印清晰可读，第一行“SV358”、第二行“A26”、第三行“0147”与正品标准逐字一致，字符顺序相同；左下角圆点标记位置一致，封装为8脚方形贴片，引脚数量与排布相符。未见Logo差异或明显颜色异常，光照角度不同不影响判定。",
+            "instructionVersion": 1,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 10470,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "13aecf56-8a60-4ea8-a2b8-a68b114667de.json",
+            "features": [
+              "黑色方形8引脚贴片封装",
+              "左下角圆形标记点",
+              "三行浅色丝印文字"
+            ],
+            "differences": [],
+            "instructionConflicts": []
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/4124f097-c849-4303-957a-8a2d90450ae9.png",
+            "assetId": "4124f097-c849-4303-957a-8a2d90450ae9.png",
+            "width": 307,
+            "height": 303,
+            "rotation": 21.689064025878906,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"items\":[{\"componentId\":\"ac720a0d-65ed-4e4b-b5dc-4793d7ff8ba1\",\"status\":\"decided\",\"verdict\":\"PASS\",\"lines\":[\"SV358\",\"A26\",\"0147\"],\"confidence\":0.95,\"reason\":\"待检元件三行丝印清晰可读，第一行“SV358”、第二行“A26”、第三行“0147”与正品标准逐字一致，字符顺序相同；左下角圆点标记位置一致，封装为8脚方形贴片，引脚数量与排布相符。未见Logo差异或明显颜色异常，光照角度不同不影响判定。\",\"features\":[\"黑色方形8引脚贴片封装\",\"左下角圆形标记点\",\"三行浅色丝印文字\"],\"differences\":[]}],\"instructionConflicts\":[]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 456,
+            "completion_tokens": 185,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.16328704298369,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 4.515,
+            "promptTokensCount": 456,
+            "predictedTokensCount": 185,
+            "totalTokensCount": 641
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": null
+        },
+        {
+          "label": "P001-03",
+          "expectedLines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "PASS",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.95,
+            "reason": "待检元件丝印三行文字内容、顺序及字符字形与正品标准完全一致。第一行“SV358”中S、V、3、5、8字形清晰且匹配；第二行“A26”及第三行“0147”均无差异。封装形状、引脚数量（8脚SOIC）及左下角定位圆点位置均与标准图一致。",
+            "instructionVersion": 1,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 11564,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "7df219ab-6a2c-40cc-9d53-a04f97610e38.json",
+            "features": [
+              "8引脚SOIC封装",
+              "黑色塑封体",
+              "左下角有圆形定位点",
+              "丝印字体为无衬线体"
+            ],
+            "differences": [],
+            "instructionConflicts": []
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/b50e8bd6-12cf-4a9b-bf83-dff4ff5ab1f5.png",
+            "assetId": "b50e8bd6-12cf-4a9b-bf83-dff4ff5ab1f5.png",
+            "width": 287,
+            "height": 346,
+            "rotation": -37.042476654052734,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"items\": [{\"componentId\": \"bfb5d8cf-26d0-44d0-9a1f-e51cea916484\", \"status\": \"decided\", \"verdict\": \"PASS\", \"lines\": [\"SV358\", \"A26\", \"0147\"], \"confidence\": 0.95, \"reason\": \"待检元件丝印三行文字内容、顺序及字符字形与正品标准完全一致。第一行“SV358”中S、V、3、5、8字形清晰且匹配；第二行“A26”及第三行“0147”均无差异。封装形状、引脚数量（8脚SOIC）及左下角定位圆点位置均与标准图一致。\", \"features\": [\"8引脚SOIC封装\", \"黑色塑封体\", \"左下角有圆形定位点\", \"丝印字体为无衬线体\"], \"differences\": []}], \"instructionConflicts\": []}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 458,
+            "completion_tokens": 220,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.14782935942639,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 4.522,
+            "promptTokensCount": 458,
+            "predictedTokensCount": 220,
+            "totalTokensCount": 678
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": null
+        }
+      ]
+    }
+  ],
+  "onsiteOverrideRepeatedCase": [
+    {
+      "caseId": "REALVISION2",
+      "scope": "repeated onsite override",
+      "sourceSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+      "photoStatus": "ready",
+      "preparation": {
+        "version": "green-contours-v1",
+        "sourceHash": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+        "uprightUrl": "/api/files/ff74cc6a-0e21-49f1-b8d3-67755f8c4ef0.png",
+        "annotatedUrl": "/api/files/272f916e-ec2f-4ad8-9e5d-1ee580a78dcf.png",
+        "sheetUrl": "/api/files/ba370c33-4b49-407b-969b-20ef29d112e9.png",
+        "width": 1536,
+        "height": 1024,
+        "elapsedMs": 308,
+        "coverage": "complete",
+        "issues": []
+      },
+      "elapsedMs": 25386,
+      "summary": {
+        "total": 2,
+        "completed": 2,
+        "pass": 2,
+        "fail": 0,
+        "lowConfidence": 0,
+        "modified": 0,
+        "pendingPhotos": 0,
+        "qualityPhotos": 0,
+        "failedPhotos": 0,
+        "canSubmit": true,
+        "verdict": "PASS"
+      },
+      "resourceCheckBefore": {
+        "availableGiB": 19.32,
+        "cpuPercent": 3.9,
+        "load": [
+          2.52490234375,
+          3.2607421875,
+          3.0390625
+        ]
+      },
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+      "localEvidenceDir": "outputs/real-vision-20261018/state-sLDZCB",
+      "components": [
+        {
+          "label": "P001-01",
+          "expectedLines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "PASS",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.95,
+            "reason": "待检元件三行丝印分别为SV358、A26、0147，与正品标准逐行一致；字符顺序、字形（含S/5区分）及左下角圆点标志位置均匹配，封装为8引脚方形贴片，未见异常差异。现场说明允许SV385作为变体，但本件为SV358，与标准一致，故判定PASS。",
+            "instructionVersion": 2,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 11873,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "65501833-7493-4e87-a01a-1956e9e52c47.json",
+            "features": [
+              "黑色方形贴片封装",
+              "8引脚（上下各4）",
+              "左下角圆形凹点标记",
+              "三行浅色丝印"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/b0e5c6a6-9428-43d4-831e-1becf362d1be.png",
+            "assetId": "b0e5c6a6-9428-43d4-831e-1becf362d1be.png",
+            "width": 448,
+            "height": 537,
+            "rotation": 13.36693000793457,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"items\":[{\"componentId\":\"f7da9b12-400c-44d0-8df0-264492cb5e5d\",\"status\":\"decided\",\"verdict\":\"PASS\",\"lines\":[\"SV358\",\"A26\",\"0147\"],\"confidence\":0.95,\"reason\":\"待检元件三行丝印分别为SV358、A26、0147，与正品标准逐行一致；字符顺序、字形（含S/5区分）及左下角圆点标志位置均匹配，封装为8引脚方形贴片，未见异常差异。现场说明允许SV385作为变体，但本件为SV358，与标准一致，故判定PASS。\",\"features\":[\"黑色方形贴片封装\",\"8引脚（上下各4）\",\"左下角圆形凹点标记\",\"三行浅色丝印\"],\"differences\":[]}],\"instructionConflicts\":[]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 490,
+            "completion_tokens": 202,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.23593148103968,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 5.289,
+            "promptTokensCount": 490,
+            "predictedTokensCount": 202,
+            "totalTokensCount": 692
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": [
+            {
+              "inputIndex": 0,
+              "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+              "sentWidth": 431,
+              "sentHeight": 419,
+              "encodedBytes": 335565,
+              "effectiveWidth": null,
+              "effectiveHeight": null
+            },
+            {
+              "inputIndex": 1,
+              "sha256": "cf53ffd1f59143c023b044e5d2323f34e07a5d9d235c62e9bf90f36db829b8c0",
+              "sentWidth": 448,
+              "sentHeight": 537,
+              "encodedBytes": 475643,
+              "effectiveWidth": null,
+              "effectiveHeight": null
+            }
+          ]
+        },
+        {
+          "label": "P001-02",
+          "expectedLines": [
+            "SV385",
+            "A26",
+            "0147"
+          ],
+          "expectedVerdict": "PASS",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "confidence": 0.9,
+            "reason": "待检第一行读作SV385，与正品标准SV358在第三位字符不同；依据现场说明允许第一行SV385作为SV358的可接受变体，故不判不合格。第二行A26、第三行0147与正品一致，字符顺序和封装外观未见异常。",
+            "instructionVersion": 2,
+            "source": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 12523,
+            "promptVersion": "silkscreen-pair-v1",
+            "rawRecord": "f042ead4-af02-4c7b-be17-5cccee581ed5.json",
+            "features": [
+              "黑色方形8引脚SOP封装",
+              "左下角圆形pin1标记",
+              "三行丝印清晰可读"
+            ],
+            "differences": [
+              {
+                "category": "text",
+                "message": "第一行第三位字符由5变为8，现场说明允许该变体",
+                "lineIndex": 0,
+                "referenceText": "SV358",
+                "sampleText": "SV385"
+              }
+            ],
+            "instructionConflicts": [],
+            "instructionWarnings": [
+              "系统提示（非模型原文）：存在可见差异但结论为合格，且本次设置了优先现场说明。请核对现场说明与正品标准的关系；本次已按现场说明执行。"
+            ]
+          },
+          "matchesThisSyntheticCase": true,
+          "crop": {
+            "url": "/api/files/72dc52d5-02f2-43db-8ba2-e88ab5179613.png",
+            "assetId": "72dc52d5-02f2-43db-8ba2-e88ab5179613.png",
+            "width": 481,
+            "height": 541,
+            "rotation": -19.04662322998047,
+            "qualityReasons": []
+          },
+          "rawReply": [
+            {
+              "finish_reason": "stop",
+              "message": {
+                "role": "assistant",
+                "content": "{\"items\":[{\"componentId\":\"63e56bbe-568d-45ee-a08c-0dc46846bca9\",\"status\":\"decided\",\"verdict\":\"PASS\",\"lines\":[\"SV385\",\"A26\",\"0147\"],\"confidence\":0.9,\"reason\":\"待检第一行读作SV385，与正品标准SV358在第三位字符不同；依据现场说明允许第一行SV385作为SV358的可接受变体，故不判不合格。第二行A26、第三行0147与正品一致，字符顺序和封装外观未见异常。\",\"features\":[\"黑色方形8引脚SOP封装\",\"左下角圆形pin1标记\",\"三行丝印清晰可读\"],\"differences\":[{\"category\":\"text\",\"message\":\"第一行第三位字符由5变为8，现场说明允许该变体\",\"lineIndex\":0,\"referenceText\":\"SV358\",\"sampleText\":\"SV385\"}]}],\"instructionConflicts\":[]}"
+              }
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 484,
+            "completion_tokens": 221,
+            "reasoning_tokens": 0
+          },
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 32.23202448890045,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 5.445,
+            "promptTokensCount": 484,
+            "predictedTokensCount": 221,
+            "totalTokensCount": 705
+          },
+          "templateSha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "inputMetrics": [
+            {
+              "inputIndex": 0,
+              "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+              "sentWidth": 431,
+              "sentHeight": 419,
+              "encodedBytes": 335565,
+              "effectiveWidth": null,
+              "effectiveHeight": null
+            },
+            {
+              "inputIndex": 1,
+              "sha256": "26bdb05242fe26efa36c9257b35914f30a8ede8759b74d810b26b0c778b8ce64",
+              "sentWidth": 481,
+              "sentHeight": 541,
+              "encodedBytes": 451037,
+              "effectiveWidth": null,
+              "effectiveHeight": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "cpuProbe": [
+    {
+      "case": "single",
+      "count": 1,
+      "elapsedMs": 245,
+      "workerPeakRssMiB": 140.0,
+      "coverage": "complete",
+      "resourcesBefore": {
+        "availableGiB": 19.2,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2
+      },
+      "resourcesAfter": {
+        "availableGiB": 18.95,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2
+      }
+    },
+    {
+      "case": "pair",
+      "count": 2,
+      "elapsedMs": 311,
+      "workerPeakRssMiB": 138.02,
+      "coverage": "complete",
+      "resourcesBefore": {
+        "availableGiB": 18.99,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2
+      },
+      "resourcesAfter": {
+        "availableGiB": 19.09,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2
+      }
+    },
+    {
+      "case": "dim-three",
+      "count": 3,
+      "elapsedMs": 270,
+      "workerPeakRssMiB": 133.88,
+      "coverage": "complete",
+      "resourcesBefore": {
+        "availableGiB": 19.14,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2
+      },
+      "resourcesAfter": {
+        "availableGiB": 19.04,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2
+      }
+    }
+  ],
+  "validation": {
+    "nodeTests": 23,
+    "pythonTestGroups": 2,
+    "typecheck": "passed",
+    "productionFrontendBuild": "passed",
+    "browser": "人工操作IAB，横竖屏、真实识别、切换、原图/标注/白板、人工修正、报告、模拟回填均完成；原生文件选择器未自动化控制，multipart上传另行实际验证",
+    "previousRoundData": "旧4轮记录逐字节一致，旧19张照片保留"
+  }
+}

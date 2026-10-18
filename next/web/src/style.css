@@ -12,3 +12,11 @@
 @media(max-height:650px) and (min-width:801px){.sv-header{min-height:62px}.sv-main{padding-top:16px;padding-bottom:16px;gap:10px}.sv-heading{min-height:60px}.sv-heading h1{font-size:25px}.sv-heading p{font-size:14px}.sv-footer{min-height:76px;padding-top:10px;padding-bottom:10px}.sv-footer .sv-btn{min-height:48px}.sv-photo-thumb{aspect-ratio:2.1}.sv-empty-capture{gap:10px}.sv-capture-icon{width:62px;height:62px}.sv-empty-capture .sv-btn{min-height:48px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.sv-spin{animation:none;border-radius:50%}}
 @media print{.sv-header,.sv-footer,.sv-message,.sv-busy,.sv-download{display:none}.sv-app{height:auto;max-width:none;overflow:visible}.sv-main{overflow:visible}.sv-report{padding:0}.sv-panel{break-inside:avoid}.sv-report-component{break-inside:avoid}}
+
+.sv-rectified-crop { width:100%; } .sv-rectified-crop img { position:static; width:100%; height:100%; object-fit:contain; }
+.sv-extraction-tabs { display:flex; gap:8px; flex-wrap:wrap; } .sv-extraction-tabs .sv-btn[aria-pressed="true"] { background:var(--brand-soft); color:var(--brand); }
+
+.sv-report-model-detail summary { min-height:44px; align-content:center; cursor:pointer; color:var(--muted); font-size:13px; }
+.sv-instruction-priority { background:oklch(97% .035 85); border:1px solid oklch(88% .08 85); color:oklch(40% .08 65); padding:16px 20px; border-radius:12px; }
+.sv-instruction-priority h2 { font-size:17px; margin-bottom:6px; }
+.sv-instruction-priority p { font-size:14px; line-height:1.6; max-width:75ch; }

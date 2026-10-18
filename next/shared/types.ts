@@ -4,16 +4,22 @@ export type RoundStatus = 'draft' | 'queued' | 'running' | 'ready' | 'submitting
 export type SampleKind = 'pass' | 'fail' | 'four' | 'twenty' | 'quality';
 export interface Person { id: string; name: string }
 export interface Review { id: string; verdict: Verdict; reason: string; person: Person; at: string; instructionVersion: number }
-export interface AIJudgement { verdict: Verdict; lines: string[]; confidence: number; reason: string; instructionVersion: number }
+export interface AIJudgement { verdict: Verdict; lines: string[]; confidence: number; reason: string; instructionVersion: number;
+  source?: 'lmstudio'; model?: string; elapsedMs?: number; promptVersion?: string; rawRecord?: string;
+  features?: string[]; differences?: { category:string; message:string; lineIndex:number|null; referenceText:string|null; sampleText:string|null }[]; instructionConflicts?: string[]; instructionWarnings?:string[];
+}
 export interface ComponentResult {
   id: string; label: string; index: number; bbox: [number, number, number, number];
   ai: AIJudgement | null; aiHistory: AIJudgement[];
   review: Review | null; reviewHistory: Review[];
+  crop?: { url: string; width: number; height: number; rotation: number; qualityReasons: string[]; assetId: string };
 }
+export interface Preparation { version:string; sourceHash:string; uprightUrl:string; annotatedUrl:string; sheetUrl:string; width:number; height:number; elapsedMs:number; coverage:'complete'|'uncertain'; issues:string[] }
 export interface Photo {
   id: string; sequence: number; filename: string; file: string; url: string; hash: string;
   width: number; height: number; sample: SampleKind | null; status: PhotoStatus; uploadKey?: string;
   message: string; components: ComponentResult[];
+  preparation?: Preparation;
 }
 export interface Standard { id: string; version: number; material: string; supplier: string; image: string; lines: string[]; description: string }
 export interface Transfer { id: string; key: string; revision: number; status: 'sending' | 'success' | 'failed'; message: string; at: string; receipt?: string; reportUrl?: string }
@@ -25,6 +31,7 @@ export interface Round {
 export interface Task {
   id: string; number: string; material: string; supplier: string; standard: Standard | null;
   roundId: string | null; effectiveRoundId: string | null;
+  trialPhoto?: 'single'|'pair'|'dim-three';
 }
 export interface Summary {
   total: number; completed: number; pass: number; fail: number; lowConfidence: number; modified: number;
@@ -32,4 +39,5 @@ export interface Summary {
 }
 export interface TaskListItem extends Task { status: string; summary: Summary | null }
 export interface TaskView { task: Task; round: Round | null; effective: Round | null; summary: Summary | null }
-export interface Bootstrap { person: Person; mode: 'mock'; tasks: TaskListItem[] }
+export interface RecognitionStatus { mode:'mock'|'lmstudio'; model?:string }
+export interface Bootstrap { person: Person; mode: 'mock'; recognition?:RecognitionStatus; tasks: TaskListItem[] }

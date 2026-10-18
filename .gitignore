@@ -56,3 +56,4 @@ next-env.d.ts
 
 # User-provided local inspection photos, not website assets
 /images/
+/next/丝印照片/

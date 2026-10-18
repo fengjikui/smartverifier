@@ -6,24 +6,25 @@ import { Store } from './store.ts';
 import { assertMutable, finalVerdict, summarize } from '../shared/domain.ts';
 import type { ComponentResult, Person, Photo, Round, SampleKind, Standard, Task, TaskListItem, TaskView, Verdict } from '../shared/types.ts';
 import { sampleBox, sampleCount, sampleFails, sampleLowConfidence, twentyFailures, twentySample } from '../shared/sample-presets.ts';
+import { RecognitionProblem } from './vision/local-pipeline.ts';
+import type { VisionPipeline } from './vision/local-pipeline.ts';
 
 export class ApiError extends Error { status: number; constructor(status: number, message: string) { super(message); this.status = status; } }
 export const person: Person = { id: 'QA018', name: '王敏' };
 const now = () => new Date().toISOString();
 const sampleFiles: Record<SampleKind, string> = { pass: 'reference.png', fail: 'mismatch.png', four: 'four-components.png', twenty: 'twenty-components.png', quality: 'reference.png' };
-const sampleHashes: Record<string, SampleKind> = {
-  ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97: 'pass',
-  b0926e327952e093b2895bfa852bacad76e47e03efe3c552b5a9d15d7b9d9afa: 'fail',
-  '5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b': 'four',
-};
 const standard: Standard = { id: 'STD-358', version: 1, material: 'MAT-358-08', supplier: '华信电子', image: '/assets/detail-1.png', lines: ['SV358', 'A26', '0147'], description: '核对型号丝印、文字顺序、Logo与外观。当前为虚构标准，仅用于本地流程试用。' };
 function escapeMarkdown(s: string) { return s.replace(/[\\`*_{}\[\]<>#!|]/g, '\\$&'); }
 
 export class InspectionService {
-  store: Store; directory: string; root: string; interval: number; queue: string[] = []; worker = false; closing = false;
-  constructor(directory: string, root: string, interval = 1200) {
+  store: Store; directory: string; root: string; interval: number; queue: string[] = []; worker = false; closing = false; vision?:VisionPipeline;
+  constructor(directory: string, root: string, interval = 1200, vision?:VisionPipeline) {
     this.directory = directory; this.root = root; this.interval = interval; this.store = new Store(directory);
+    this.vision=vision;
     if (!this.store.tasks().length) for (const [id, material, supplier] of [['IQCF26090500016', 'MAT-358-08', '华信电子'], ['IQCF26090500017', 'MAT-358-08', '华信电子'], ['IQCF26090500018', 'MAT-725-16', '远成电子']]) this.store.saveTask({ id, number: id, material, supplier, standard: material === 'MAT-358-08' ? standard : null, roundId: null, effectiveRoundId: null });
+    if(vision)for(const [i,trialPhoto,title] of [[1,'single','单件'],[2,'pair','双件 · 含字符差异'],[3,'dim-three','三件 · 较暗光照']] as const){
+      const id='REALVISION'+i;if(!this.store.task(id))this.store.saveTask({id,number:'真实比对 · '+title,material:'SYN-SV358',supplier:'模拟拍摄验证',standard:{...standard,id:'STD-SYN-GREEN-1',material:'SYN-SV358',supplier:'模拟拍摄验证',image:'/api/reference/green-mat-v1.png',description:'严格核对各行丝印字符与顺序、标志和封装特征。允许正常拍照光照及角度差异。虚构样本只验证技术链路，不能据此认定真伪。'},roundId:null,effectiveRoundId:null,trialPhoto});
+    }
     for (const round of this.store.rounds()) {
       if (['queued', 'running'].includes(round.status)) {
         for (const p of round.photos) if (['queued', 'running'].includes(p.status)) { p.status = 'error'; p.message = '服务已重启，已完成的结果保留，请重新检测未完成部分。'; }
@@ -45,7 +46,7 @@ export class InspectionService {
     const previous = t.roundId ? this.round(t.roundId) : null;
     if (previous && previous.status !== 'submitted') throw new ApiError(409, '当前还有未提交的检测草稿，请先继续本轮。');
     const r: Round = { id: randomUUID(), taskId: id, number: (previous?.number ?? 0) + 1, revision: 1, status: 'draft', createdAt: now(), standard: structuredClone(t.standard), instruction: previous?.instruction ?? '', instructionVersion: 1, nextPhotoSequence: previous?.nextPhotoSequence ?? 1, photos: [], transfer: null };
-    if (reuse && previous) r.photos = previous.photos.map(p => ({ ...structuredClone(p), id: randomUUID(), status: 'pending', message: '', components: [] }));
+    if (reuse && previous) r.photos = previous.photos.map(p => ({ ...structuredClone(p), id: randomUUID(), status: 'pending', message: '', components: [], preparation:undefined }));
     t.roundId = r.id;
     this.store.transaction(() => { this.store.saveRound(r); this.store.saveTask(t); });
     return this.view(id);
@@ -68,7 +69,7 @@ export class InspectionService {
     await writeFile(path.join(this.directory, 'files', file), input.bytes, { mode: 0o600 });
     const r = this.mutable(id, revision), old = input.replaceId ? r.photos.find(p => p.id === input.replaceId) : null;
     if (input.replaceId && !old) throw new ApiError(404, '要替换的照片已不存在，请刷新后重试。');
-    const photo: Photo = { id: randomUUID(), uploadKey: input.clientId, sequence: old?.sequence ?? r.nextPhotoSequence++, filename: path.basename(input.filename).slice(0,160), file, url: '/api/files/' + file, hash, width: input.width, height: input.height, sample: input.sample ?? sampleHashes[hash] ?? null, status: 'pending', message: '', components: [] };
+    const photo: Photo = { id: randomUUID(), uploadKey: input.clientId, sequence: old?.sequence ?? r.nextPhotoSequence++, filename: path.basename(input.filename).slice(0,160), file, url: '/api/files/' + file, hash, width: input.width, height: input.height, sample: input.sample ?? null, status: 'pending', message: '', components: [] };
     if (old) r.photos[r.photos.indexOf(old)] = photo; else r.photos.push(photo);
     this.store.audit(r, actor, old ? 'photo.replace' : 'photo.add', { oldId: old?.id, photoId: photo.id, hash });
     return this.saveMutation(r);
@@ -77,6 +78,13 @@ export class InspectionService {
     if (!Object.hasOwn(sampleFiles, sample)) throw new ApiError(400, '请选择一种内置样例。');
     const bytes = await readFile(path.join(this.root, 'fixtures/inspection', sampleFiles[sample]));
     return this.addPhoto(id, revision, { bytes, filename: '内置样例-' + sampleFiles[sample], width: sample === 'twenty' ? twentySample.width : 1536, height: sample === 'twenty' ? twentySample.height : 1024, sample, replaceId }, actor);
+  }
+  async addRealTrial(id:string,revision:number,actor:Person){
+    const r=this.mutable(id,revision),task=this.task(r.taskId);
+    if(!this.vision||!task.trialPhoto)throw new ApiError(409,'当前任务没有配置真实识别试拍照片。');
+    if(r.photos.some(p=>p.uploadKey==='real-trial:'+task.trialPhoto))return this.view(r.taskId);
+    const bytes=await readFile(path.join(this.root,'fixtures/inspection/green-mat-v1',task.trialPhoto+'.png'));
+    return this.addPhoto(id,revision,{bytes,filename:'模拟拍摄-'+task.trialPhoto+'.png',width:1536,height:1024,clientId:'real-trial:'+task.trialPhoto},actor);
   }
   async addTwentyPhotos(id: string, revision: number, clientId: string, actor: Person): Promise<TaskView> {
     const prefix = 'sample-set:' + clientId + ':';
@@ -135,7 +143,7 @@ export class InspectionService {
       const id = this.queue.shift()!;
       try { await this.process(id); } catch(error) {
         if(this.closing)return;
-        console.error('模拟检测任务失败',error);
+        console.error('检测任务失败',error);
         const r=this.round(id);for(const p of r.photos)if(['queued','running'].includes(p.status)){p.status='error';p.message='检测没有完成，已完成结果保留，请重试。';}
         r.status='draft';r.revision++;this.store.saveRound(r);
       }
@@ -146,9 +154,10 @@ export class InspectionService {
     for (const photo of r.photos.filter(p => p.status === 'queued')) {
       if (this.closing) return;
       r = this.round(id); const p = r.photos.find(p => p.id === photo.id)!; p.status = 'running'; r.revision++; this.store.saveRound(r);
-      await delay(this.interval);
+      if(p.sample||!this.vision)await delay(this.interval);
       if (this.closing) return;
-      if (!p.sample) { p.status = 'error'; p.message = '照片已保存。本阶段尚未接入真实模型，请使用内置样例体验检测；不会为这张照片伪造判定。'; }
+      if (!p.sample&&this.vision) { await this.processReal(r,p); }
+      else if (!p.sample) { p.status = 'error'; p.message = '照片已保存。本阶段尚未接入真实模型，请使用内置样例体验检测；不会为这张照片伪造判定。'; }
       else if (p.sample === 'quality') { p.status = 'quality'; p.message = '图片质量过低，请重新拍照（内置质量反馈状态示例）。'; }
       else {
         const count = sampleCount(p.sample);
@@ -169,6 +178,31 @@ export class InspectionService {
       r.revision++; this.store.saveRound(r);
     }
     if (!this.closing) { r = this.round(id); r.status = r.photos.every(p => p.status === 'ready') ? 'ready' : 'draft'; r.revision++; this.store.saveRound(r); }
+  }
+  async processReal(r:Round,p:Photo){
+    try{
+      if(!p.preparation||p.preparation.sourceHash!==p.hash){
+        p.message='正在定位元件并生成裁片…';this.store.saveRound(r);
+        const prepared=await this.vision!.prepare(p);if(this.closing)return;
+        p.preparation=prepared.preparation;p.components=prepared.components;
+        p.width=prepared.preparation.width;p.height=prepared.preparation.height;r.revision++;this.store.saveRound(r);
+      }
+      if(p.preparation.coverage!=='complete')throw new RecognitionProblem('quality',p.preparation.issues.join(' '));
+      const quality:string[]=[];
+      for(const c of p.components){
+        if(this.closing)return;
+        if(c.ai?.instructionVersion===r.instructionVersion)continue;
+        if(c.crop?.qualityReasons.length){quality.push(...c.crop.qualityReasons);continue;}
+        p.message=`已定位${p.components.length}件，正在比对第${c.index+1}件…`;r.revision++;this.store.saveRound(r);
+        try{
+          const ai=await this.vision!.recognize(r,p,c);if(this.closing)return;
+          if(!ai)throw new RecognitionProblem('quality','图片质量过低，请重新拍照。');
+          if(ai.instructionVersion!==r.instructionVersion)throw new RecognitionProblem('error','检测说明已更新，请重新检测。');
+          c.ai=ai;c.aiHistory.push(structuredClone(ai));r.revision++;this.store.saveRound(r);
+        }catch(error){if(error instanceof RecognitionProblem&&error.kind==='quality'){quality.push(error.message);continue;}throw error;}
+      }
+      p.status=quality.length?'quality':'ready';p.message=[...new Set(quality)].join(' ');
+    }catch(error){if(this.closing)return;p.status=error instanceof RecognitionProblem?error.kind:'error';p.message=error instanceof RecognitionProblem?error.message:'元件定位未完成，请调整拍摄后重试。';console.error('真实识别未完成',error);}
   }
   submit(id: string, revision: number, actor: Person, simulateFailure = false) {
     const r = this.round(id);
@@ -193,13 +227,20 @@ export class InspectionService {
     this.store.transaction(() => { this.store.db.prepare('INSERT OR IGNORE INTO receipts VALUES(?,?)').run(transfer.key, JSON.stringify({ receipt, roundId: id, verdict: summarize(r).verdict, badCount: summarize(r).fail })); this.store.saveRound(r); this.store.saveTask(t); this.store.audit(r, r.submittedBy!, 'mes.mock.saved', { key: transfer.key, receipt }); });
   }
   report(r: Round): string {
-    const s = summarize(r), lines = ['# 丝印检测报告（本地模拟）', '', '> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- 检验单号：${r.taskId}`, `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (r.submittedBy ? `${r.submittedBy.name} ${r.submittedBy.id}` : '尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', '说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
+    const real=r.photos.some(p=>p.components.some(c=>c.ai?.source==='lmstudio'));
+    const s = summarize(r), lines = [real?'# 丝印检测报告（本机真实识别）':'# 丝印检测报告（本地模拟）', '', real?'> 结果来源按元件标明，可能同时包含真实模型与内置预设。身份及MES仍为本地模拟，未接通公司系统。带“模拟拍摄”名称的照片由图像生成模型生成，不用于评估现场准确率。':'> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- 检验单号：${r.taskId}`, `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (r.submittedBy ? `${r.submittedBy.name} ${r.submittedBy.id}` : '尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', real?'现场说明已随真实双图一起发送给模型；内置预设不执行自然语言要求。':'说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
+    const conflicts=[...new Set(r.photos.flatMap(p=>p.components.flatMap(c=>[...(c.ai?.instructionConflicts??[]),...(c.ai?.instructionWarnings??[])])))];
+    if(conflicts.length)lines.splice(4,0,'## 重要：现场说明优先及与标准的关系','本次按现场检验人员指示进行检测。',...conflicts.map(escapeMarkdown),'');
     for (const p of r.photos) {
       lines.push(`## 照片 P${String(p.sequence).padStart(3,'0')}`, `![原始照片](${p.url})`, '', escapeMarkdown(p.filename));
+      if(p.preparation)lines.push('',`![定位编号（原图外侧引线）](${p.preparation.annotatedUrl})`,`![裁片白板（保持裁片像素）](${p.preparation.sheetUrl})`,`预处理：${p.preparation.version}；${p.preparation.elapsedMs} ms；原图SHA256：${p.hash}`,'');
       for (const c of p.components) {
         lines.push(`### ${c.label} · ${finalVerdict(c) === 'PASS' ? '合格' : finalVerdict(c) === 'FAIL' ? '不合格' : '未完成'}`, '', '| 行 | 实拍识别原文 | 正品原文 |', '| --- | --- | --- |');
         for (let i = 0; i < Math.max(c.ai?.lines.length ?? 0, r.standard.lines.length); i++) lines.push(`| ${i+1} | ${escapeMarkdown(c.ai?.lines[i] ?? '')} | ${escapeMarkdown(r.standard.lines[i] ?? '')} |`);
         lines.push('', escapeMarkdown(c.ai?.reason ?? p.message));
+        lines.push('结果来源：'+(c.ai?.source==='lmstudio'?'本机 LM Studio 真实识别':c.ai?'内置预设（非模型识别）':'尚未生成结论'));
+        if(c.crop)lines.push(`![元件裁片 ${c.label}](${c.crop.url})`);
+        if(c.ai?.source==='lmstudio')lines.push(`模型：${escapeMarkdown(c.ai.model??'')}；${c.ai.elapsedMs} ms；判断把握：${c.ai.confidence}（模型自评，非校准概率）；提示词：${c.ai.promptVersion}；原始响应记录：${c.ai.rawRecord}`,...(c.ai.features??[]).map(f=>'外观：'+escapeMarkdown(f)),...(c.ai.differences??[]).map(d=>'差异：'+escapeMarkdown(d.message)));
         if (c.review) lines.push(`人工修正：${c.review.person.name} ${c.review.person.id}，${c.review.at}，原因：${escapeMarkdown(c.review.reason)}。AI原判${c.ai?.verdict}保留。`);
       }
     }

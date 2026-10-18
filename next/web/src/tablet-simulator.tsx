@@ -13,7 +13,7 @@ export function TabletSimulator() {
   const fit = Math.max(.1, Math.min(1, (available.width - 48) / deviceWidth, (available.height - 48) / deviceHeight));
   const scale = actualSize ? 1 : fit;
   const demo = new URLSearchParams(location.search).get('demo');
-  const initialTask = demo === 'photos' ? 'DEMO20PHOTOS' : demo === 'board' ? 'DEMO20BOARD' : null;
+  const initialTask = demo === 'photos' ? 'DEMO20PHOTOS' : demo === 'board' ? 'DEMO20BOARD' : demo === 'real' ? 'REALVISION2' : null;
   const initialReport = initialTask && new URLSearchParams(location.search).get('view') === 'report';
 
   useLayoutEffect(() => {
