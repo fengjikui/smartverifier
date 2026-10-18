@@ -1,4 +1,4 @@
-import { publicUrl } from '../shared/paths.ts';
+import { apiPath, assetPath, publicUrl } from '../shared/paths.ts';
 import { createHash, randomUUID } from 'node:crypto';
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
@@ -18,7 +18,7 @@ import { Registry } from './admin/registry.ts';
 export const person: Person = { id: 'QA018', name: '王敏' };
 const now = () => new Date().toISOString();
 const sampleFiles: Record<SampleKind, string> = { pass: 'reference.png', fail: 'mismatch.png', four: 'four-components.png', twenty: 'twenty-components.png', quality: 'reference.png' };
-const standard: Standard = { id: 'STD-358', version: 1, material: 'MAT-358-08', supplier: '华信电子', image: '/assets/detail-1.png', lines: ['SV358', 'A26', '0147'], description: '核对型号丝印、文字顺序、Logo与外观。当前为虚构标准，仅用于本地流程试用。' };
+const standard: Standard = { id: 'STD-358', version: 1, material: 'MAT-358-08', supplier: '华信电子', image: assetPath('detail-1.png'), lines: ['SV358', 'A26', '0147'], description: '核对型号丝印、文字顺序、Logo与外观。当前为虚构标准，仅用于本地流程试用。' };
 function escapeMarkdown(s: string) { return s.replace(/[\\`*_{}\[\]<>#!|]/g, '\\$&'); }
 
 export class InspectionService {
@@ -28,7 +28,7 @@ export class InspectionService {
     this.vision=vision;
     if (!this.store.tasks().length) for (const [id, material, supplier] of [['IQCF26090500016', 'MAT-358-08', '华信电子'], ['IQCF26090500017', 'MAT-358-08', '华信电子'], ['IQCF26090500018', 'MAT-725-16', '远成电子']]) this.store.saveTask({ id, number: id, material, supplier, standard: material === 'MAT-358-08' ? standard : null, roundId: null, effectiveRoundId: null });
     if(vision)for(const [i,trialPhoto,title] of [[1,'single','单件'],[2,'pair','双件 · 含字符差异'],[3,'dim-three','三件 · 较暗光照']] as const){
-      const id='REALVISION'+i;if(!this.store.task(id))this.store.saveTask({id,number:'真实比对 · '+title,material:'SYN-SV358',supplier:'模拟拍摄验证',standard:{...standard,id:'STD-SYN-GREEN-1',material:'SYN-SV358',supplier:'模拟拍摄验证',image:'/api/reference/green-mat-v1.png',description:'严格核对各行丝印字符与顺序、标志和封装特征。允许正常拍照光照及角度差异。虚构样本只验证技术链路，不能据此认定真伪。'},roundId:null,effectiveRoundId:null,trialPhoto});
+      const id='REALVISION'+i;if(!this.store.task(id))this.store.saveTask({id,number:'真实比对 · '+title,material:'SYN-SV358',supplier:'模拟拍摄验证',standard:{...standard,id:'STD-SYN-GREEN-1',material:'SYN-SV358',supplier:'模拟拍摄验证',image:apiPath('/reference/green-mat-v1.png'),description:'严格核对各行丝印字符与顺序、标志和封装特征。允许正常拍照光照及角度差异。虚构样本只验证技术链路，不能据此认定真伪。'},roundId:null,effectiveRoundId:null,trialPhoto});
     }
     for (const round of this.store.rounds()) {
       if (['queued', 'running'].includes(round.status)) {
@@ -116,7 +116,7 @@ export class InspectionService {
     await writeFile(path.join(this.directory, 'files', file), input.bytes, { mode: 0o600 });
     const r = this.mutable(id, revision), old = input.replaceId ? r.photos.find(p => p.id === input.replaceId) : null;
     if (input.replaceId && !old) throw new ApiError(404, '要替换的照片已不存在，请刷新后重试。');
-    const photo: Photo = { id: randomUUID(), uploadKey: input.clientId, sequence: old?.sequence ?? r.nextPhotoSequence++, filename: path.basename(input.filename).slice(0,160), file, url: '/api/files/' + file, hash, width: input.width, height: input.height, sample: input.sample ?? null, status: 'pending', message: '', components: [] };
+    const photo: Photo = { id: randomUUID(), uploadKey: input.clientId, sequence: old?.sequence ?? r.nextPhotoSequence++, filename: path.basename(input.filename).slice(0,160), file, url: apiPath('/files/' + file), hash, width: input.width, height: input.height, sample: input.sample ?? null, status: 'pending', message: '', components: [] };
     if (old) r.photos[r.photos.indexOf(old)] = photo; else r.photos.push(photo);
     this.store.audit(r, actor, old ? 'photo.replace' : 'photo.add', { oldId: old?.id, photoId: photo.id, hash });
     return this.saveMutation(r);
@@ -146,7 +146,7 @@ export class InspectionService {
         const sample = twentyFailures.has(i) ? 'fail' : 'pass', bytes = sample === 'fail' ? fail : pass, file = randomUUID() + '.png';
         files.push(file);
         await writeFile(path.join(this.directory, 'files', file), bytes, { mode: 0o600 });
-        photos.push({ id:randomUUID(),uploadKey:prefix+i,sequence:0,filename:`内置20张照片样例-${String(i+1).padStart(2,'0')}.png`,file,url:'/api/files/'+file,hash:createHash('sha256').update(bytes).digest('hex'),width:1536,height:1024,sample,status:'pending',message:'',components:[] });
+        photos.push({ id:randomUUID(),uploadKey:prefix+i,sequence:0,filename:`内置20张照片样例-${String(i+1).padStart(2,'0')}.png`,file,url:apiPath('/files/'+file),hash:createHash('sha256').update(bytes).digest('hex'),width:1536,height:1024,sample,status:'pending',message:'',components:[] });
       }
       const round = this.mutable(id, revision);
       for (const photo of photos) photo.sequence = round.nextPhotoSequence++;
@@ -268,7 +268,7 @@ export class InspectionService {
     if (fail) { r.status = 'submit_failed'; transfer.status = 'failed'; transfer.message = '模拟MES暂时不可用，结果已保留，请重试。'; r.revision++; this.store.saveRound(r); return; }
     const prior = this.store.db.prepare('SELECT data FROM receipts WHERE key=?').get(transfer.key);
     const receipt = prior ? JSON.parse(String(prior.data)).receipt : 'MOCK-' + randomUUID().slice(0,8).toUpperCase();
-    transfer.status = 'success'; transfer.receipt = receipt; transfer.message = '已保存到模拟MES，未连接公司MES。'; transfer.at = now(); transfer.reportUrl = '/api/rounds/' + id + '/report.md';
+    transfer.status = 'success'; transfer.receipt = receipt; transfer.message = '已保存到模拟MES，未连接公司MES。'; transfer.at = now(); transfer.reportUrl = apiPath('/rounds/' + id + '/report.md');
     r.status = 'submitted'; r.revision++; t.effectiveRoundId = r.id;
     await mkdir(path.join(this.directory, 'reports'), { recursive: true, mode: 0o700 });
     await writeFile(path.join(this.directory, 'reports', id + '.md'), this.report(r), { mode: 0o600 });

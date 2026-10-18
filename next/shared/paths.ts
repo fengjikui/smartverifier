@@ -36,41 +36,34 @@ export function adminRoute(pathname: string, search = ''): string {
   return route;
 }
 
-/** 旧页地址迁移；null 代表不属于已知的旧入口。查询参数由调用方原样保留。 */
+/** 仅认可当前模块的网页与资源入口，不再注册旧地址或其跳转。 */
 export function canonicalPage(pathname: string): string | null {
-  const path = pathname.replace(/\/+$/, '') || '/';
-  if (path === '/') return MARKING_BASE;
-  if (path === '/tablet-preview' || path === MARKING_BASE + '/tablet-preview') return markingPaths.preview;
-  if (path === '/debug/model') return markingPaths.debug;
-  if (path === '/admin' || path.startsWith('/admin/')) return adminPath(path.slice(7) || 'references');
+  const path = pathname.replace(/\/+$/, '');
+  if (path === MARKING_BASE || path === markingPaths.preview || path === markingPaths.debug) return path;
   if (path === MARKING_BASE + '/admin') return markingPaths.standards;
-  if (path === MARKING_BASE || path.startsWith(MARKING_BASE + '/')) return path;
+  const admin = MARKING_BASE + '/admin/';
+  if (['standards','standards/new','standards/trash','imports','audit-logs','tasks'].some(route => path === admin + route)) return path;
+  if (path.startsWith(admin) && /^standards\/[a-f0-9-]{36}(?:\/(?:edit|copy))?$/.test(path.slice(admin.length))) return path;
+  if (path.startsWith(MARKING_BASE + '/assets/')) return path;
   return null;
 }
 
-/** 接口采用版本号 + 业务命名空间；旧名称只作为兼容入口。 */
+/** 调用方直接使用正式资源名称，不接受旧 API 前缀或别名。 */
 export function apiPath(route: string): string {
   if (route === MARKING_API || route.startsWith(MARKING_API + '/')) return route;
-  const suffix = route.startsWith('/api/') ? route.slice(4) : route;
-  return MARKING_API + suffix
-    .replace(/^\/task-list(?=\?|$)/, '/tasks')
-    .replace(/^\/standalone(?=\/|\?|$)/, '/checks')
-    .replace(/^\/admin\/references(?=\/|\?|$)/, '/admin/standards')
-    .replace(/^\/admin\/events(?=\?|$)/, '/admin/audit-logs');
+  if (!route.startsWith('/') || route.startsWith('/api/')) throw new Error('请使用模块内的规范 API 资源路径。');
+  return MARKING_API + route;
 }
 
-export function internalApiPath(pathname: string): string {
-  if (pathname !== MARKING_API && !pathname.startsWith(MARKING_API + '/')) return pathname;
-  return '/api' + pathname.slice(MARKING_API.length)
-    .replace(/^\/tasks$/, '/task-list')
-    .replace(/^\/checks(?=\/|$)/, '/standalone')
-    .replace(/^\/admin\/standards(?=\/|$)/, '/admin/references')
-    .replace(/^\/admin\/audit-logs$/, '/admin/events');
+export function apiRoute(pathname: string): string | null {
+  return pathname.startsWith(MARKING_API + '/') ? pathname.slice(MARKING_API.length) : null;
 }
 
 export const assetPath = (name: string) => MARKING_BASE + '/assets/' + name;
 export function publicUrl(value: string): string {
-  if (value.startsWith('/api/')) return apiPath(value);
+  if (value.startsWith(MARKING_API + '/')) return value;
+  // 仅转换存量资料中的链接；对应的旧 HTTP 路由已移除。
+  if (value.startsWith('/api/')) return apiPath(value.slice(4));
   if (value.startsWith('/assets/')) return assetPath(value.slice(8));
   return value;
 }

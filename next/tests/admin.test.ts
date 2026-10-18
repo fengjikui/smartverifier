@@ -23,7 +23,7 @@ function seedMesTask(service:InspectionService,fields:{number:string;material:st
 test('标准库：版本冲突、重复、任务自动绑定、软删除与历史快照保护，15000条分页查询',async t=>{
   const directory=await mkdtemp(path.join(tmpdir(),'sv-registry-')),service=new InspectionService(directory,root),r=service.registry;
   t.after(async()=>{service.store.close();await rm(directory,{recursive:true,force:true});});
-  const asset={id:'11111111-1111-1111-1111-111111111111.png',filename:'正品.png',width:800,height:600,bytes:100,sha256:'a'.repeat(64),thumbnail:'/api/reference-assets/11111111-1111-1111-1111-111111111111-thumb.jpg'};r.addAsset(asset);
+  const asset={id:'11111111-1111-1111-1111-111111111111.png',filename:'正品.png',width:800,height:600,bytes:100,sha256:'a'.repeat(64),thumbnail:'/api/v1/inspections/marking/reference-assets/11111111-1111-1111-1111-111111111111-thumb.jpg'};r.addAsset(asset);
   assert.throws(()=>r.save(input,person),/图片/);
   let standard=r.save({...input,assetId:asset.id},person);assert.equal(standard.material,'00123');
   assert.throws(()=>r.save({...input,assetId:asset.id},person),/已存在/);
@@ -46,24 +46,24 @@ test('标准库：版本冲突、重复、任务自动绑定、软删除与历�
 test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复跳过、错误阻断、幂等导入、关联检验',async t=>{
   const directory=await mkdtemp(path.join(tmpdir(),'sv-admin-http-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1});await once(server,'listening');const addr=server.address();assert.ok(addr&&typeof addr!=='string');const base='http://127.0.0.1:'+addr.port;
   t.after(async()=>{admin.files.close();service.closing=true;server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await delay(30);service.store.close();await rm(directory,{recursive:true,force:true});});
-  let cookie='';async function call(route:string,data?:unknown,status=200,method?:string){const res=await fetch(base+'/api'+route,{method:method??(data===undefined?'GET':'POST'),headers:{...(cookie?{Cookie:cookie}:{}),...(data===undefined||data instanceof FormData?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:data instanceof FormData?data:JSON.stringify(data)});const v=await res.json();assert.equal(res.status,status,JSON.stringify(v));return v;}
-  await call('/admin/references',undefined,401);await call('/admin/session',{id:'admin',code:'wrong'},401);
-  const login=await fetch(base+'/api/admin/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:'admin',code:'admin123'})});assert.equal(login.status,200);cookie=login.headers.get('set-cookie')!.split(';')[0];assert.equal((await call('/admin/session')).person.id,'ADMIN-TRIAL');
-  const inspector=await fetch(base+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),inspectionCookie=inspector.headers.get('set-cookie')!.split(';')[0];
-  assert.equal((await fetch(base+'/api/admin/references',{headers:{Cookie:inspectionCookie}})).status,401,'检验员会话不能成为管理员');
+  let cookie='';async function call(route:string,data?:unknown,status=200,method?:string){const res=await fetch(base+'/api/v1/inspections/marking'+route,{method:method??(data===undefined?'GET':'POST'),headers:{...(cookie?{Cookie:cookie}:{}),...(data===undefined||data instanceof FormData?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:data instanceof FormData?data:JSON.stringify(data)});const v=await res.json();assert.equal(res.status,status,JSON.stringify(v));return v;}
+  await call('/admin/standards',undefined,401);await call('/admin/session',{id:'admin',code:'wrong'},401);
+  const login=await fetch(base+'/api/v1/inspections/marking/admin/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:'admin',code:'admin123'})});assert.equal(login.status,200);cookie=login.headers.get('set-cookie')!.split(';')[0];assert.equal((await call('/admin/session')).person.id,'ADMIN-TRIAL');
+  const inspector=await fetch(base+'/api/v1/inspections/marking/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),inspectionCookie=inspector.headers.get('set-cookie')!.split(';')[0];
+  assert.equal((await fetch(base+'/api/v1/inspections/marking/admin/standards',{headers:{Cookie:inspectionCookie}})).status,401,'检验员会话不能成为管理员');
   const bytes=await readFile('fixtures/inspection/green-mat-v1/reference-crop.png'),f=new FormData();f.set('image',new File([bytes],'正品.png'));const asset=await call('/admin/assets',f,201);assert.ok(asset.width>0);
-  const raw=await fetch(base+'/api/reference-assets/'+asset.id,{headers:{Cookie:cookie}});assert.deepEqual(Buffer.from(await raw.arrayBuffer()),bytes,'保存原始字节');
-  assert.equal((await fetch(base+asset.thumbnail,{headers:{Cookie:cookie}})).status,200);assert.equal((await fetch(base+'/api/reference-assets/'+asset.id)).status,401);
+  const raw=await fetch(base+'/api/v1/inspections/marking/reference-assets/'+asset.id,{headers:{Cookie:cookie}});assert.deepEqual(Buffer.from(await raw.arrayBuffer()),bytes,'保存原始字节');
+  assert.equal((await fetch(base+asset.thumbnail,{headers:{Cookie:cookie}})).status,200);assert.equal((await fetch(base+'/api/v1/inspections/marking/reference-assets/'+asset.id)).status,401);
   const invalid=new FormData();invalid.set('image',new File([new Uint8Array([1,2,3])],'伪装.png'));await call('/admin/assets',invalid,400);
-  let standard:ReferenceRecord=await call('/admin/references',{...input,assetId:asset.id},201);await call('/admin/references',{...input,assetId:asset.id},409);
-  standard=await call('/admin/references/'+standard.id,{...input,assetId:asset.id,version:1,description:'更新'},200,'PUT');assert.equal(standard.version,2);
+  let standard:ReferenceRecord=await call('/admin/standards',{...input,assetId:asset.id},201);await call('/admin/standards',{...input,assetId:asset.id},409);
+  standard=await call('/admin/standards/'+standard.id,{...input,assetId:asset.id,version:1,description:'更新'},200,'PUT');assert.equal(standard.version,2);
   const created=seedMesTask(service,{number:'MES-TEST-001',material:input.material,supplier:input.supplier});
   const tasksBefore=service.store.tasks();
   for(const [route,method] of [['/admin/tasks','POST'],['/admin/tasks/'+created.id,'POST'],['/admin/tasks/'+created.id,'PUT'],['/admin/tasks/'+created.id,'PATCH'],['/admin/tasks/'+created.id,'DELETE'],['/admin/tasks/T00000000000000000000000000000000','DELETE']])assert.match((await call(route,{number:'不得修改',material:'OTHER',supplier:'OTHER'},405,method)).message,/MES/);
   assert.deepEqual(service.store.tasks(),tasksBefore,'管理接口不能增删改 MES 任务');
   assert.ok((await call('/admin/tasks')).items.some((task:Task)=>task.id===created.id&&task.standard?.id===standard.id));
-  assert.equal((await fetch(base+'/api/tasks/'+created.id+'/open',{method:'POST',headers:{Cookie:inspectionCookie,'Content-Type':'application/json'},body:'{}'}).then(r=>r.json())).round.standard.id,standard.id);
-  for(const kind of ['xlsx','json','zip','help'])assert.equal((await fetch(base+'/api/admin/templates/'+kind,{headers:{Cookie:cookie}})).status,200);
+  assert.equal((await fetch(base+'/api/v1/inspections/marking/tasks/'+created.id+'/open',{method:'POST',headers:{Cookie:inspectionCookie,'Content-Type':'application/json'},body:'{}'}).then(r=>r.json())).round.standard.id,standard.id);
+  for(const kind of ['xlsx','json','zip','help'])assert.equal((await fetch(base+'/api/v1/inspections/marking/admin/templates/'+kind,{headers:{Cookie:cookie}})).status,200);
   async function poll(id:string){for(let i=0;i<100;i++){const j:ImportJob=await call('/admin/imports/'+id);if(j.status!=='validating')return j;await delay(100);}throw Error('预检超时');}
   const pack=new FormData();pack.append('files',new File([await readFile('next/templates/reference-import-v1/JSON标准包示例.zip')],'示例.zip'));
   let job:ImportJob=await poll((await call('/admin/imports',pack,202)).id);assert.equal(job.status,'preview',job.message);assert.equal(job.counts.ready,2);
@@ -78,8 +78,8 @@ test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复
   const ej=await poll((await call('/admin/imports',excel,202)).id);assert.equal(ej.rows[0].material,'000007');assert.equal(ej.counts.ready,1);assert.equal(ej.counts.error,2);assert.match(ej.rows[1].message,/文本/);assert.match(ej.rows[2].message,/公式/);
   assert.equal(spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.load_workbook(sys.argv[1]);w.active.delete_rows(3,2);w.save(sys.argv[1])",generated]).status,0);
   const corrected=new FormData();corrected.append('files',new File([await readFile(generated)],'已修正.xlsx'));corrected.append('files',new File([bytes],'正品.png'));
-  const clean=await poll((await call('/admin/imports',corrected,202)).id);assert.equal(clean.counts.error,0);assert.equal((await call('/admin/imports/'+clean.id+'/commit',{})).receipt.created,1);assert.equal((await call('/admin/references?q=000007')).items[0].material,'000007');
+  const clean=await poll((await call('/admin/imports',corrected,202)).id);assert.equal(clean.counts.error,0);assert.equal((await call('/admin/imports/'+clean.id+'/commit',{})).receipt.created,1);assert.equal((await call('/admin/standards?q=000007')).items[0].material,'000007');
   const traversal=path.join(directory,'unsafe.zip');assert.equal(spawnSync(python,['-c',"import zipfile,sys;z=zipfile.ZipFile(sys.argv[1],'w');z.writestr('../escape.png',b'x');z.close()",traversal]).status,0);
   const malicious=new FormData();malicious.append('files',new File([await readFile(traversal)],'unsafe.zip'));const unsafe=await poll((await call('/admin/imports',malicious,202)).id);assert.equal(unsafe.status,'failed');assert.match(unsafe.message,/不安全/);
-  await call('/admin/session',{},200,'DELETE');await call('/admin/references',undefined,401);
+  await call('/admin/session',{},200,'DELETE');await call('/admin/standards',undefined,401);
 });

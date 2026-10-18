@@ -1,6 +1,8 @@
 # 丝印检测系统 · 新版工作区
 
-公共路径统一为 `/inspections/marking`，接口为 `/api/v1/inspections/marking`；旧地址兼容跳转。详见[路径与扩展约定](docs/统一路径与扩展约定.md)。
+公共路径统一为 `/inspections/marking`，接口为 `/api/v1/inspections/marking`；旧地址已停用并返回 404。详见[路径与扩展约定](docs/统一路径与扩展约定.md)。
+
+[公司电脑试用部署与迁移](docs/公司电脑试用部署与迁移.md)：安装、配置、局域网、数据备份恢复及回退。
 
 ## MES 接通前的试用入口
 

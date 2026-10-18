@@ -1,3 +1,4 @@
+import { apiPath } from '../../shared/paths.ts';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { mockTask } from '../mes/mock.ts';
@@ -72,7 +73,7 @@ export class Registry {
     const asset=input.assetId?this.asset(input.assetId):null;
     if(input.assetId&&!asset)throw new ApiError(400,'正品图片不存在，请重新选择。');
     if(input.status==='active'&&!asset)throw new ApiError(400,'启用前请添加正品图片；暂时不完整可保存为草稿。');
-    const at=stamp(),record:ReferenceRecord={...input,id:id??randomUUID(),version:(before?.version??0)+1,image:asset?'/api/reference-assets/'+asset.id:'',asset,createdAt:before?.createdAt??at,updatedAt:at,updatedBy:actor,deletedAt:null};
+    const at=stamp(),record:ReferenceRecord={...input,id:id??randomUUID(),version:(before?.version??0)+1,image:asset?apiPath('/reference-assets/'+asset.id):'',asset,createdAt:before?.createdAt??at,updatedAt:at,updatedBy:actor,deletedAt:null};
     this.persist(record);this.event('reference',record.id,before?'reference.update':'reference.create',actor,before,record);return record;
   }
   trash(id:string,version:number,restore:boolean,actor:Person){

@@ -1,6 +1,6 @@
 # 产品上下文
 
-2026-10-18：丝印检测网页统一在 `/inspections/marking`，接口在 `/api/v1/inspections/marking`；正品管理使用 `/admin/standards` 子路径。旧链接兼容，业务资料不迁移。未来其他检测类型与 `marking` 并列，当前不扩展业务范围。
+2026-10-18：丝印检测网页统一在 `/inspections/marking`，接口在 `/api/v1/inspections/marking`；正品管理使用 `/admin/standards` 子路径。旧入口已清理，返回 404；只在读取时转换存量图片引用，业务资料不迁移。未来其他检测类型与 `marking` 并列，当前不扩展业务范围。
 
 ## Register
 

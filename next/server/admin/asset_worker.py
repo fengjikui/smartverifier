@@ -31,7 +31,7 @@ def asset(data, filename, folder):
         if not (folder/name).exists(): (folder/name).write_bytes(data);os.chmod(folder/name,0o600)
         if not (folder/thumb).exists():
             image.thumbnail((192,192),Image.Resampling.LANCZOS);image.save(folder/thumb,quality=85);os.chmod(folder/thumb,0o600)
-    return dict(id=name,filename=Path(filename).name[:160],width=w,height=h,bytes=len(data),sha256=sha,thumbnail='/api/reference-assets/'+thumb)
+    return dict(id=name,filename=Path(filename).name[:160],width=w,height=h,bytes=len(data),sha256=sha,thumbnail='/api/v1/inspections/marking/reference-assets/'+thumb)
 
 if __name__ == '__main__':
     try:

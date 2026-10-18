@@ -1,3 +1,4 @@
+import { apiPath, assetPath, publicUrl } from '../../shared/paths.ts';
 import { spawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -66,13 +67,16 @@ export class LocalVisionPipeline implements VisionPipeline {
       issues:raw.issues.map(message=>({code:'RECAPTURE',message,componentIds:[]})),
     });
     const artifact={...raw,sourceSha256:photo.hash,photoId:photo.id};await this.record('separation',artifact);
-    return {preparation:{version:raw.version,sourceHash:photo.hash,uprightUrl:'/api/files/'+raw.upright.assetId,annotatedUrl:'/api/files/'+raw.annotated.assetId,sheetUrl:'/api/files/'+raw.sheet.assetId,width:raw.width,height:raw.height,elapsedMs:raw.elapsedMs,coverage:raw.coverage,issues:raw.issues},
-      components:raw.components.map((c,index):ComponentResult=>({id:c.componentId,label:c.label,index,bbox:c.bbox,ai:null,aiHistory:[],review:null,reviewHistory:[],crop:{url:'/api/files/'+c.modelView.assetId,assetId:c.modelView.assetId,width:c.modelView.width,height:c.modelView.height,rotation:c.rotationClockwiseDegrees,qualityReasons:c.quality.reasons}}))};
+    return {preparation:{version:raw.version,sourceHash:photo.hash,uprightUrl:apiPath('/files/'+raw.upright.assetId),annotatedUrl:apiPath('/files/'+raw.annotated.assetId),sheetUrl:apiPath('/files/'+raw.sheet.assetId),width:raw.width,height:raw.height,elapsedMs:raw.elapsedMs,coverage:raw.coverage,issues:raw.issues},
+      components:raw.components.map((c,index):ComponentResult=>({id:c.componentId,label:c.label,index,bbox:c.bbox,ai:null,aiHistory:[],review:null,reviewHistory:[],crop:{url:apiPath('/files/'+c.modelView.assetId),assetId:c.modelView.assetId,width:c.modelView.width,height:c.modelView.height,rotation:c.rotationClockwiseDegrees,qualityReasons:c.quality.reasons}}))};
   }
   reference(round:Round){
-    const registered=round.standard.image.match(/^\/api\/reference-assets\/([a-f0-9-]+\.(png|jpg|webp))$/);if(registered)return this.filename(registered[1]);
-    if(round.standard.image==='/api/reference/green-mat-v1.png')return path.join(this.root,'fixtures/inspection/green-mat-v1/reference-crop.png');
-    if(/^\/assets\/[a-zA-Z0-9_.-]+\.(png|jpg|webp)$/.test(round.standard.image))return path.join(this.root,'outputs/next-web/dist',round.standard.image);
+    const image=publicUrl(round.standard.image),prefix=apiPath('/reference-assets/');
+    const registered=image.startsWith(prefix)?image.slice(prefix.length):'';
+    if(/^[a-f0-9-]+\.(png|jpg|webp)$/.test(registered))return this.filename(registered);
+    if(image===apiPath('/reference/green-mat-v1.png'))return path.join(this.root,'fixtures/inspection/green-mat-v1/reference-crop.png');
+    const asset=image.startsWith(assetPath(''))?image.slice(assetPath('').length):'';
+    if(/^[a-zA-Z0-9_.-]+\.(png|jpg|webp)$/.test(asset))return path.join(this.root,'outputs/next-web/dist/assets',asset);
     throw new RecognitionProblem('error','当前正品图片没有配置可读取的本地文件，请联系管理员。');
   }
   async record(kind:string,data:unknown){const dir=path.join(this.directory,'vision-records');await mkdir(dir,{recursive:true,mode:0o700});const name=randomUUID()+'.json';await writeFile(path.join(dir,name),JSON.stringify({kind,at:new Date().toISOString(),data},null,2),{mode:0o600});return name;}

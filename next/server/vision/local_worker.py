@@ -23,6 +23,14 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 VERSION = "green-contours-v1"
 
 
+def load_averages():
+    # Windows 不提供 os.getloadavg；不可获取时留空，不阻止正常识别。
+    try:
+        return os.getloadavg()
+    except (AttributeError, OSError, NotImplementedError):
+        return None
+
+
 def check_resources():
     import psutil
     available = psutil.virtual_memory().available / 2**30
@@ -35,7 +43,7 @@ def check_resources():
         thermal = subprocess.check_output(["pmset", "-g", "therm"], text=True, timeout=3)
         if any("No " not in line and ("warning level" in line or "Speed_Limit" in line) for line in thermal.splitlines()):
             raise RuntimeError("RESOURCE_PRESSURE: 系统报告热或性能压力，请冷却后重试。")
-    return {"availableGiB":round(available,2),"thermal":thermal.strip(),"cpuThreads":2,"cpuPercent":cpu,"load":os.getloadavg()}
+    return {"availableGiB":round(available,2),"thermal":thermal.strip(),"cpuThreads":2,"cpuPercent":cpu,"load":load_averages()}
 
 
 def decode(filename):

@@ -28,19 +28,20 @@ test('调试HTTP要求会话、可增量查看、图片原样返回，样例隔�
   };
   const {server,service}=startServer({state,port:0,host:'127.0.0.1',vision:pipeline,debug:true});await once(server,'listening');const address=server.address();assert.ok(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port;
   t.after(async()=>{release();service.closing=true;server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));service.store.close();await rm(state,{recursive:true,force:true});});
-  assert.equal((await fetch(base+'/api/debug/traces')).status,401);const login=await fetch(base+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),cookie=login.headers.get('set-cookie')!.split(';')[0];
+  assert.equal((await fetch(base+'/api/v1/inspections/marking/debug/traces')).status,401);const login=await fetch(base+'/api/v1/inspections/marking/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),cookie=login.headers.get('set-cookie')!.split(';')[0];
   const headers={'Cookie':cookie,'Content-Type':'application/json'};
-  assert.equal((await fetch(base+'/api/debug/samples',{method:'POST',headers:{...headers,Origin:'https://other.example'},body:'{}'})).status,403);
-  const initial=(await fetch(base+'/api/bootstrap',{headers}));const before=await initial.json();
-  const response=await fetch(base+'/api/debug/samples',{method:'POST',headers,body:JSON.stringify({mode:'board4',format:'json-schema'})});assert.equal(response.status,202);const {id}=await response.json();
+  assert.equal((await fetch(base+'/api/v1/inspections/marking/debug/samples',{method:'POST',headers:{...headers,Origin:'https://other.example'},body:'{}'})).status,403);
+  assert.equal((await fetch(base+'/api/v1/inspections/marking/debug/traces',{headers:{...headers,'X-Forwarded-For':'192.168.1.5'}})).status,403);
+  const initial=(await fetch(base+'/api/v1/inspections/marking/bootstrap',{headers}));const before=await initial.json();
+  const response=await fetch(base+'/api/v1/inspections/marking/debug/samples',{method:'POST',headers,body:JSON.stringify({mode:'board4',format:'json-schema'})});assert.equal(response.status,202);const {id}=await response.json();
   for(let i=0;i<50;i++){try{await readFile(path.join(store.folder(id),'events.ndjson'));break;}catch{await new Promise(resolve=>setTimeout(resolve,5));}}
   assert.equal((requestData.responseSchema as {properties:{items:{maxItems:number}}}).properties.items.maxItems,4);
   assert.equal(requestData.inputLayout,'prefix-first');
-  assert.equal((await fetch(base+'/api/debug/samples',{method:'POST',headers,body:JSON.stringify({mode:'board6',format:'prompt-json'})})).status,409);
-  assert.equal((await fetch(base+'/api/debug/traces/'+id+'/images/0.png')).status,401);
-  assert.equal(await(await fetch(base+'/api/debug/traces/'+id+'/images/0.png',{headers})).text(),'actual fixture bytes');
-  const events=await(await fetch(base+'/api/debug/traces/'+id+'?after=1',{headers})).json();assert.deepEqual(events.events,[]);
+  assert.equal((await fetch(base+'/api/v1/inspections/marking/debug/samples',{method:'POST',headers,body:JSON.stringify({mode:'board6',format:'prompt-json'})})).status,409);
+  assert.equal((await fetch(base+'/api/v1/inspections/marking/debug/traces/'+id+'/images/0.png')).status,401);
+  assert.equal(await(await fetch(base+'/api/v1/inspections/marking/debug/traces/'+id+'/images/0.png',{headers})).text(),'actual fixture bytes');
+  const events=await(await fetch(base+'/api/v1/inspections/marking/debug/traces/'+id+'?after=1',{headers})).json();assert.deepEqual(events.events,[]);
   release();for(let i=0;i<100;i++){const events:TraceEvent[]=await store.read(id);if(events.some(e=>e.type==='validation'))break;await new Promise(resolve=>setTimeout(resolve,5));}
-  assert.equal((await store.list())[0].status,'valid');const after=await(await fetch(base+'/api/bootstrap',{headers})).json();assert.deepEqual(before.tasks,after.tasks);
-  const health=await(await fetch(base+'/api/health')).json();assert.deepEqual(health.visionConfiguration,{inputLayout:'prefix-first',outputFormat:'json-schema'});
+  assert.equal((await store.list())[0].status,'valid');const after=await(await fetch(base+'/api/v1/inspections/marking/bootstrap',{headers})).json();assert.deepEqual(before.tasks,after.tasks);
+  const health=await(await fetch(base+'/api/v1/inspections/marking/health')).json();assert.deepEqual(health.visionConfiguration,{inputLayout:'prefix-first',outputFormat:'json-schema'});
 });

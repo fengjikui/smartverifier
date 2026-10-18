@@ -4,8 +4,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Store } from '../store.ts';
 import type { Person } from '../../shared/types.ts';
 import { ApiError } from '../errors.ts';
+import { directLoopback as local } from '../network.ts';
 const hash=(s:string)=>createHash('sha256').update(s).digest('hex');
-const local=(req:IncomingMessage)=>['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress??'');
 const cookie=(req:IncomingMessage)=>req.headers.cookie?.split(';').map(v=>v.trim()).find(v=>v.startsWith('sv_admin_session='))?.slice(17);
 export class AdminAuth {
   store:Store; attempts=new Map<string,{count:number;until:number}>();

@@ -17,7 +17,7 @@ export function StandardSelection({onStart,onOpen,busy,onError}:{onStart:(standa
       .finally(()=>{if(active)setLoading(false);}),180);
     return()=>{active=false;clearTimeout(timer);};
   },[material,supplier,page,retry]);
-  useEffect(()=>{if(!historyOpen)return;let active=true;void request<{items:TaskListItem[]}>('/standalone').then(v=>{if(active)setRecent(v.items);}).catch(onError);return()=>{active=false;};},[historyOpen]);
+  useEffect(()=>{if(!historyOpen)return;let active=true;void request<{items:TaskListItem[]}>('/checks').then(v=>{if(active)setRecent(v.items);}).catch(onError);return()=>{active=false;};},[historyOpen]);
   const blocked=busy||loading||failed;
   return <><main className="sv-main sv-standard-selection">
     <div className="sv-heading"><h1>选择正品，开始自主检测</h1><p>按物料编号找到标准，确认供应商后拍照检测。</p></div>

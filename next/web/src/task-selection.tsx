@@ -6,7 +6,7 @@ import type { TaskPage } from '../../shared/catalog';
 export function TaskSelection({search,onSearch,onOpen,busy,onError}: {search:string;onSearch:(value:string)=>void;onOpen:(id:string)=>void;busy:boolean;onError:(e:unknown)=>void}) {
   const [data,setData]=useState<TaskPage|null>(null),[page,setPage]=useState(1),[loading,setLoading]=useState(true);
   useEffect(()=>{setPage(1);},[search]);
-  useEffect(()=>{let active=true;setLoading(true);const timer=setTimeout(()=>void request<TaskPage>(`/task-list?q=${encodeURIComponent(search)}&page=${page}`).then(value=>{if(active)setData(value);}).catch(e=>{if(active)onError(e);}).finally(()=>{if(active)setLoading(false);}),180);return()=>{active=false;clearTimeout(timer);};},[search,page]);
+  useEffect(()=>{let active=true;setLoading(true);const timer=setTimeout(()=>void request<TaskPage>(`/tasks?q=${encodeURIComponent(search)}&page=${page}`).then(value=>{if(active)setData(value);}).catch(e=>{if(active)onError(e);}).finally(()=>{if(active)setLoading(false);}),180);return()=>{active=false;clearTimeout(timer);};},[search,page]);
   return <><main className="sv-main sv-tasks sv-task-selection">
     <div className="sv-task-heading"><div><h1>选择模拟 MES 任务</h1><p>已录入的正品标准可自动用于模拟任务，先验证完整检测流程。</p></div><label className="sv-task-search">搜索任务<div><Search size={19} aria-hidden="true"/><Field value={search} placeholder="单号末几位 / 物料 / 供应商" onChange={e=>onSearch(e.target.value)}/>{search?<Btn tone="quiet" className="sv-icon-button" aria-label="清空任务搜索" onClick={()=>onSearch('')}><X size={18}/></Btn>:null}</div></label></div>
     <section className="sv-panel sv-task-list" aria-busy={loading}><div className="sv-task-table-head"><span>检验任务 / 物料 / 供应商</span><span>当前状态</span><span>操作</span></div>

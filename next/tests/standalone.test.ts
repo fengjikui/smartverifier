@@ -11,7 +11,7 @@ import type { TaskView } from '../shared/types.ts';
 
 const root=path.resolve('.');
 function register(service:InspectionService,supplier='供应商甲',material='000007') {
-  service.registry.addAsset({id:'11111111-1111-1111-1111-111111111111.png',filename:'测试正品.png',width:800,height:600,bytes:100,sha256:'a'.repeat(64),thumbnail:'/api/reference-assets/11111111-1111-1111-1111-111111111111-thumb.jpg'});
+  service.registry.addAsset({id:'11111111-1111-1111-1111-111111111111.png',filename:'测试正品.png',width:800,height:600,bytes:100,sha256:'a'.repeat(64),thumbnail:'/api/v1/inspections/marking/reference-assets/11111111-1111-1111-1111-111111111111-thumb.jpg'});
   return service.registry.save({material,supplier,name:'测试元件',description:'',lines:['SV358','A26','0147'],assetId:'11111111-1111-1111-1111-111111111111.png',status:'active'},person);
 }
 async function waitFor(service:InspectionService,id:string,status:string){for(let i=0;i<200;i++){const v=service.view(id);if(v.round?.status===status)return v;await delay(5);}throw Error('等待状态超时 '+status);}
@@ -60,15 +60,15 @@ test('HTTP：正品查询、供应商选择、自主检测归属、任务写入�
   const directory=await mkdtemp(path.join(tmpdir(),'sv-standalone-http-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1});await once(server,'listening');const address=server.address();assert.ok(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port;
   t.after(async()=>{service.closing=true;admin.files.close();server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await delay(30);service.store.close();await rm(directory,{recursive:true,force:true});});
   const standard=register(service);register(service,'供应商乙');
-  const login=await fetch(base+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),cookie=login.headers.get('set-cookie')!.split(';')[0];
-  async function call(url:string,data?:unknown,status=200,selectedCookie=cookie){const r=await fetch(base+'/api'+url,{method:data===undefined?'GET':'POST',headers:{Cookie:selectedCookie,...(data===undefined?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:JSON.stringify(data)});const value=await r.json();assert.equal(r.status,status,JSON.stringify(value));return value;}
+  const login=await fetch(base+'/api/v1/inspections/marking/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),cookie=login.headers.get('set-cookie')!.split(';')[0];
+  async function call(url:string,data?:unknown,status=200,selectedCookie=cookie){const r=await fetch(base+'/api/v1/inspections/marking'+url,{method:data===undefined?'GET':'POST',headers:{Cookie:selectedCookie,...(data===undefined?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:JSON.stringify(data)});const value=await r.json();assert.equal(r.status,status,JSON.stringify(value));return value;}
   assert.equal((await call('/standards?material=000007')).total,2);assert.equal((await call('/standards?material=000007&supplier='+encodeURIComponent('供应商甲'))).items[0].id,standard.id);
-  const view:TaskView=await call('/standalone',{standardId:standard.id,version:1,clientId:'api-1'},201);
-  assert.equal((await call('/standalone')).items.length,1);assert.ok(!(await call('/task-list')).items.some((item:{id:string})=>item.id===view.task.id));
+  const view:TaskView=await call('/checks',{standardId:standard.id,version:1,clientId:'api-1'},201);
+  assert.equal((await call('/checks')).items.length,1);assert.ok(!(await call('/tasks')).items.some((item:{id:string})=>item.id===view.task.id));
   await call('/rounds/'+view.round!.id+'/submit',{revision:view.round!.revision},409);await call('/rounds/'+view.round!.id+'/complete',{revision:view.round!.revision},409);
   service.store.db.prepare('INSERT INTO sessions VALUES(?,?,?)').run('other-person',JSON.stringify({id:'OTHER',name:'其他人'}),Date.now()+60000);
-  assert.equal((await call('/standalone',undefined,200,'sv_next_session=other-person')).items.length,0);
+  assert.equal((await call('/checks',undefined,200,'sv_next_session=other-person')).items.length,0);
   await call('/tasks/'+view.task.id,undefined,404,'sv_next_session=other-person');await call('/rounds/'+view.round!.id+'/report.md',undefined,404,'sv_next_session=other-person');
-  const started=await call('/tasks/'+(await call('/task-list?q=000007')).items[0].id+'/open',{});assert.equal(started.round.standard.material,'000007');assert.equal(started.task.origin,'demo-mes');
+  const started=await call('/tasks/'+(await call('/tasks?q=000007')).items[0].id+'/open',{});assert.equal(started.round.standard.material,'000007');assert.equal(started.task.origin,'demo-mes');
   assert.equal(service.store.db.prepare('SELECT COUNT(*) n FROM receipts').get()!.n,0);
 });

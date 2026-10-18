@@ -12,7 +12,8 @@ import type { VisionPipeline } from './vision/local-pipeline.ts';
 import { TraceStore } from './vision/trace-store.ts';
 import { adminRoutes } from './admin/http.ts';
 import { DebugRuns } from './vision/debug-runs.ts';
-import { MARKING_BASE, MARKING_API, apiPath, assetPath, canonicalPage, internalApiPath, publicLinkReplacer } from '../shared/paths.ts';
+import { directLoopback } from './network.ts';
+import { MARKING_BASE, MARKING_API, canonicalPage, apiRoute, publicLinkReplacer } from '../shared/paths.ts';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const revisionSchema = z.number().int().positive();
@@ -49,48 +50,45 @@ export function startServer(options: { state?: string; port?: number; host?: str
     res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','same-origin'); res.setHeader('X-Frame-Options','SAMEORIGIN');
     try {
       const url=new URL(req.url ?? '/', 'http://localhost');
-      const canonical=canonicalPage(url.pathname);
-      const legacyApi=url.pathname.startsWith('/api/')&&!url.pathname.startsWith('/api/v1/');
-      const legacyAsset=url.pathname.startsWith('/assets/');
-      if(['GET','HEAD'].includes(req.method??'')&&((canonical&&canonical!==url.pathname)||legacyApi||legacyAsset)){
-        const target=new URL(legacyApi?apiPath(url.pathname):legacyAsset?assetPath(url.pathname.slice(8)):canonical!,'http://localhost');
-        const defaults=new URLSearchParams(target.search);target.search=url.search;for(const [key,value]of defaults)target.searchParams.set(key,value);
-        res.writeHead(308,{Location:target.pathname+target.search,'Cache-Control':'no-store'});return res.end();
-      }
-      // 接口分发保留原路由，兼容旧脚本和历史图片；新入口统一走版本化前缀。
-      if(url.pathname===MARKING_API||url.pathname.startsWith(MARKING_API+'/'))url.pathname=internalApiPath(url.pathname);
-      const pathname=decodeURIComponent(url.pathname);
+      const incoming=decodeURIComponent(url.pathname),api=apiRoute(incoming),canonical=canonicalPage(incoming);
+      if(api===null){
+        if(!canonical)throw new ApiError(404,'页面不存在，请使用新的丝印检测入口。');
+        if(canonical!==incoming&&['GET','HEAD'].includes(req.method??'')){
+          res.writeHead(308,{Location:canonical+url.search,'Cache-Control':'no-store'});return res.end();
+        }
+      }else url.pathname=api;
+      const pathname=api??incoming;
       if (req.method!=='GET'&&req.method!=='HEAD') {
         const origin=req.headers.origin;
         if (origin && !['http://'+req.headers.host,'https://'+req.headers.host].includes(origin)) throw new ApiError(403,'请从本应用页面发起操作。');
       }
-      if(pathname==='/api/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1,modelDebug:debug,...(vision instanceof LocalVisionPipeline?{visionConfiguration:{inputLayout:vision.inputLayout,outputFormat:vision.structured?'json-schema':'prompt-json'}}:{})});
+      if(pathname==='/health'&&req.method==='GET')return send(res,{ok:true,mode:'mock',recognition,schemaVersion:1,modelDebug:debug,...(vision instanceof LocalVisionPipeline?{visionConfiguration:{inputLayout:vision.inputLayout,outputFormat:vision.structured?'json-schema':'prompt-json'}}:{})});
       const token=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('sv_next_session='))?.slice('sv_next_session='.length);
       const session=token?service.store.db.prepare('SELECT person,expires FROM sessions WHERE token=?').get(token):null;
       if(await admin.handle(req,res,url,!!session&&Number(session.expires)>Date.now()))return;
-      if(pathname==='/api/session'&&req.method==='POST'){
+      if(pathname==='/session'&&req.method==='POST'){
         await jsonBody(req); const key=randomBytes(32).toString('hex');
         service.store.db.prepare('DELETE FROM sessions WHERE expires<?').run(Date.now());
         service.store.db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(key,JSON.stringify(person),Date.now()+24*60*60*1000);
         res.setHeader('Set-Cookie',`sv_next_session=${key}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
         return send(res,{person,mode:'mock',recognition,tasks:service.list()});
       }
-      if(pathname.startsWith('/api/')){
+      if(api!==null){
         if(!session||Number(session.expires)<Date.now())throw new ApiError(401,'本地试用会话已过期，请重新进入，草稿已保留。');
         const actor=JSON.parse(String(session.person));
-        if(pathname.startsWith('/api/debug/')){
+        if(pathname.startsWith('/debug/')){
           if(!debug)throw new ApiError(404,'本服务未启用模型调试窗口。');
-          if(!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress??''))throw new ApiError(403,'模型调试只允许在服务器本机查看。');
-          if(pathname==='/api/debug/traces'&&req.method==='GET')return send(res,{traces:await traces.list(),running:debugRuns?.running??false});
-          if(pathname==='/api/debug/samples'&&req.method==='POST'){
+          if(!directLoopback(req))throw new ApiError(403,'模型调试只允许在服务器本机直接查看。');
+          if(pathname==='/debug/traces'&&req.method==='GET')return send(res,{traces:await traces.list(),running:debugRuns?.running??false});
+          if(pathname==='/debug/samples'&&req.method==='POST'){
             if(!debugRuns)throw new ApiError(409,'此服务没有配置可调用的VLM。');
             if(service.worker||debugRuns.running)throw new ApiError(409,'当前有识别正在执行，请完成后再试，调试不会抢占检验任务。');
             const input=z.object({mode:z.enum(['single','board4','board6']),format:z.enum(['prompt-json','json-schema']),inputLayout:z.enum(['legacy','prefix-first']).default('prefix-first')}).strict().parse(await jsonBody(req));
             return send(res,{id:debugRuns.start(input.mode,input.format,actor.id,input.inputLayout)},202);
           }
-          const image=pathname.match(/^\/api\/debug\/traces\/([a-f0-9-]{36})\/images\/([0-9])\.png$/);
+          const image=pathname.match(/^\/debug\/traces\/([a-f0-9-]{36})\/images\/([0-9])\.png$/);
           if(image&&req.method==='GET')return await file(res,path.join(traces.folder(image[1]),'image-'+image[2]+'.png'),true);
-          const trace=pathname.match(/^\/api\/debug\/traces\/([a-f0-9-]{36})$/);
+          const trace=pathname.match(/^\/debug\/traces\/([a-f0-9-]{36})$/);
           if(trace&&req.method==='GET'){
             const after=z.coerce.number().int().nonnegative().parse(url.searchParams.get('after')??'0');
             let events;try{events=await traces.read(trace[1]);}catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT')throw new ApiError(404,'记录正在创建，稍后自动重试。');throw e;}
@@ -98,27 +96,27 @@ export function startServer(options: { state?: string; port?: number; host?: str
           }
           throw new ApiError(404,'调试接口不存在。');
         }
-        if(pathname==='/api/session'&&req.method==='DELETE'){
+        if(pathname==='/session'&&req.method==='DELETE'){
           service.store.db.prepare('DELETE FROM sessions WHERE token=?').run(token!);res.setHeader('Set-Cookie','sv_next_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,{ok:true});
         }
-        if(pathname==='/api/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',recognition,tasks:service.list()});
-        if(pathname==='/api/task-list'&&req.method==='GET')return send(res,service.taskPage(z.string().max(200).parse(url.searchParams.get('q')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
-        if(pathname==='/api/standards'&&req.method==='GET')return send(res,service.registry.catalog(z.string().max(160).parse(url.searchParams.get('material')??''),z.string().max(160).parse(url.searchParams.get('supplier')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
-        if(pathname==='/api/standalone'&&req.method==='GET')return send(res,{items:service.standaloneRecent(actor)});
-        if(pathname==='/api/standalone'&&req.method==='POST'){
+        if(pathname==='/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',recognition,tasks:service.list()});
+        if(pathname==='/tasks'&&req.method==='GET')return send(res,service.taskPage(z.string().max(200).parse(url.searchParams.get('q')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
+        if(pathname==='/standards'&&req.method==='GET')return send(res,service.registry.catalog(z.string().max(160).parse(url.searchParams.get('material')??''),z.string().max(160).parse(url.searchParams.get('supplier')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
+        if(pathname==='/checks'&&req.method==='GET')return send(res,{items:service.standaloneRecent(actor)});
+        if(pathname==='/checks'&&req.method==='POST'){
           const input=z.object({standardId:z.string().uuid(),version:z.number().int().positive(),clientId:z.string().min(1).max(100)}).strict().parse(await jsonBody(req));
           return send(res,service.startStandalone(input.standardId,input.version,input.clientId,actor),201);
         }
-        if(pathname==='/api/reference/green-mat-v1.png'&&req.method==='GET')return await file(res,path.join(root,'fixtures/inspection/green-mat-v1/reference-crop.png'),true);
-        const taskMatch=pathname.match(/^\/api\/tasks\/([A-Z0-9]+)(?:\/(open|rounds))?$/);
+        if(pathname==='/reference/green-mat-v1.png'&&req.method==='GET')return await file(res,path.join(root,'fixtures/inspection/green-mat-v1/reference-crop.png'),true);
+        const taskMatch=pathname.match(/^\/tasks\/([A-Z0-9]+)(?:\/(open|rounds))?$/);
         if(taskMatch){const [,id,action]=taskMatch;service.authorizeTask(id,actor);
           if(req.method==='GET'&&!action)return send(res,service.view(id));
           if(req.method==='POST'&&action==='open'){await jsonBody(req);return send(res,service.open(id));}
           if(req.method==='POST'&&action==='rounds'){const data=z.object({reuse:z.boolean()}).parse(await jsonBody(req));return send(res,service.newRound(id,data.reuse));}
         }
-        const fileMatch=pathname.match(/^\/api\/files\/([a-f0-9-]+\.(png|jpg|webp))$/);
+        const fileMatch=pathname.match(/^\/files\/([a-f0-9-]+\.(png|jpg|webp))$/);
         if(fileMatch&&req.method==='GET')return await file(res,path.join(state,'files',fileMatch[1]),true);
-        const match=pathname.match(/^\/api\/rounds\/([a-f0-9-]+)\/(sample|sample-set|real-trial|photos|remove|notes|review|analyze|complete|submit|report\.md)$/);
+        const match=pathname.match(/^\/rounds\/([a-f0-9-]+)\/(sample|sample-set|real-trial|photos|remove|notes|review|analyze|complete|submit|report\.md)$/);
         if(match){const [,id,action]=match;service.authorizeTask(service.round(id).taskId,actor);
           if(action==='report.md'&&req.method==='GET'){
             const round=service.round(id);res.writeHead(200,{'Content-Type':'text/markdown; charset=utf-8','Content-Disposition':`attachment; filename="${round.taskId}-R${round.number}.md"`,'Cache-Control':'private, no-store'});return res.end(service.report(round));

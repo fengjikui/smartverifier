@@ -50,9 +50,9 @@ SV_MODEL_DEBUG=0
 
 ## 验证与故障处理
 
-`GET /api/health`的`recognition.mode`为`vlm`时表示业务服务已启用真实模型适配器，并返回provider及模型名；不代表已经完成网络连通或模型可用探测。`visionConfiguration`显示当前输入编排及Schema方式，健康接口不会返回密钥。
+`GET /api/v1/inspections/marking/health`的`recognition.mode`为`vlm`时表示业务服务已启用真实模型适配器，并返回provider及模型名；不代表已经完成网络连通或模型可用探测。`visionConfiguration`显示当前输入编排及Schema方式，健康接口不会返回密钥。
 
-本机调试页仍为 `/debug/model`，需显式启用且只允许服务器本机查看。HTTP适配保留输入图像、实际Schema和流事件；首字与速率是客户端计时，LM Studio SDK返回的统计另按SDK口径记录。401／429／服务器错误、截断、超时及结构错误均保留未完成状态，不生成假合格，不允许部分提交。重试由用户显式触发，不隐式重复推理。
+本机调试页仍为 `/inspections/marking/debug/model`，需显式启用且只允许服务器本机查看。HTTP适配保留输入图像、实际Schema和流事件；首字与速率是客户端计时，LM Studio SDK返回的统计另按SDK口径记录。401／429／服务器错误、截断、超时及结构错误均保留未完成状态，不生成假合格，不允许部分提交。重试由用户显式触发，不隐式重复推理。
 
 兼容HTTP适配已使用本地测试服务，经过真实HTTP、Python工作器、OpenCV、业务状态、报告和模拟回填的闭环测试；该测试服务返回固定结果，用于验证协议与流程，不作为模型准确率证据。本机千问实际推理单独复核。
 

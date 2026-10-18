@@ -51,7 +51,7 @@ export function App(){
     try{await fn();}catch(e){showError(e);if(e instanceof ApiError&&e.status===409&&route.task){try{setData(await request<TaskView>('/tasks/'+route.task));}catch{/* Keep the last visible draft if disconnected. */}}}finally{busyRef.current=false;setBusy('');}
   }
   function taskList(){const entry=data?.task.origin==='standalone'?'standards':'tasks';setData(null);setDialog(null);navigate({entry});void refreshList().catch(showError);}
-  async function startStandalone(standard:CatalogChoice){if(!startAttempt.current||startAttempt.current.id!==standard.id||startAttempt.current.version!==standard.version)startAttempt.current={id:standard.id,version:standard.version,key:uploadKey()};const key=startAttempt.current.key;await run('正在准备自主检测…',async()=>{const view=await request<TaskView>('/standalone',{standardId:standard.id,version:standard.version,clientId:key});startAttempt.current=null;setData(view);navigate({task:view.task.id});});}
+  async function startStandalone(standard:CatalogChoice){if(!startAttempt.current||startAttempt.current.id!==standard.id||startAttempt.current.version!==standard.version)startAttempt.current={id:standard.id,version:standard.version,key:uploadKey()};const key=startAttempt.current.key;await run('正在准备自主检测…',async()=>{const view=await request<TaskView>('/checks',{standardId:standard.id,version:standard.version,clientId:key});startAttempt.current=null;setData(view);navigate({task:view.task.id});});}
   function overview(){navigate({task:route.task,view:'overview'},true);}
   function openPhoto(photo:Photo,component?:ComponentResult,replaceHistory=false){
     setImageView('original');

@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -11,6 +12,10 @@ spec=importlib.util.spec_from_file_location('worker', ROOT/'next/server/vision/l
 worker=importlib.util.module_from_spec(spec);spec.loader.exec_module(worker)
 
 class PreprocessingTest(unittest.TestCase):
+    def test_load_unavailable_on_windows(self):
+        with patch.object(worker.os, 'getloadavg', create=True, side_effect=AttributeError('unavailable')):
+            self.assertIsNone(worker.load_averages())
+
     def test_six_generated_components(self):
         for name,count in [('single',1),('pair',2),('dim-three',3)]:
             with self.subTest(name=name),tempfile.TemporaryDirectory() as folder:

@@ -26,7 +26,7 @@ test('20件拼图资产与预设坐标一致，所有格子可独立定位且原
 test('真实API：20张照片及20件单图，完整统计、幂等添加、重判与替换',async t=>{
   const directory=await mkdtemp(path.join(tmpdir(),'sv-twenty-test-'));
   const {server,service}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1});
-  await once(server,'listening');const address=server.address();assert.ok(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port+'/api';
+  await once(server,'listening');const address=server.address();assert.ok(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port+'/api/v1/inspections/marking';
   t.after(async()=>{service.closing=true;server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await delay(20);service.store.close();await rm(directory,{recursive:true,force:true});});
   const login=await fetch(base+'/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
   const headers={Cookie:login.headers.get('set-cookie')!.split(';')[0],'Content-Type':'application/json'};
