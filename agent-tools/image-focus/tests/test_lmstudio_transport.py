@@ -9,6 +9,12 @@ from smartverifier_focus.lmstudio_transport import LmStudioTransport, request_te
 
 
 class LmStudioTransportTests(unittest.IsolatedAsyncioTestCase):
+    async def test_experiment_timeout_is_bounded_without_changing_the_default(self):
+        transport=object.__new__(LmStudioTransport)
+        for seconds in (0,181,float('inf')):
+            with self.assertRaisesRegex(ValueError,'between 1 and 180'):
+                await transport.complete([],None,100,timeout_seconds=seconds)
+
     async def test_sdk_tool_events_reach_agent_even_without_text_fragments(self):
         from lmstudio.json_api import PredictionToolCallEvent
         from lmstudio._sdk_models import ToolCallRequest

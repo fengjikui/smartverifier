@@ -6,7 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { z } from 'zod';
 import { imageSchema, modelReplySchema } from './contracts.ts';
-import { validateSeparation } from './validation.ts';
+import { validateReplyItems, validateSeparation } from './validation.ts';
 import type { AIJudgement, ComponentResult, Photo, Preparation, Round } from '../../shared/types.ts';
 
 const preparedSchema=z.object({version:z.string(),width:z.number().int().positive(),height:z.number().int().positive(),originalWidth:z.number().int().positive(),originalHeight:z.number().int().positive(),originalToUpright:z.array(z.number()).length(9),upright:imageSchema,annotated:imageSchema,sheet:imageSchema,
@@ -84,11 +84,13 @@ export class LocalVisionPipeline implements VisionPipeline {
 }
 
 export function parsePairReply(content:string,componentId:string){
+  return parseBatchReply(content,[componentId]);
+}
+
+export function parseBatchReply(content:string,componentIds:string[]){
   // 接受整个响应恰好被一层代码围栏包裹，不搜索/拼补损坏的 JSON。
   const text=content.trim().replace(/^```(?:json)?\s*\n([\s\S]*?)\n```$/,'$1');
-  const reply=modelReplySchema.parse(JSON.parse(text));
-  if(reply.items.length!==1||reply.items[0].componentId!==componentId)throw new Error('结果元件编号不匹配');
-  return reply;
+  return validateReplyItems(componentIds,JSON.parse(text));
 }
 
 export function instructionPriorityWarnings(instruction:string,reply:z.infer<typeof modelReplySchema>){

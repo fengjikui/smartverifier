@@ -33,14 +33,19 @@ export function validateSeparation(input: PhotoInput, raw: unknown): SeparationR
 }
 
 export function validateModelReply(batch: PlannedBatch, raw: unknown): ModelReply {
+  return validateReplyItems(batch.components.map(c=>c.componentId),raw);
+}
+
+export function validateReplyItems(componentIds: string[], raw: unknown): ModelReply {
   // 不把数组自动包装为对象；结构错误保留原文，按协议失败处理。
-  const reply = modelReplySchema.parse(raw), expected = new Set(batch.components.map(c => c.componentId));
+  const reply = modelReplySchema.parse(raw), expected = new Set(componentIds);
+  if(!componentIds.length||expected.size!==componentIds.length)throw new VisionContractError('INVALID_EXPECTED_IDS','输入元件编号必须非空且不重复。');
   const actual = reply.items.map(item => item.componentId);
   if (new Set(actual).size !== actual.length) throw new VisionContractError('DUPLICATE_RESULT', '模型返回重复元件编号。');
   if (actual.some(id => !expected.has(id))) throw new VisionContractError('UNKNOWN_COMPONENT', '模型返回了输入中不存在的元件。');
   if (actual.length !== expected.size) throw new VisionContractError('MISSING_RESULT', '模型漏回元件结果，不能当作完整批次。');
   // 模型返回顺序可以不同，写回必须按ID匹配；不能按数组位置串号。
-  return { ...reply, items: batch.components.map(c => reply.items.find(item => item.componentId === c.componentId)!) };
+  return { ...reply, items: componentIds.map(id => reply.items.find(item => item.componentId === id)!) };
 }
 
 function sameScope(a: AnalysisScope, b: AnalysisScope) {

@@ -103,11 +103,13 @@ class LmStudioTransport:
             chat.add_entry(role, items)
         return chat
 
-    async def complete(self, messages: list[dict], tools: list[dict] | None, max_tokens: int) -> dict:
+    async def complete(self, messages: list[dict], tools: list[dict] | None, max_tokens: int, *, timeout_seconds: float = 55) -> dict:
         from lmstudio.json_api import PredictionFragmentEvent, PredictionToolCallEvent
         from lmstudio._sdk_models import LlmPredictionConfig
         from msgspec import convert
-        async with asyncio.timeout(55):
+        if not 1 <= timeout_seconds <= 180:
+            raise ValueError("Request timeout must be between 1 and 180 seconds")
+        async with asyncio.timeout(timeout_seconds):
             chat = await self.history(messages)
             config = {"temperature": 0, "maxTokens": max_tokens, "promptTemplate": self.template,
                       "contextOverflowPolicy": "stopAtLimit",
