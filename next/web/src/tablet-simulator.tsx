@@ -2,7 +2,7 @@ import { markingPaths } from '../../shared/paths';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpDown, Expand, ExternalLink, Minimize, MousePointer2, RefreshCw, Tablet } from 'lucide-react';
 import { installTabletMouseScrolling } from './tablet-mouse';
-import { loginBrand, loginBrands } from './login-screen';
+import { loginBrand, loginBrands, loginLayout as parseLoginLayout } from './login-screen';
 import type { LoginLayout } from './login-screen';
 import './tablet-simulator.css';
 
@@ -11,7 +11,7 @@ export function TabletSimulator() {
   const host = useRef<HTMLDivElement>(null), stage = useRef<HTMLDivElement>(null), frame = useRef<HTMLIFrameElement>(null);
   const detach = useRef<(() => void) | null>(null);
   const [portrait, setPortrait] = useState(params.get('orientation')==='portrait'||(reviewingLogin&&params.get('orientation')!=='landscape')), [actualSize, setActualSize] = useState(false), [fullscreen, setFullscreen] = useState(false);
-  const [loginLayout,setLoginLayout]=useState<LoginLayout>(params.get('layout')==='split'?'split':'stacked');
+  const [loginLayout,setLoginLayout]=useState<LoginLayout>(parseLoginLayout(params.get('layout')));
   const [brandId,setBrandId]=useState<string>(loginBrand(params.get('brand')).id);
   const [available, setAvailable] = useState({width: 0, height: 0}), [error, setError] = useState('');
   const width = portrait ? 840 : 1280, height = portrait ? 1280 : 840;
@@ -71,7 +71,7 @@ export function TabletSimulator() {
       </div>
     </header>
     {reviewingLogin?<section className="sv-login-review-controls" aria-label="登录页设计对照">
-      <div className="sv-login-review-layout"><span>布局</span><div className="sv-simulator-orientation" role="group" aria-label="登录布局"><button aria-pressed={loginLayout==='split'} onClick={()=>setLoginLayout('split')}>左右分布</button><button aria-pressed={loginLayout==='stacked'} onClick={()=>setLoginLayout('stacked')}>上下分布</button></div></div>
+      <div className="sv-login-review-layout"><span>布局</span><div className="sv-simulator-orientation" role="group" aria-label="登录布局"><button aria-pressed={loginLayout==='auto'} onClick={()=>setLoginLayout('auto')}>自动适配</button><button aria-pressed={loginLayout==='split'} onClick={()=>setLoginLayout('split')}>左右分布</button><button aria-pressed={loginLayout==='stacked'} onClick={()=>setLoginLayout('stacked')}>上下分布</button></div></div>
       <label>名称<select aria-label="项目名称" value={brandId} onChange={e=>setBrandId(e.target.value)}>{loginBrands.map(item=><option value={item.id} key={item.id}>{item.name}{item.id==='guanwei'?'（现名）':'（候选）'}</option>)}</select></label>
       <p>{brand.meaning}<span>候选名称仅供本页比较，正式名称待确认。</span></p>
     </section>:null}
