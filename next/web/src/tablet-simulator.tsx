@@ -2,22 +2,34 @@ import { markingPaths } from '../../shared/paths';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpDown, Expand, ExternalLink, Minimize, MousePointer2, RefreshCw, Tablet } from 'lucide-react';
 import { installTabletMouseScrolling } from './tablet-mouse';
+import { loginBrand, loginBrands } from './login-screen';
+import type { LoginLayout } from './login-screen';
 import './tablet-simulator.css';
 
 export function TabletSimulator() {
+  const params=new URLSearchParams(location.search),reviewingLogin=params.get('screen')==='login';
   const host = useRef<HTMLDivElement>(null), stage = useRef<HTMLDivElement>(null), frame = useRef<HTMLIFrameElement>(null);
   const detach = useRef<(() => void) | null>(null);
-  const [portrait, setPortrait] = useState(false), [actualSize, setActualSize] = useState(false), [fullscreen, setFullscreen] = useState(false);
+  const [portrait, setPortrait] = useState(params.get('orientation')==='portrait'||(reviewingLogin&&params.get('orientation')!=='landscape')), [actualSize, setActualSize] = useState(false), [fullscreen, setFullscreen] = useState(false);
+  const [loginLayout,setLoginLayout]=useState<LoginLayout>(params.get('layout')==='split'?'split':'stacked');
+  const [brandId,setBrandId]=useState<string>(loginBrand(params.get('brand')).id);
   const [available, setAvailable] = useState({width: 0, height: 0}), [error, setError] = useState('');
   const width = portrait ? 840 : 1280, height = portrait ? 1280 : 840;
   const deviceWidth = width + 26, deviceHeight = height + 26;
   const fit = Math.max(.1, Math.min(1, (available.width - 48) / deviceWidth, (available.height - 48) / deviceHeight));
   const scale = actualSize ? 1 : fit;
-  const params=new URLSearchParams(location.search);
   const demo=params.get('demo'),requestedTask=params.get('task');
   const explicitTask=requestedTask&&/^[A-Z0-9]{1,100}$/.test(requestedTask)?requestedTask:null;
   const initialTask = demo === 'photos' ? 'DEMO20PHOTOS' : demo === 'board' ? 'DEMO20BOARD' : demo === 'real' ? 'REALVISION2' : explicitTask;
   const initialReport = initialTask && new URLSearchParams(location.search).get('view') === 'report';
+  const brand=loginBrand(brandId);
+  const frameUrl=reviewingLogin?markingPaths.loginPreview+'?'+new URLSearchParams({layout:loginLayout,brand:brandId}):markingPaths.workbench+(initialTask?'?task='+initialTask+(initialReport?'&view=report':''):'');
+
+  useEffect(()=>{
+    if(!reviewingLogin)return;
+    const query=new URLSearchParams(location.search);query.set('layout',loginLayout);query.set('brand',brandId);query.set('orientation',portrait?'portrait':'landscape');
+    history.replaceState(null,'',location.pathname+'?'+query);
+  },[reviewingLogin,loginLayout,brandId,portrait]);
 
   useLayoutEffect(() => {
     const element = stage.current!;
@@ -26,7 +38,7 @@ export function TabletSimulator() {
     return () => observer.disconnect();
   }, []);
   useEffect(() => {
-    document.title = '观微 · 平板模拟试用';
+    document.title = reviewingLogin?'登录页布局与名称对照':'观微 · 平板模拟试用';
     const listener = () => setFullscreen(document.fullscreenElement === host.current);
     document.addEventListener('fullscreenchange', listener);
     return () => { document.removeEventListener('fullscreenchange', listener); detach.current?.(); };
@@ -45,7 +57,7 @@ export function TabletSimulator() {
   }
   return <div className="sv-simulator" ref={host}>
     <header className="sv-simulator-toolbar">
-      <div className="sv-simulator-title"><Tablet size={22} aria-hidden="true"/><div><h1>平板试用</h1><p>HUAWEI MatePad 11.5 S</p></div></div>
+      <div className="sv-simulator-title"><Tablet size={22} aria-hidden="true"/><div><h1>{reviewingLogin?'登录页对照':'平板试用'}</h1><p>HUAWEI MatePad 11.5 S</p></div></div>
       <div className="sv-simulator-controls">
         <div className="sv-simulator-orientation" role="group" aria-label="模拟平板方向">
           <button aria-pressed={!portrait} onClick={()=>setPortrait(false)}>横屏</button>
@@ -55,13 +67,19 @@ export function TabletSimulator() {
         <button className="sv-simulator-button" onClick={()=>frame.current?.contentWindow?.location.reload()}><RefreshCw size={17}/>刷新</button>
         {document.fullscreenEnabled?<button className="sv-simulator-button" onClick={()=>void toggleFullscreen()}>{fullscreen?<Minimize size={17}/>:<Expand size={17}/>}<span>{fullscreen?'退出全屏':'全屏体验'}</span></button>:null}
         <a className="sv-simulator-button" href={markingPaths.workbench} target="_blank" rel="noopener"><ExternalLink size={17}/><span>普通网页</span></a>
+        <a className="sv-simulator-button" href={markingPaths.preview+(reviewingLogin?'':'?screen=login')}>{reviewingLogin?'流程试用':'登录页对比'}</a>
       </div>
     </header>
+    {reviewingLogin?<section className="sv-login-review-controls" aria-label="登录页设计对照">
+      <div className="sv-login-review-layout"><span>布局</span><div className="sv-simulator-orientation" role="group" aria-label="登录布局"><button aria-pressed={loginLayout==='split'} onClick={()=>setLoginLayout('split')}>左右分布</button><button aria-pressed={loginLayout==='stacked'} onClick={()=>setLoginLayout('stacked')}>上下分布</button></div></div>
+      <label>名称<select aria-label="项目名称" value={brandId} onChange={e=>setBrandId(e.target.value)}>{loginBrands.map(item=><option value={item.id} key={item.id}>{item.name}{item.id==='guanwei'?'（现名）':'（候选）'}</option>)}</select></label>
+      <p>{brand.meaning}<span>候选名称仅供本页比较，正式名称待确认。</span></p>
+    </section>:null}
     <div className="sv-simulator-caption"><span>网页视口 <strong>{width} × {height}</strong><span className="sv-simulator-caption-extra"> · 原型约定尺寸，非屏幕物理像素</span></span><span>{Math.round(scale*100)}% 显示</span></div>
     <main className="sv-simulator-stage" ref={stage} aria-label="平板网页模拟区">
       <div className="sv-simulator-sized" style={{width:deviceWidth*scale,height:deviceHeight*scale}}>
         <div className="sv-simulator-device" style={{width:deviceWidth,height:deviceHeight,transform:`scale(${scale})`}}>
-          <iframe ref={frame} src={markingPaths.workbench+(initialTask?'?task='+initialTask+(initialReport?'&view=report':''):'')} title="观微平板检验工作台" width={width} height={height} allow="camera; fullscreen" onLoad={loaded}/>
+          <iframe ref={frame} src={frameUrl} title={reviewingLogin?'登录页设计预览':'观微平板检验工作台'} width={width} height={height} allow="camera; fullscreen" onLoad={loaded}/>
         </div>
       </div>
     </main>

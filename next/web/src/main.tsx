@@ -14,4 +14,6 @@ if (location.pathname.startsWith(MARKING_BASE + '/admin/')) {
   void import('./model-debug').then(({ModelDebug})=>root.render(<ModelDebug/>));
 } else if (location.pathname === markingPaths.preview) {
   void import('./tablet-simulator').then(({TabletSimulator}) => root.render(<TabletSimulator/>));
+} else if (location.pathname === markingPaths.loginPreview) {
+  void import('./login-preview').then(({LoginPreview})=>root.render(<LoginPreview/>));
 } else root.render(<App/>);

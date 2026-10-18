@@ -64,6 +64,12 @@
 .sv-simulator-help { flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 24px; padding: 0 20px 18px; color: var(--muted); font-size: 13px; }
 .sv-simulator-help span { display: inline-flex; align-items: center; gap: 7px; }
 .sv-simulator-error { color: var(--brand); background: var(--brand-soft); padding: 8px 24px; font-size: 13px; text-align: center; flex-shrink: 0; }
+.sv-login-review-controls { display:flex; align-items:center; gap:24px; flex-wrap:wrap; padding:14px 28px; border-bottom:1px solid var(--line); background:var(--paper); flex-shrink:0; }
+.sv-login-review-layout, .sv-login-review-controls label { display:flex; align-items:center; gap:12px; font-size:13px; flex-shrink:0; white-space:nowrap; }
+.sv-login-review-controls .sv-simulator-orientation button { min-height:38px; }
+.sv-login-review-controls select { width:auto; min-width:160px; min-height:44px; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--ink); padding:8px 32px 8px 12px; font-size:14px; }
+.sv-login-review-controls > p { margin-left:auto; font-size:14px; color:var(--ink); }
+.sv-login-review-controls > p span { display:block; font-size:12px; color:var(--muted); margin-top:3px; }
 @media (max-width: 950px) {
   .sv-simulator-toolbar { padding: 12px 18px; gap: 14px; }
   .sv-simulator-controls { gap: 6px; }
@@ -72,6 +78,8 @@
   .sv-simulator-help-extra { display: none !important; }
 }
 @media (max-width: 680px) {
+  .sv-login-review-controls { gap:12px 20px; padding:12px 18px; }
+  .sv-login-review-controls > p { margin-left:0; flex:1 0 100%; }
   .sv-simulator-toolbar { flex-wrap: wrap; gap: 10px; }
   .sv-simulator-controls { justify-content: flex-start; }
   .sv-simulator-caption-extra { display: none; }

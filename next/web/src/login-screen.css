@@ -1,0 +1,41 @@
+/* 上下方案只改变登录布局；左右方案继续沿用已经确认的样式。 */
+.sv-login.sv-login--stacked {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+}
+.sv-login--stacked .sv-login-brand {
+  min-height: 0;
+  padding: 44px 56px 36px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 18px;
+  row-gap: 20px;
+}
+.sv-login--stacked .sv-login-brand h1 { font-size: 36px; line-height: 48px; }
+.sv-login--stacked .sv-login-brand h2 { grid-column: 1 / -1; font-size: 32px; line-height: 1.55; }
+.sv-login--stacked .sv-login-spacer { display: none; }
+.sv-login--stacked .sv-login-brand > p { grid-column: 1 / -1; margin-top: 4px; font-size: 15px; }
+.sv-login--stacked .sv-login-brand > small { grid-column: 1 / -1; margin-top: -14px; font-size: 13px; opacity: .85; }
+.sv-login--stacked .sv-login-content {
+  width: 100%;
+  max-width: 620px;
+  padding: 48px 24px 56px;
+  margin: auto;
+  gap: 22px;
+}
+@media (min-width: 901px) and (max-height: 950px) {
+  .sv-login--stacked .sv-login-brand { padding: 26px 48px 24px; row-gap: 12px; }
+  .sv-login--stacked .sv-login-brand h1 { font-size: 30px; }
+  .sv-login--stacked .sv-login-brand h2 { font-size: 27px; }
+  .sv-login--stacked .sv-login-brand > small { margin-top: -8px; }
+  .sv-login--stacked .sv-login-content { padding-top: 30px; padding-bottom: 34px; gap: 18px; }
+}
+@media (max-width: 600px) {
+  .sv-login--stacked .sv-login-brand { padding: 28px; row-gap: 16px; }
+  .sv-login--stacked .sv-login-brand h1 { font-size: 30px; }
+  .sv-login--stacked .sv-login-brand h2 { font-size: 23px; }
+  .sv-login--stacked .sv-login-brand > p,
+  .sv-login--stacked .sv-login-brand > small { display: none; }
+  .sv-login--stacked .sv-login-content { padding: 30px 28px; gap: 18px; }
+}

@@ -6,6 +6,8 @@
 
 ## MES 接通前的试用入口
 
+- [登录页布局与名称对照](http://127.0.0.1:5190/inspections/marking/preview/tablet?screen=login)：切换左右／上下布局与“观微、鉴微、明鉴”，支持横竖屏。正式名称待确认；[说明与验证](docs/登录布局与名称对照.md)。
+
 - [自主检测](http://127.0.0.1:5190/inspections/marking?entry=standards)：按物料查询、选择供应商及正品，上传照片后调用真实 VLM；展示结论与不良数量，供电脑 MES 手工填写。回填按钮禁用，照片和结果仅存本系统。
 - [平板模拟试用](http://127.0.0.1:5190/inspections/marking/preview/tablet)：默认同样进入自主检测；真实平板直接打开网页即可。
 - [模拟 MES 任务](http://127.0.0.1:5190/inspections/marking?entry=tasks)：管理端新录入并启用的正品自动提供对应模拟任务，选择后自动关联图片与描述。任务列表仍只读。

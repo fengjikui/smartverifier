@@ -33,6 +33,7 @@ test('HTTP：旧入口与别名彻底关闭，新路径鉴权、资源、下载�
   const normalized=await fetch(base+markingPaths.preview+'/?demo=photos&view=report',{redirect:'manual'});assert.equal(normalized.status,308);assert.equal(normalized.headers.get('location'),markingPaths.preview+'?demo=photos&view=report');
   assert.equal((await fetch(base+markingPaths.standards)).status,200);
   assert.equal((await fetch(base+markingPaths.preview)).status,200);
+  assert.equal((await fetch(base+markingPaths.loginPreview+'?layout=stacked&brand=jianwei')).status,200);
   assert.equal((await fetch(base+MARKING_BASE+'/assets/tasks-scan.svg')).headers.get('content-type'),'image/svg+xml');
   assert.equal((await fetch(base+'/inspections/other')).status,404);
   assert.equal((await fetch(base+MARKING_API+'/tasks')).status,401);

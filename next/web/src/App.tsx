@@ -14,6 +14,7 @@ import { TaskSelection } from './task-selection';
 import { InspectionOverview } from './inspection-overview';
 import type { AlbumFilter } from './inspection-overview';
 import { InspectionTransfer } from './inspection-transfer';
+import { LoginScreen } from './login-screen';
 import type { Bootstrap, ComponentResult, Photo, SampleKind, TaskView, Verdict } from '../../shared/types';
 
 type PendingUpload={file:File;key:string;replaceId?:string};
@@ -77,13 +78,7 @@ export function App(){
   const summary=data?.summary,locked=!!busy||working||finished;
 
   if(loading)return <div className="sv-loading"><Spinner/>正在打开检验工作台…</div>;
-  if(!boot)return <div className="sv-login">
-    <section className="sv-login-brand"><img src={assetPath('login-scan.svg')} width="48" height="48" alt=""/><h1>观微</h1><h2>让每一次丝印检验，<br/>清楚、有据可查。</h2><div className="sv-login-spacer"/><p>拍照检测 / 自动比对 / MES 回填</p><small>丝印检测工作台</small></section>
-    <section className="sv-login-content"><img src={assetPath('login-shield.svg')} width="36" height="36" alt=""/><h2>登录检验工作台</h2><p>从拍照到结果保存，在平板上轻松完成。</p><Pill tone="warning">本机开发试用</Pill>
-      <Btn tone="primary" disabled={!!busy} onClick={()=>void run('正在进入…',async()=>{setBoot(await request<Bootstrap>('/session',{}));})}>{busy?<Spinner/>:null}进入本地试用</Btn>
-      <p className="sv-description">支持配置的 VLM 服务识别。身份及MES仍为模拟，未连接公司系统；任务内会标明照片和结果来源。</p><hr/><small>华为平板 · 横屏优先 · 支持中途继续</small>{error?<p className="sv-error" role="alert">{error}</p>:null}
-    </section>
-  </div>;
+  if(!boot)return <LoginScreen busy={!!busy} error={error} onEnter={()=>void run('正在进入…',async()=>{setBoot(await request<Bootstrap>('/session',{}));})}/>;
 
   const mainView=route.view??'overview';
   return <div className="sv-app">

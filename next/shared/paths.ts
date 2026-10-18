@@ -5,6 +5,7 @@ export const markingPaths = {
   workbench: MARKING_BASE,
   standards: MARKING_BASE + '/admin/standards',
   preview: MARKING_BASE + '/preview/tablet',
+  loginPreview: MARKING_BASE + '/preview/login',
   debug: MARKING_BASE + '/debug/model',
 };
 
@@ -39,7 +40,7 @@ export function adminRoute(pathname: string, search = ''): string {
 /** 仅认可当前模块的网页与资源入口，不再注册旧地址或其跳转。 */
 export function canonicalPage(pathname: string): string | null {
   const path = pathname.replace(/\/+$/, '');
-  if (path === MARKING_BASE || path === markingPaths.preview || path === markingPaths.debug) return path;
+  if (path === MARKING_BASE || path === markingPaths.preview || path === markingPaths.loginPreview || path === markingPaths.debug) return path;
   if (path === MARKING_BASE + '/admin') return markingPaths.standards;
   const admin = MARKING_BASE + '/admin/';
   if (['standards','standards/new','standards/trash','imports','audit-logs','tasks'].some(route => path === admin + route)) return path;
