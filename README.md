@@ -23,7 +23,7 @@ Windows 使用 `py -3.12 -m venv .venv` 和 `./.venv/Scripts/python.exe -m pip .
 - 平板预览：<http://127.0.0.1:5190/inspections/marking/preview/tablet>
 - 模型调试：`/inspections/marking/debug/model`，需配置启用，限服务端本机访问。
 
-管理端本机试用账号 `admin` / `admin123`，仅允许服务器本机登录；这不是生产认证方案。局域网管理员使用临时授权配置，见[部署说明](docs/部署说明.md)。
+正品管理员当前使用独立账号密码，不依赖 IDaaS。默认仅允许本机；运行 `npm run admin:account` 配置录入人员，再用 `npm run admin:access -- lan` 临时开放，`npm run admin:access -- local` 恢复仅本机，修改后重启服务。未配置账号时，本机仍可用 `admin` / `admin123` 体验，但不能远程使用。详见[部署说明](docs/部署说明.md)。
 
 ## 使用真实 VLM
 

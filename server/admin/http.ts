@@ -5,11 +5,12 @@ import type { InspectionService } from '../service.ts';
 import { ApiError } from '../errors.ts';
 import { AdminFiles } from './files.ts';
 import { AdminAuth } from './auth.ts';
+import { readAdminAccess } from './access-config.ts';
 
 type Helpers={body:(req:http.IncomingMessage,max?:number)=>Promise<Buffer>;json:(req:http.IncomingMessage)=>Promise<Record<string,unknown>>;send:(res:http.ServerResponse,data:unknown,status?:number)=>void;file:(res:http.ServerResponse,path:string,priv?:boolean)=>Promise<void>};
 const paging=z.coerce.number().int().min(1).max(100000).default(1);
 export function adminRoutes(service:InspectionService,root:string,directory:string,helpers:Helpers){
-  const registry=service.registry,auth=new AdminAuth(service.store),files=new AdminFiles(registry,root,directory),{body,json,send,file}=helpers;
+  const registry=service.registry,auth=new AdminAuth(service.store,readAdminAccess(process.env,root)),files=new AdminFiles(registry,root,directory),{body,json,send,file}=helpers;
   let reading=false;
   async function form(req:http.IncomingMessage,max:number){if(reading){req.resume();throw new ApiError(429,'正在接收其他文件，请稍后重试。');}reading=true;try{if(!req.headers['content-type']?.startsWith('multipart/form-data;'))throw new ApiError(415,'请选择要上传的文件。');const bytes=await body(req,max);return await new Request('http://localhost',{method:'POST',headers:{'Content-Type':req.headers['content-type']},body:new Uint8Array(bytes)}).formData();}finally{reading=false;}}
   return {auth,files,async handle(req:http.IncomingMessage,res:http.ServerResponse,url:URL,inspector:boolean){const p=decodeURIComponent(url.pathname),method=req.method;
@@ -21,8 +22,8 @@ export function adminRoutes(service:InspectionService,root:string,directory:stri
       await file(res,path.join(directory,'files',image[1]),true);return true;
     }
     if(!p.startsWith('/admin/'))return false;
-    if(p==='/admin/config'&&method==='GET'){send(res,{accessMode:process.env.SV_ADMIN_USERS_FILE?'access-code':'loopback'});return true;}
-    if(p==='/admin/session'&&method==='POST'){const input=z.object({id:z.string().max(80),name:z.string().max(80).optional(),code:z.string().max(256).optional()}).strict().parse(await json(req));send(res,auth.login(req,res,input));return true;}
+    if(p==='/admin/config'&&method==='GET'){send(res,auth.publicConfig());return true;}
+    if(p==='/admin/session'&&method==='POST'){const input=z.object({id:z.string().max(80),name:z.string().max(80).optional(),code:z.string().max(256).optional()}).strict().parse(await json(req));send(res,await auth.login(req,res,input));return true;}
     const actor=auth.require(req);
     if(p==='/admin/session'&&method==='GET'){send(res,auth.current(req));return true;}
     if(p==='/admin/session'&&method==='DELETE'){auth.logout(req,res);send(res,{ok:true});return true;}
