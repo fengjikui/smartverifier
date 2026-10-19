@@ -9,7 +9,7 @@ import type { CatalogPage } from '../../shared/catalog.ts';
 import type { ReferenceRecord, ReferenceInput, ReferenceAsset, Page, MaintenanceEvent, ImportJob } from '../../shared/admin.ts';
 
 const text=(max:number)=>z.string().trim().max(max).transform(s=>s.normalize('NFC'));
-export const referenceInput=z.object({material:text(160).pipe(z.string().min(1)),supplier:text(160).pipe(z.string().min(1)),name:text(200).default(''),description:text(8000).default(''),lines:z.array(text(300)).max(50).default([]),assetId:z.string().max(100).default(''),status:z.enum(['active','draft']).default('active')}).strict();
+export const referenceInput=z.object({material:text(160).pipe(z.string().min(1)),supplier:text(160).pipe(z.string().min(1)),modelNumber:text(200).default(''),name:text(200).default(''),description:text(8000).default(''),lines:z.array(text(300)).max(50).default([]),assetId:z.string().max(100).default(''),status:z.enum(['active','draft']).default('active')}).strict();
 const stamp=()=>new Date().toISOString();
 const like=(s:string)=>'%'+s.replace(/[!%_]/g,c=>'!'+c)+'%';
 export class Registry {
@@ -28,10 +28,10 @@ export class Registry {
   asset(id:string):ReferenceAsset|null {const r=this.store.db.prepare('SELECT data FROM reference_assets WHERE id=?').get(id);return r?JSON.parse(String(r.data)):null;}
   addAsset(asset:ReferenceAsset){this.store.db.prepare('INSERT OR IGNORE INTO reference_assets VALUES(?,?)').run(asset.id,JSON.stringify(asset));}
   get(id:string):ReferenceRecord {const r=this.store.db.prepare('SELECT data FROM reference_records WHERE id=?').get(id);if(!r)throw new ApiError(404,'这条正品标准不存在。');const record:ReferenceRecord=JSON.parse(String(r.data));record.asset=this.asset(record.assetId);return record;}
-  match(material:string,supplier:string):Standard|null {const r=this.store.db.prepare("SELECT data FROM reference_records WHERE material=? AND supplier=? AND deleted_at IS NULL AND status='active'").get(material.normalize('NFC').trim(),supplier.normalize('NFC').trim());if(!r)return null;const v=JSON.parse(String(r.data));return {id:v.id,version:v.version,material:v.material,supplier:v.supplier,image:v.image,lines:v.lines,description:v.description};}
+  match(material:string,supplier:string):Standard|null {const r=this.store.db.prepare("SELECT data FROM reference_records WHERE material=? AND supplier=? AND deleted_at IS NULL AND status='active'").get(material.normalize('NFC').trim(),supplier.normalize('NFC').trim());if(!r)return null;const v=JSON.parse(String(r.data));return {id:v.id,version:v.version,material:v.material,supplier:v.supplier,modelNumber:v.modelNumber??'',image:v.image,lines:v.lines,description:v.description};}
   active(id:string):Standard|null {
     const row=this.store.db.prepare("SELECT data FROM reference_records WHERE id=? AND deleted_at IS NULL AND status='active'").get(id);
-    if(!row)return null;const r=JSON.parse(String(row.data));return {id:r.id,version:r.version,material:r.material,supplier:r.supplier,image:r.image,lines:r.lines,description:r.description};
+    if(!row)return null;const r=JSON.parse(String(row.data));return {id:r.id,version:r.version,material:r.material,supplier:r.supplier,modelNumber:r.modelNumber??'',image:r.image,lines:r.lines,description:r.description};
   }
   catalog(material='',supplier='',page=1,size=25,offset=(page-1)*size):CatalogPage {
     const clauses=["deleted_at IS NULL","status='active'"],params:string[]=[];
@@ -41,7 +41,7 @@ export class Registry {
     if(supplier){clauses.push('supplier=?');params.push(supplier);}
     const where=clauses.join(' AND '),total=Number(this.store.db.prepare('SELECT COUNT(*) n FROM reference_records WHERE '+where).get(...params)!.n);
     const items=this.store.db.prepare('SELECT data FROM reference_records WHERE '+where+' ORDER BY updated_at DESC,id LIMIT ? OFFSET ?').all(...params,size,offset).map(row=>{
-      const r=JSON.parse(String(row.data));return {id:r.id,version:r.version,material:r.material,supplier:r.supplier,name:r.name,image:r.image,lines:r.lines,description:r.description,thumbnail:this.asset(r.assetId)?.thumbnail??r.image};
+      const r=JSON.parse(String(row.data));return {id:r.id,version:r.version,material:r.material,supplier:r.supplier,modelNumber:r.modelNumber??'',name:r.name,image:r.image,lines:r.lines,description:r.description,thumbnail:this.asset(r.assetId)?.thumbnail??r.image};
     });
     return {items,total,page,size,suppliers};
   }
@@ -49,7 +49,7 @@ export class Registry {
   page(q='',status='all',page=1,size=25):Page<ReferenceRecord>{
     const where=[status==='trash'?'deleted_at IS NOT NULL':'deleted_at IS NULL'],params:(string|number)[]=[];
     if(['active','draft'].includes(status)){where.push('status=?');params.push(status);}
-    if(q){where.push("(material LIKE ? ESCAPE '!' OR supplier LIKE ? ESCAPE '!' OR name LIKE ? ESCAPE '!')");params.push(like(q),like(q),like(q));}
+    if(q){where.push("(material LIKE ? ESCAPE '!' OR supplier LIKE ? ESCAPE '!' OR name LIKE ? ESCAPE '!' OR json_extract(data,'$.modelNumber') LIKE ? ESCAPE '!')");params.push(like(q),like(q),like(q),like(q));}
     const clause=where.join(' AND '),total=Number(this.store.db.prepare('SELECT COUNT(*) n FROM reference_records WHERE '+clause).get(...params)!.n);
     const items=this.store.db.prepare('SELECT data FROM reference_records WHERE '+clause+' ORDER BY updated_at DESC,id LIMIT ? OFFSET ?').all(...params,size,(page-1)*size).map(r=>{const v:ReferenceRecord=JSON.parse(String(r.data));v.asset=this.asset(v.assetId);return v;});
     return {items,total,page,size};
@@ -88,7 +88,7 @@ export class Registry {
   saveJob(job:ImportJob,owner:string){this.store.db.prepare('INSERT INTO reference_imports VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(job.id,owner,JSON.stringify(job));}
   commitJob(id:string,actor:Person){let job=this.job(id,actor.id);if(job.status==='committed')return job;if(job.status!=='preview'||job.counts.error)throw new ApiError(409,'请先处理导入错误，重新上传并通过预检。');
     this.store.transaction(()=>{job=this.job(id,actor.id);if(job.status==='committed')return;let created=0,skipped=0;
-      for(const row of job.rows){if(row.status==='skip'||this.duplicate(row.material,row.supplier)){skipped++;continue;}this.saveWithinTransaction(referenceInput.parse({material:row.material,supplier:row.supplier,name:row.name,description:row.description,lines:row.lines,assetId:row.assetId,status:'active'}),actor);created++;}
+      for(const row of job.rows){if(row.status==='skip'||this.duplicate(row.material,row.supplier)){skipped++;continue;}this.saveWithinTransaction(referenceInput.parse({material:row.material,supplier:row.supplier,modelNumber:row.modelNumber??'',name:row.name,description:row.description,lines:row.lines,assetId:row.assetId,status:'active'}),actor);created++;}
       job.status='committed';job.receipt={created,skipped};job.message=`已新增 ${created} 条，跳过 ${skipped} 条重复标准。`;this.saveJob(job,actor.id);this.event('import',job.id,'import.commit',actor,null,{filename:job.filename,...job.receipt});
     });return job;
   }

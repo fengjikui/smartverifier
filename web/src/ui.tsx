@@ -1,6 +1,6 @@
 import { assetPath } from '../../shared/paths';
 import type { ComponentProps, ReactNode } from 'react';
-import { X, LoaderCircle } from 'lucide-react';
+import { X, LoaderCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,8 +18,8 @@ export function VerdictPill({verdict}:{verdict:Verdict|null}){return <Pill tone=
 export function PhotoPill({photo}:{photo:Photo}){
   if(photo.status==='running')return <Pill><Spinner/>正在检测</Pill>;
   if(photo.status==='queued')return <Pill>排队中</Pill>;
-  if(photo.status==='quality')return <Pill tone="warning">! 需要重拍</Pill>;
-  if(photo.status==='error')return <Pill tone="warning">! 未完成</Pill>;
+  if(photo.status==='quality')return <Pill tone="warning"><AlertTriangle size={17}/>需要重拍</Pill>;
+  if(photo.status==='error')return <Pill tone="warning"><AlertTriangle size={17}/>未完成</Pill>;
   if(photo.status==='pending')return <Pill>待检测</Pill>;
   return <VerdictPill verdict={photo.components.some(c=>finalVerdict(c)==='FAIL')?'FAIL':'PASS'}/>;
 }

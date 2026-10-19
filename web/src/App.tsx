@@ -1,6 +1,6 @@
 import { assetPath } from '../../shared/paths';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Camera, ImagePlus, ChevronLeft, X, Info, AlertTriangle, LogOut } from 'lucide-react';
+import { Camera, ChevronLeft, X, Info, AlertTriangle, LogOut } from 'lucide-react';
 import { action, ApiError, imageSize, request } from './api';
 import { Btn, Modal, Pill, Spinner } from './ui';
 import { useRoute } from './use-route';
@@ -15,6 +15,7 @@ import { InspectionOverview } from './inspection-overview';
 import type { AlbumFilter } from './inspection-overview';
 import { InspectionTransfer } from './inspection-transfer';
 import { LoginScreen } from './login-screen';
+import { CameraCapture } from './camera-capture';
 import type { Bootstrap, ComponentResult, Photo, SampleKind, TaskView, Verdict } from '../../shared/types';
 
 type PendingUpload={file:File;key:string;replaceId?:string};
@@ -26,9 +27,10 @@ const mutable=(data:TaskView|null)=>!!data?.round&&!['queued','running','submitt
 export function App(){
   const [boot,setBoot]=useState<Bootstrap|null>(null),[loading,setLoading]=useState(true),[data,setData]=useState<TaskView|null>(null);
   const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(''),[search,setSearch]=useState('');
+  const [captureOpen,setCaptureOpen]=useState(false);
   const [dialog,setDialog]=useState<DialogState>(null),[filter,setFilter]=useState<AlbumFilter>('all'),[pendingFiles,setPendingFiles]=useState<PendingUpload[]>([]);
   const [imageView,setImageView]=useState<'original'|'annotated'|'sheet'>('original'),[instruction,setInstruction]=useState(''),[verdict,setVerdict]=useState<Verdict>('PASS'),[reason,setReason]=useState('AI识别错误，人工核对后修正'),[extraReason,setExtraReason]=useState('');
-  const album=useRef<HTMLInputElement>(null),camera=useRef<HTMLInputElement>(null),gallery=useRef<HTMLDivElement>(null),scroll=useRef(0),replace=useRef<string|undefined>(undefined),busyRef=useRef(false);
+  const gallery=useRef<HTMLDivElement>(null),scroll=useRef(0),replace=useRef<string|undefined>(undefined),busyRef=useRef(false);
   const startAttempt=useRef<{id:string;version:number;key:string}|null>(null);
   const {route,navigate}=useRoute();
   const density=useAlbumDensity(gallery,scroll,route.task);
@@ -60,7 +62,7 @@ export function App(){
     if(gallery.current)scroll.current=gallery.current.scrollTop;
     navigate({task:route.task,view:'detail',photo:photo.id,component:(component??photo.components.find(c=>c.ai))?.id},replaceHistory);
   }
-  function picker(kind:'camera'|'album',replaceId?:string){replace.current=replaceId;(kind==='camera'?camera:album).current?.click();}
+  function picker(_kind:'camera',replaceId?:string){replace.current=replaceId;setCaptureOpen(true);}
   async function upload(items:PendingUpload[]){
     if(!data?.round)return;let view=data;
     for(let i=0;i<items.length;i++){
@@ -71,12 +73,13 @@ export function App(){
     }
     setDialog(null);overview();setNotice(hasRealRecognition(boot?.recognition)?'照片已保存，点击开始检测即可自动定位并与正品比对。':'照片已保存。当前服务未启用真实识别，可使用内置样例体验流程。');
   }
-  function filesPicked(files:FileList|null){if(!files?.length)return;const items=Array.from(files).slice(0,replace.current?1:undefined).map(file=>({file,key:uploadKey(),replaceId:replace.current}));replace.current=undefined;setPendingFiles(items);void run('正在保存照片…',()=>upload(items));}
+  function filesPicked(files:FileList|File[]|null){if(!files?.length)return;const items=Array.from(files).slice(0,replace.current?1:undefined).map(file=>({file,key:uploadKey(),replaceId:replace.current}));replace.current=undefined;setPendingFiles(items);void run('正在保存照片…',()=>upload(items));}
   async function update(name:string,values:Record<string,unknown>={}){if(data){const next=await action(data,name,values);setData(next);if((filter==='fail'&&!next.summary?.fail)||(filter==='attention'&&!next.summary?.qualityPhotos&&!next.summary?.failedPhotos))setFilter('all');}}
   const selectedPhoto=round?.photos.find(p=>p.id===route.photo),selectedComponent=selectedPhoto?.components.find(c=>c.id===route.component)??selectedPhoto?.components.find(c=>c.ai);
   const standalone=data?.task.origin==='standalone',finished=round?.status==='submitted'||round?.status==='completed';
   const summary=data?.summary,locked=!!busy||working||finished;
 
+  if(captureOpen&&boot&&data?.round)return <CameraCapture label={data.task.material+' · '+data.task.supplier} replacing={!!replace.current} onCancel={()=>{replace.current=undefined;setCaptureOpen(false);}} onDone={files=>{setCaptureOpen(false);filesPicked(files);}}/>;
   if(loading)return <div className="sv-loading"><Spinner/>正在打开检验工作台…</div>;
   if(!boot)return <LoginScreen busy={!!busy} error={error} onEnter={()=>void run('正在进入…',async()=>{setBoot(await request<Bootstrap>('/session',{}));})}/>;
 
@@ -99,17 +102,17 @@ export function App(){
       <InspectionReport key={round.id} round={round} summary={summary} task={data.task} person={boot.person} onOriginal={photo=>{setImageView('original');setDialog({type:'original',photo});}}/>
       <footer className="sv-footer"><FooterNote standalone={standalone} title={`本轮${summary?.total??0}件 · 不合格${summary?.fail??0}件`}/><Btn tone="primary" onClick={overview}>返回照片总览</Btn></footer>
     </>:<>
-      <InspectionOverview realEnabled={hasRealRecognition(boot.recognition)} onRealTrial={()=>void run('正在添加模拟拍摄照片…',()=>update('real-trial'))} data={data} working={working} busy={!!busy} compact={density.compact} filter={filter} onFilter={value=>{scroll.current=0;setFilter(value);}} onToggleDensity={density.toggle} gallery={gallery} onScroll={top=>{scroll.current=top;}} actions={{open:openPhoto,add:picker,replace:p=>picker('album',p.id),remove:p=>setDialog({type:'remove',photo:p}),notes:()=>{setInstruction(round.instruction);setDialog({type:'notes'});},report:()=>navigate({task:route.task,view:'report'}),samples:()=>setDialog({type:'samples'})}}/>
+      <InspectionOverview realEnabled={hasRealRecognition(boot.recognition)} onRealTrial={()=>void run('正在添加模拟拍摄照片…',()=>update('real-trial'))} data={data} working={working} busy={!!busy} compact={density.compact} filter={filter} onFilter={value=>{scroll.current=0;setFilter(value);}} onToggleDensity={density.toggle} gallery={gallery} onScroll={top=>{scroll.current=top;}} actions={{open:openPhoto,add:picker,replace:p=>picker('camera',p.id),remove:p=>setDialog({type:'remove',photo:p}),notes:()=>{setInstruction(round.instruction);setDialog({type:'notes'});},report:()=>navigate({task:route.task,view:'report'}),samples:()=>setDialog({type:'samples'})}}/>
         {pendingFiles.length?<div className="sv-upload-retry" role="status">还有{pendingFiles.length}张照片未确认保存。<Btn disabled={!!busy} onClick={()=>void run('正在重试上传…',()=>upload(pendingFiles))}>重试保存</Btn><Btn tone="quiet" disabled={!!busy} onClick={()=>setPendingFiles([])}>取消待上传照片</Btn></div>:null}
       {standalone?<footer className="sv-footer sv-workflow-footer sv-standalone-footer"><FooterNote standalone title={round.status==='completed'?'本次检测已完成，结果保存在本系统':working?'正在检测，请稍候':summary?.verdict?`结论${summary.verdict==='PASS'?'合格':'不合格'} · 不良数量${summary.fail}件`:'拍清每个丝印，确认后开始检测'}/>
         <Btn disabled title="未关联MES任务，暂不支持回填">提交到 MES</Btn>{round.photos.length&&round.status!=='completed'?<Btn disabled={locked} onClick={()=>picker('camera')}><Camera size={20}/>继续拍照</Btn>:null}
         {round.status==='completed'?<><Btn disabled={!!busy} onClick={()=>setDialog({type:'retest'})}>再检一批</Btn><Btn tone="primary" onClick={taskList}>返回正品选择</Btn></>:summary?.canSubmit?<><Btn tone="primary" disabled={!!busy||pendingFiles.length>0} onClick={()=>void run('正在保存本次结果…',async()=>{await update('complete');setNotice('本次检测已完成。请在电脑 MES 中手工填写检验结论和不良数量。');})}>完成本次检测</Btn></>:summary?.qualityPhotos&&!summary.pendingPhotos&&!summary.failedPhotos?<Btn tone="primary" disabled={locked} onClick={()=>{scroll.current=0;setFilter('attention');}}>查看需重拍照片</Btn>:<Btn tone="primary" disabled={locked||!round.photos.length||pendingFiles.length>0} onClick={()=>void run('正在加入检测队列…',()=>update('analyze'))}>{working?<Spinner/>:null}{working?'正在检测':summary?.completed?'检测未完成部分':'开始检测'}</Btn>}
       </footer>:<>      <footer className="sv-footer sv-workflow-footer"><FooterNote standalone={standalone} title={round.status==='submitted'?'本轮结果已保存':working?`${round.photos.length}张照片已保存`:summary?.canSubmit?`${summary.verdict==='PASS'?'合格':'不合格'} · 不良数${summary.fail}`:summary?.qualityPhotos||summary?.failedPhotos?`${(summary?.qualityPhotos??0)+(summary?.failedPhotos??0)}张照片需要处理`:round.photos.length?'照片已保存，可继续添加':'正品基准已关联 · '+data.task.material}/>
-        {round.status==='submitted'?<Btn disabled={!!busy} onClick={()=>setDialog({type:'retest'})}>重新检测</Btn>:round.photos.length?<><Btn disabled={locked} onClick={()=>picker('camera')}><Camera size={20}/>继续拍照</Btn><Btn tone="quiet" disabled={locked} onClick={()=>picker('album')}><ImagePlus size={20}/>从相册添加</Btn></>:null}
+        {round.status==='submitted'?<Btn disabled={!!busy} onClick={()=>setDialog({type:'retest'})}>重新检测</Btn>:round.photos.length?<><Btn disabled={locked} onClick={()=>picker('camera')}><Camera size={20}/>继续拍照</Btn></>:null}
         {round.status==='submitted'?<Btn tone="primary" onClick={taskList}>返回任务列表</Btn>:summary?.canSubmit?<Btn tone="primary" disabled={!!busy||pendingFiles.length>0} onClick={()=>void run('正在发起回填…',async()=>{await update('submit');navigate({task:route.task,view:'transfer'});})}>提交到模拟MES</Btn>:summary?.qualityPhotos&&!summary.pendingPhotos&&!summary.failedPhotos?<Btn tone="primary" disabled={locked} onClick={()=>{scroll.current=0;setFilter('attention');}}>查看需重拍照片</Btn>:<Btn tone="primary" disabled={locked||!round.photos.length||pendingFiles.length>0} onClick={()=>void run('正在加入检测队列…',()=>update('analyze'))}>{working?<Spinner/>:null}{working?'正在检测':summary?.completed?'检测未完成部分':'开始检测'}</Btn>}
       </footer></>}
     </>}
-    <input ref={album} tabIndex={-1} aria-hidden="true" className="sv-file-input" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={e=>{filesPicked(e.target.files);e.target.value='';}}/><input ref={camera} tabIndex={-1} aria-hidden="true" className="sv-file-input" type="file" accept="image/*" capture="environment" onChange={e=>{filesPicked(e.target.files);e.target.value='';}}/>
+
     {dialog?.type==='samples'?<Modal title={dialog.replaceId?'用样例替换这张照片':'选择一种内置样例'} description="这些图片及检测结果为虚构预设，仅用于体验流程，不代表真实识别效果。" onClose={()=>{if(!busy)setDialog(null);}}><div className="sv-sample-options">{!dialog.replaceId?<Btn className="sv-sample-featured" disabled={!!busy} onClick={()=>void run('正在添加20张照片…',async()=>{await update('sample-set',{clientId:uploadKey()});setDialog(null);overview();})}><strong>20张照片 · 每张1件</strong><span>16件合格、4件不合格，试试紧凑预览</span></Btn>:null}{([['twenty','20个元件 · 同一张照片','16件合格、4件不合格，体验20个元件按钮'],['four','四个元件','3件合格、1件不合格，含建议复核'],['pass','一个合格元件','体验正常合格与增量检测'],['fail','一个不合格元件','体验字符错序与人工修正'],['quality','需要重拍的状态','体验质量提示及提交阻断']] as [SampleKind,string,string][]).map(([sample,title,sub])=><Btn key={sample} disabled={!!busy} onClick={()=>void run('正在添加样例…',async()=>{await update('sample',{sample,replaceId:dialog.replaceId});setDialog(null);overview();})}><strong>{title}</strong><span>{sub}</span></Btn>)}</div></Modal>:null}
     {dialog?.type==='remove'?<Modal title={'移除照片 '+photoName(dialog.photo)+'？'} description={`该照片及其${dialog.photo.components.length}件元件的结果会从本轮移除，已提交历史不受影响。`} onClose={()=>{if(!busy)setDialog(null);}} actions={<><Btn disabled={!!busy} onClick={()=>setDialog(null)}>保留照片</Btn><Btn tone="danger" disabled={!!busy} onClick={()=>void run('正在移除…',async()=>{await update('remove',{photoId:dialog.photo.id});setDialog(null);})}>确认移除</Btn></>}/>:null}
     {dialog?.type==='notes'?<Modal title="本次检测说明" description="补充此次任务的要求。保存后，已有元件也需要按最新说明重新判定，不必重拍。" onClose={()=>{if(!busy)setDialog(null);}} actions={<><Btn disabled={!!busy} onClick={()=>setDialog(null)}>取消</Btn><Btn tone="primary" disabled={!!busy} onClick={()=>void run('正在保存说明…',async()=>{await update('notes',{instruction});setDialog(null);setNotice('说明已保存，请点击检测，已有元件会按最新说明重新判定；内置预设样例仅演示流程。');})}>保存说明</Btn></>}><label className="sv-field">现场补充说明<textarea value={instruction} maxLength={4000} onChange={e=>setInstruction(e.target.value)} rows={5} placeholder="例如：本批次的日期码允许变化，重点核对型号。可用系统输入法语音输入。"/></label><p className="sv-description">本次说明随报告保留，优先于通用说明，不会修改正品数据库。</p></Modal>:null}

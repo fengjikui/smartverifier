@@ -5,13 +5,15 @@
       "materialCode": "MAT-DEMO-001",
       "supplierName": "示例供应商甲",
       "imagePath": "images/demo-reference.png",
-      "description": "核对 NOVA、NX32F407、VGT6 的字形、排列及外形。\n批次码 24W32 允许变化。"
+      "description": "",
+      "modelNumber": "NX32F407VGT6"
     },
     {
       "materialCode": "MAT-DEMO-002",
       "supplierName": "示例供应商乙",
       "imagePath": "images/demo-reference.png",
-      "description": "核对型号 NX32F407、Logo 及封装外形。允许批次码随生产批次变化。"
+      "description": "",
+      "modelNumber": "NX32F407VGT6"
     }
   ]
 }

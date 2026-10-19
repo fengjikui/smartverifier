@@ -40,10 +40,8 @@
 .sv-album-filters .sv-btn[aria-pressed="true"] { color: var(--ink); background: var(--paper); border-color: var(--line); }
 .sv-inspection-overview .sv-album-toolbar > .sv-density-toggle { min-width: 0; }
 .sv-inspection-overview .sv-photo-card { position: relative; }
-.sv-inspection-overview .sv-photo-caption { padding-right: 40px; min-height: 76px; }
-.sv-inspection-overview .sv-album-compact .sv-photo-caption { padding-right: 34px; min-height: 68px; }
-.sv-photo-menu { position: absolute; right: 4px; bottom: 4px; }
-.sv-photo-menu .sv-icon-button { min-height: 44px; width: 44px; }
+.sv-inspection-overview .sv-photo-caption { min-height: 76px; }
+.sv-inspection-overview .sv-album-compact .sv-photo-caption { min-height: 68px; }
 .sv-album-empty { padding: 32px 16px; text-align: center; color: var(--muted); }
 .sv-more-trigger.sv-btn { font-size: 14px; }
 .sv-action-menu[data-slot="dropdown-menu-content"] { z-index: 80; min-width: 190px; max-width: calc(100vw - 32px); background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 28px oklch(.2 .01 20 / .12); padding: 6px; animation: none; }
@@ -92,9 +90,12 @@
   .sv-inspection-overview .sv-density-toggle { min-width: 44px; }
   .sv-photo-attention { flex-wrap: wrap; gap: 0; padding-top: 8px; }
   .sv-photo-attention .sv-btn { margin-left: auto; }
-  .sv-inspection-overview .sv-album-compact .sv-photo-caption { padding-right: 0; padding-bottom: 38px; }
   .sv-workflow-footer .sv-footer-note { flex-direction: column; align-items: start; }
   .sv-workflow-footer .sv-footer-note span { max-width: none; }
   .sv-workflow-footer > .sv-btn { min-width: 0; font-size: 13px; padding: 8px; gap: 5px; }
   .sv-transfer-conclusion { font-size: 16px; gap: 12px; }
 }
+/* Direct photo actions remain touchable in standard and compact grids. */
+.sv-photo-actions{display:flex;justify-content:flex-end;gap:8px;padding:0 12px 10px}
+.sv-photo-actions .sv-btn{min-height:44px;min-width:60px;padding:8px 12px;font-size:14px}
+.sv-photo-actions .sv-photo-delete{color:var(--brand)}

@@ -28,7 +28,7 @@ export function StandardSelection({onStart,onOpen,busy,onError}:{onStart:(standa
     <div className="sv-standard-results" aria-busy={loading}>
       {loading&&!data?<div className="sv-loading"><Spinner/>正在查询正品标准…</div>:failed?<div className="sv-standard-empty"><h2>暂时无法读取正品标准</h2><Btn onClick={()=>setRetry(v=>v+1)}>重新加载</Btn></div>:!data?.items.length?<div className="sv-standard-empty"><h2>{material||supplier?'没有找到匹配的正品标准':'暂无可用的正品标准'}</h2><p>{material||supplier?'可调整物料编号或供应商，再试一次。':'请联系管理员录入正品图片并启用，检测说明可以留空。'}</p></div>:<div className={'sv-standard-grid'+(loading?' is-loading':'')}>{data.items.map(standard=><article className="sv-standard-choice" key={standard.id}>
         <button className="sv-standard-thumbnail" disabled={blocked} onClick={()=>setPreview(standard)} aria-label={'查看正品 '+standard.material+' '+standard.supplier}><img src={standard.thumbnail} alt="正品图片" loading="lazy"/></button>
-        <div><h2>{standard.material}</h2><p>{standard.supplier}</p>{standard.name?<small>{standard.name}</small>:null}</div>
+        <div><h2>{standard.material}</h2><p>{standard.supplier}</p>{standard.modelNumber||standard.name?<small>{standard.modelNumber||standard.name}</small>:null}</div>
         <Btn tone="primary" disabled={blocked} onClick={()=>onStart(standard)}>开始检测<ArrowRight size={17}/></Btn>
       </article>)}</div>}
     </div>

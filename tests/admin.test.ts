@@ -12,7 +12,7 @@ import { LocalVisionPipeline } from '../server/vision/local-pipeline.ts';
 import type { ReferenceRecord, ImportJob } from '../shared/admin.ts';
 import type { Task } from '../shared/types.ts';
 const root=path.resolve('.');
-const input={material:'00123',supplier:'测试供应商',name:'测试器件',description:'允许批次码变化。',lines:[],assetId:'',status:'active' as const};
+const input={material:'00123',supplier:'测试供应商',modelNumber:'SV-358-MODEL',name:'测试器件',description:'允许批次码变化。',lines:[],assetId:'',status:'active' as const};
 
 // 模拟 MES 已同步的数据，不通过应用提供手工维护入口。
 function seedMesTask(service:InspectionService,fields:{number:string;material:string;supplier:string}):Task {
@@ -56,18 +56,22 @@ test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复
   assert.equal((await fetch(base+asset.thumbnail,{headers:{Cookie:cookie}})).status,200);assert.equal((await fetch(base+'/api/v1/inspections/marking/reference-assets/'+asset.id)).status,401);
   const invalid=new FormData();invalid.set('image',new File([new Uint8Array([1,2,3])],'伪装.png'));await call('/admin/assets',invalid,400);
   let standard:ReferenceRecord=await call('/admin/standards',{...input,assetId:asset.id},201);await call('/admin/standards',{...input,assetId:asset.id},409);
-  standard=await call('/admin/standards/'+standard.id,{...input,assetId:asset.id,version:1,description:'更新'},200,'PUT');assert.equal(standard.version,2);
+  standard=await call('/admin/standards/'+standard.id,{...input,assetId:asset.id,version:1,description:'更新'},200,'PUT');assert.equal(standard.version,2);assert.equal(standard.modelNumber,'SV-358-MODEL');assert.equal((await call('/admin/standards?q=SV-358-MODEL')).total,1);
   const created=seedMesTask(service,{number:'MES-TEST-001',material:input.material,supplier:input.supplier});
   const tasksBefore=service.store.tasks();
   for(const [route,method] of [['/admin/tasks','POST'],['/admin/tasks/'+created.id,'POST'],['/admin/tasks/'+created.id,'PUT'],['/admin/tasks/'+created.id,'PATCH'],['/admin/tasks/'+created.id,'DELETE'],['/admin/tasks/T00000000000000000000000000000000','DELETE']])assert.match((await call(route,{number:'不得修改',material:'OTHER',supplier:'OTHER'},405,method)).message,/MES/);
   assert.deepEqual(service.store.tasks(),tasksBefore,'管理接口不能增删改 MES 任务');
   assert.ok((await call('/admin/tasks')).items.some((task:Task)=>task.id===created.id&&task.standard?.id===standard.id));
   assert.equal((await fetch(base+'/api/v1/inspections/marking/tasks/'+created.id+'/open',{method:'POST',headers:{Cookie:inspectionCookie,'Content-Type':'application/json'},body:'{}'}).then(r=>r.json())).round.standard.id,standard.id);
-  for(const kind of ['xlsx','json','zip','help'])assert.equal((await fetch(base+'/api/v1/inspections/marking/admin/templates/'+kind,{headers:{Cookie:cookie}})).status,200);
+  for(const kind of ['xlsx','json','zip','help','filenames'])assert.equal((await fetch(base+'/api/v1/inspections/marking/admin/templates/'+kind,{headers:{Cookie:cookie}})).status,200);
   async function poll(id:string){for(let i=0;i<100;i++){const j:ImportJob=await call('/admin/imports/'+id);if(j.status!=='validating')return j;await delay(100);}throw Error('预检超时');}
   const pack=new FormData();pack.append('files',new File([await readFile('templates/reference-import-v1/JSON标准包示例.zip')],'示例.zip'));
   let job:ImportJob=await poll((await call('/admin/imports',pack,202)).id);assert.equal(job.status,'preview',job.message);assert.equal(job.counts.ready,2);
   job=await call('/admin/imports/'+job.id+'/commit',{});assert.equal(job.receipt!.created,2);assert.deepEqual((await call('/admin/imports/'+job.id+'/commit',{})).receipt,job.receipt);
+  const named=new FormData();named.append('files',new File([await readFile('templates/reference-import-v1/图片命名示例.zip')],'图片.zip'));
+  const filenameJob:ImportJob=await poll((await call('/admin/imports',named,202)).id);assert.equal(filenameJob.counts.ready,2);
+  const namedModel=filenameJob.rows[0].modelNumber;assert.ok(namedModel);await call('/admin/imports/'+filenameJob.id+'/commit',{});
+  assert.ok((await call('/admin/standards?q='+encodeURIComponent(namedModel!))).items.some((v:ReferenceRecord)=>v.modelNumber===namedModel));
   const again=new FormData();again.append('files',new File([await readFile('templates/reference-import-v1/JSON标准包示例.zip')],'示例.zip'));assert.equal((await poll((await call('/admin/imports',again,202)).id)).counts.skip,2);
   const missing=new FormData();missing.append('files',new File([JSON.stringify({schemaVersion:'1.0',records:[{materialCode:'NEW',supplierName:'S',imagePath:'lost.png'}]})],'standards.json'));
   const bad=await poll((await call('/admin/imports',missing,202)).id);assert.equal(bad.counts.error,1);await call('/admin/imports/'+bad.id+'/commit',{},409);

@@ -1,14 +1,24 @@
 """有限额、无外部链接的 XLSX / JSON / ZIP 导入预检。不会写入正品记录。"""
-import sys, json, zipfile, io, stat, unicodedata
+import sys, json, zipfile, io, stat, unicodedata, re
 from pathlib import PurePosixPath, Path
 from asset_worker import asset, resource_check
 MAX_UNPACKED=500*1024**2
+IMAGE_SUFFIXES=('.jpg','.jpeg','.png','.webp')
+
+def filename_fields(name):
+    stem=PurePosixPath(name).stem.strip()
+    parts=re.split(r'\s+',stem)
+    if len(parts)!=3 or not all(parts):
+        raise ValueError('图片文件名须为“物料编号 供应商 型号”三段，各字段内部不要使用空格。')
+    if any(any(ord(c)<32 for c in s) for s in parts):
+        raise ValueError('文件名不能包含控制字符。')
+    return dict(zip(('materialCode','supplierName','modelNumber'),parts))
 
 def zip_entries(data):
     z=zipfile.ZipFile(io.BytesIO(data)); entries={}; total=0
     if len(z.infolist())>5000: raise ValueError('压缩包条目超过 5000 个，请拆分导入。')
     for info in z.infolist():
-        name=info.filename
+        name=unicodedata.normalize('NFC',info.filename)
         if '\\' in name or name.startswith('/') or ':' in name or '..' in PurePosixPath(name).parts or stat.S_ISLNK(info.external_attr>>16) or info.flag_bits&1:
             raise ValueError('压缩包含不安全路径、符号链接或加密文件。')
         if info.is_dir() or name.startswith('__MACOSX/') or PurePosixPath(name).name.startswith('.'): continue
@@ -30,7 +40,7 @@ def manifest(data,name):
         ws=wb['标准清单'] if '标准清单' in wb.sheetnames else wb.worksheets[0]
         if ws.max_row and ws.max_row>2001: raise ValueError('每次最多 2000 条标准，请拆分工作簿。')
         rows=ws.iter_rows(); headers=[str(c.value or '').strip() for c in next(rows)]
-        aliases={'物料编号':'materialCode','供应商名称':'supplierName','正品图片路径':'imagePath','检测说明':'description','物料名称':'name','正品丝印文字':'markingText'}
+        aliases={'物料编号':'materialCode','供应商名称':'supplierName','型号':'modelNumber','正品图片路径':'imagePath','检测说明':'description','物料名称':'name','正品丝印文字':'markingText'}
         if not all(h in headers for h in ('物料编号','供应商名称','正品图片路径')): raise ValueError('Excel 缺少必填列，请下载模板。')
         result=[]
         for cells in rows:
@@ -49,10 +59,16 @@ def manifest(data,name):
 
 def main(r):
     files=r['files']; contents={f['name']:Path(f['path']).read_bytes() for f in files}
+    filename_mode=False
+    if len(contents)!=len(files): raise ValueError('上传文件名重复，请打包为 ZIP 并使用不同路径。')
     if len(files)==1 and files[0]['name'].lower().endswith('.zip'):
         archive,entries=zip_entries(contents[files[0]['name']]); manifests=[n for n in entries if n.lower().endswith(('.xlsx','.json'))]
-        if len(manifests)!=1: raise ValueError('ZIP 中应恰好包含一个 XLSX 或 standards.json 清单及对应图片。')
-        mf=manifests[0];data=archive.read(entries[mf]); rows=manifest(data,mf)
+        if len(manifests)>1: raise ValueError('ZIP 中最多放一个 XLSX 或 JSON 清单，或只放按名称整理的图片。')
+        if manifests:
+            mf=manifests[0];data=archive.read(entries[mf]); rows=manifest(data,mf)
+        else:
+            filename_mode=True;mf=''
+            rows=[{'_filename':n,'imagePath':n} for n in sorted(entries) if n.lower().endswith(IMAGE_SUFFIXES)]
         def picture(name):
             candidates=[name,str(PurePosixPath(mf).parent/name)]
             for key in candidates:
@@ -71,13 +87,15 @@ def main(r):
     output=[];assets={};seen=set();cache={}
     for i,raw in enumerate(rows):
         if i%20==0: resource_check()
-        row={'row':i+2,'material':'','supplier':'','name':'','description':'','lines':[],'imagePath':'','status':'ready','message':''}
+        row={'row':i+(1 if filename_mode else 2),'material':'','supplier':'','modelNumber':'','name':'','description':'','lines':[],'imagePath':raw.get('imagePath','') if isinstance(raw,dict) else '', 'status':'ready','message':''}
         try:
             if not isinstance(raw,dict): raise ValueError('记录必须为对象。')
+            if '_filename' in raw:
+                raw={**filename_fields(raw['_filename']),'imagePath':raw['imagePath']}
             if raw.get('_error'): raise ValueError(raw['_error'])
-            unknown=set(raw)-{'materialCode','supplierName','imagePath','description','name','markingText','markingLines','_error'}
+            unknown=set(raw)-{'materialCode','supplierName','modelNumber','imagePath','description','name','markingText','markingLines','_error'}
             if unknown: raise ValueError('不支持的字段：'+', '.join(sorted(unknown)))
-            for source,target,maxlen in [('materialCode','material',160),('supplierName','supplier',160),('name','name',200),('description','description',8000),('imagePath','imagePath',500)]:
+            for source,target,maxlen in [('materialCode','material',160),('supplierName','supplier',160),('modelNumber','modelNumber',200),('name','name',200),('description','description',8000),('imagePath','imagePath',500)]:
                 value=raw.get(source,'')
                 if not isinstance(value,str): raise ValueError(source+' 必须为文本。')
                 row[target]=unicodedata.normalize('NFC',value.strip())
@@ -95,6 +113,7 @@ def main(r):
             a=cache[imagePath];assets[a['id']]=a;row['assetId']=a['id']
         except Exception as e: row['status']='error';row['message']=str(e)
         output.append(row)
+    if len(files)==1 and files[0]['name'].lower().endswith('.zip'): archive.close()
     return {'rows':output,'assets':list(assets.values())}
 
 if __name__=='__main__':

@@ -63,6 +63,11 @@
               "type": "string",
               "maxLength": 300
             }
+          },
+          "modelNumber": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "型号，选填；图片文件名导入时为第三段"
           }
         }
       },

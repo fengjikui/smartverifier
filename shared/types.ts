@@ -21,7 +21,7 @@ export interface Photo {
   message: string; components: ComponentResult[];
   preparation?: Preparation;
 }
-export interface Standard { id: string; version: number; material: string; supplier: string; image: string; lines: string[]; description: string }
+export interface Standard { id: string; version: number; material: string; supplier: string; modelNumber?: string; image: string; lines: string[]; description: string }
 export interface Transfer { id: string; key: string; revision: number; status: 'sending' | 'success' | 'failed'; message: string; at: string; receipt?: string; reportUrl?: string }
 export interface Round {
   id: string; taskId: string; number: number; revision: number; status: RoundStatus; createdAt: string;

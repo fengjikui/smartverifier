@@ -39,8 +39,8 @@ export function adminRoutes(service:InspectionService,root:string,directory:stri
     if(p==='/admin/imports'&&method==='POST'){const data=await form(req,202*1024*1024),uploads=data.getAll('files').filter((f):f is File=>f instanceof File);send(res,await files.start(uploads,actor),202);return true;}
     const job=p.match(/^\/admin\/imports\/([a-f0-9-]{36})(?:\/(commit))?$/);
     if(job){if(method==='GET'&&!job[2]){send(res,registry.job(job[1],actor.id));return true;}if(method==='POST'&&job[2]){await json(req);send(res,registry.commitJob(job[1],actor));return true;}}
-    const template=p.match(/^\/admin\/templates\/(xlsx|json|zip|help)$/);
-    if(template&&method==='GET'){const names:Record<string,string>={xlsx:'正品标准导入模板.xlsx',json:'standards.json',zip:'JSON标准包示例.zip',help:'填写说明.txt'};res.setHeader('Content-Disposition',`attachment; filename*=UTF-8''${encodeURIComponent(names[template[1]])}`);await file(res,path.join(root,'templates/reference-import-v1',names[template[1]]),true);return true;}
+    const template=p.match(/^\/admin\/templates\/(xlsx|json|zip|help|filenames)$/);
+    if(template&&method==='GET'){const names:Record<string,string>={xlsx:'正品标准导入模板.xlsx',json:'standards.json',zip:'JSON标准包示例.zip',help:'填写说明.txt',filenames:'图片命名示例.zip'};res.setHeader('Content-Disposition',`attachment; filename*=UTF-8''${encodeURIComponent(names[template[1]])}`);await file(res,path.join(root,'templates/reference-import-v1',names[template[1]]),true);return true;}
     throw new ApiError(404,'管理接口不存在。');
   }};
 }
