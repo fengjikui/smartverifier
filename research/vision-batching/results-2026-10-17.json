@@ -1,0 +1,1762 @@
+{
+  "date": "2026-10-17",
+  "scope": "本机受控机制与布局实验；非生产准确率评估",
+  "unique_components": 4,
+  "synthetic": true,
+  "independent_repeats_per_configuration": 1,
+  "manifest": {
+    "source": "fixtures/inspection/four-components.png",
+    "synthetic": true,
+    "source_sha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b",
+    "crop_boxes_xyxy": [
+      [
+        230,
+        60,
+        660,
+        490
+      ],
+      [
+        900,
+        75,
+        1330,
+        505
+      ],
+      [
+        250,
+        515,
+        680,
+        945
+      ],
+      [
+        880,
+        520,
+        1310,
+        950
+      ]
+    ],
+    "rotation": "保留相同原始角度，隔离布局变量",
+    "interpolation": "拼图不缩放裁片；512压力图和3072探针用Lanczos",
+    "ground_truth": [
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ],
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ],
+      [
+        "SV385",
+        "A26",
+        "0147"
+      ],
+      [
+        "SV358",
+        "A26",
+        "0147"
+      ]
+    ],
+    "repeated_images_for_8_16": true
+  },
+  "environment": {
+    "lmstudio_version": "0.4.12+1",
+    "runtime": "app-mlx-generate-mac14-arm64@34",
+    "image_inputs": {
+      "userMaxImageDimensionPixelsEnabled": true,
+      "userMaxImageDimensionPixels": 2048,
+      "ignoreModelPreferredMaxImageDimension": false
+    },
+    "model_preprocessor": {
+      "size": {
+        "longest_edge": 16777216,
+        "shortest_edge": 65536
+      },
+      "patch_size": 16,
+      "temporal_patch_size": 2,
+      "merge_size": 2,
+      "image_mean": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "image_std": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "processor_class": "Qwen3VLProcessor",
+      "image_processor_type": "Qwen2VLImageProcessorFast"
+    },
+    "model_processor": {
+      "image_processor": {
+        "do_convert_rgb": true,
+        "do_normalize": true,
+        "do_rescale": true,
+        "image_mean": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "image_processor_type": "Qwen3VLImageProcessor",
+        "image_std": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "max_pixels": 16777216,
+        "merge_size": 2,
+        "min_pixels": 65536,
+        "patch_size": 16,
+        "rescale_factor": 0.00392156862745098,
+        "temporal_patch_size": 2
+      },
+      "processor_class": "Qwen3VLProcessor",
+      "video_processor": {
+        "do_convert_rgb": true,
+        "do_normalize": true,
+        "do_rescale": true,
+        "fps": 2.0,
+        "image_mean": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "image_std": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "max_frames": 768,
+        "max_pixels": 25165824,
+        "merge_size": 2,
+        "min_frames": 4,
+        "min_pixels": 4096,
+        "patch_size": 16,
+        "rescale_factor": 0.00392156862745098,
+        "temporal_patch_size": 2,
+        "video_processor_type": "Qwen3VLVideoProcessor"
+      }
+    },
+    "evidence_files": [
+      {
+        "path": "~/.lmstudio/models/lmstudio-community/Qwen3.8-27B-MLX-4bit/preprocessor_config.json",
+        "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516"
+      },
+      {
+        "path": "~/.lmstudio/models/lmstudio-community/Qwen3.8-27B-MLX-4bit/processor_config.json",
+        "sha256": "45fc17c8dd2474af6b493b52483c26c0584b0082d368c480f9fa611e73070040"
+      },
+      {
+        "path": "~/.lmstudio/extensions/backends/vendor/_amphibian/app-mlx-generate-mac14-arm64@34/lib/python3.11/site-packages/mlx_vlm/models/qwen3_vl/processing_qwen3_vl.py",
+        "sha256": "2630de50d7a115b1d56cd112ed7acfaf3082451e732461ab71d381fdf05e3bda"
+      },
+      {
+        "path": "~/.lmstudio/extensions/backends/vendor/_amphibian/app-mlx-generate-mac14-arm64@34/lib/python3.11/site-packages/mlx_engine/model_kit/batched_vision/prompt_inputs.py",
+        "sha256": "82e164151d1c8bde5df9b8b38808065b09f555d19ba5fe3b4f5ff4b702227d50"
+      }
+    ],
+    "models": {
+      "models": [
+        {
+          "type": "llm",
+          "publisher": "mlx-community",
+          "key": "qwen3.5-4b",
+          "display_name": "Qwen3.5 4B",
+          "architecture": "qwen3_5",
+          "quantization": {
+            "name": "4bit",
+            "bits_per_weight": 4
+          },
+          "size_bytes": 3061129077,
+          "params_string": "4B",
+          "loaded_instances": [],
+          "max_context_length": 262144,
+          "format": "mlx",
+          "capabilities": {
+            "vision": true,
+            "trained_for_tool_use": true
+          },
+          "description": null
+        },
+        {
+          "type": "llm",
+          "publisher": "lmstudio-community",
+          "key": "qwen3.8-27b-mlx",
+          "display_name": "Qwen3.8 27B",
+          "architecture": "qwen3_5",
+          "quantization": {
+            "name": "4bit",
+            "bits_per_weight": 4
+          },
+          "size_bytes": 16081498220,
+          "params_string": "27B",
+          "loaded_instances": [
+            {
+              "id": "hr-qwen",
+              "config": {
+                "context_length": 16384,
+                "parallel": 1
+              }
+            }
+          ],
+          "max_context_length": 262144,
+          "format": "mlx",
+          "capabilities": {
+            "vision": true,
+            "trained_for_tool_use": true
+          },
+          "description": null
+        },
+        {
+          "type": "embedding",
+          "publisher": "nomic-ai",
+          "key": "text-embedding-nomic-embed-text-v1.5",
+          "display_name": "Nomic Embed Text v1.5",
+          "quantization": {
+            "name": "Q4_K_M",
+            "bits_per_weight": 4
+          },
+          "size_bytes": 84106624,
+          "params_string": null,
+          "loaded_instances": [],
+          "max_context_length": 2048,
+          "format": "gguf"
+        }
+      ]
+    }
+  },
+  "resource_summary": {
+    "checks": 34,
+    "min_available_gib": 18.41,
+    "max_observed_cpu_percent": 15.2,
+    "max_observed_load_1m": 3.90087890625,
+    "thermal_warnings_observed": false,
+    "exact_temperature_available": false
+  },
+  "notes": [
+    "8/16件由同四张裁片重复，不能当独立样本",
+    "SDK思考关闭；REST探针只生成最多1个token，不比较文字结果",
+    "时间为单次端到端请求，不含3秒轮间休息",
+    "API usage.prompt_tokens 未含完整视觉展开，应与引擎日志区分",
+    "错误准备请求未触发推理，记录保留在outputs，不计入成功案例"
+  ],
+  "cases": [
+    {
+      "id": "single-1",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/crop-1.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "73474c2a0732d24015396d3c7138f64b402b5a8062c1dcfed79e10df1ba0906f"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 3.571,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 30,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 289,
+      "engine_log_evidence": {
+        "line": 80,
+        "text": "[2026-10-17 16:58:01][DEBUG][mlx-engine] Stop string '<|im_end|>' not found in final text segment, even though a full stop was detected. Not trimming final segment.[coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=289 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "single-2",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/crop-2.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "5bbb9794d5574d621f6190270b7029a25cb269b7ac5735e138b9a3132e04326e"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 3.112,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 30,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 289,
+      "engine_log_evidence": {
+        "line": 96,
+        "text": "[2026-10-17 16:58:08][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=289 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "single-3",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/crop-3.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "185834aacbe9b1c3290bbf87eb55025d6ac1258c49f3216a77a9493afcca1f21"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV385\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 3.12,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 30,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 289,
+      "engine_log_evidence": {
+        "line": 111,
+        "text": "[2026-10-17 16:58:14][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=289 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "single-4",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/crop-4.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "6aada6937c17d5404a78b863494f8e0ac65e37b70474368bc1f72ae778aaaacf"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 3.123,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 30,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 289,
+      "engine_log_evidence": {
+        "line": 126,
+        "text": "[2026-10-17 16:58:21][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=289 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "original-four",
+      "input_images": [
+        {
+          "path": "fixtures/inspection/four-components.png",
+          "size": [
+            1536,
+            1024
+          ],
+          "sha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\n        \"SV385\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    }\n  ]\n}\n```",
+      "elapsed_seconds": 16.803,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 1656,
+      "engine_log_evidence": {
+        "line": 141,
+        "text": "[2026-10-17 16:58:28][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=1656 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "separate-four",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/crop-1.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "73474c2a0732d24015396d3c7138f64b402b5a8062c1dcfed79e10df1ba0906f"
+        },
+        {
+          "path": "outputs/vision-batching-20261017/crop-2.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "5bbb9794d5574d621f6190270b7029a25cb269b7ac5735e138b9a3132e04326e"
+        },
+        {
+          "path": "outputs/vision-batching-20261017/crop-3.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "185834aacbe9b1c3290bbf87eb55025d6ac1258c49f3216a77a9493afcca1f21"
+        },
+        {
+          "path": "outputs/vision-batching-20261017/crop-4.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "6aada6937c17d5404a78b863494f8e0ac65e37b70474368bc1f72ae778aaaacf"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":2,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":3,\"lines\":[\"SV385\",\"A26\",\"0147\"]},{\"id\":4,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 8.083,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 155,
+        "completion_tokens": 93,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 826,
+      "engine_log_evidence": {
+        "line": 180,
+        "text": "[2026-10-17 16:58:49][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=826 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "grid-4",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-4.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":2,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":3,\"lines\":[\"SV385\",\"A26\",\"0147\"]},{\"id\":4,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 9.357,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 93,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 1020,
+      "engine_log_evidence": {
+        "line": 197,
+        "text": "[2026-10-17 16:59:00][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=1020 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "grid-8",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-8.png",
+          "size": [
+            1920,
+            960
+          ],
+          "sha256": "1e6247cf7b927863b086ca47526b25a65b1840cb8865821981bd215f2622a885"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的8个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\"SV358\", \"A26\", \"0147\"]\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\"SV358\", \"A26\", \"0147\"]\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\"SV385\", \"A26\", \"0147\"]\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\"SV358\", \"A26\", \"0147\"]\n    },\n    {\n      \"id\": 5,\n      \"lines\": [\"SV358\", \"A26\", \"0147\"]\n    },\n    {\n      \"id\": 6,\n      \"lines\": [\"SV358\", \"A26\", \"0147\"]\n    },\n    {\n      \"id\": 7,\n      \"lines\": [\"SV385\", \"A26\", \"0147\"]\n    },\n    {\n      \"id\": 8,\n      \"lines\": [\"SV358\", \"A26\", \"0147\"]\n    }\n  ]\n}\n```",
+      "elapsed_seconds": 21.646,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 8,
+        "exact_components": 8,
+        "total": 8,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 5,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 6,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 7,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 8,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 306,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 1920,
+      "engine_log_evidence": {
+        "line": 213,
+        "text": "[2026-10-17 16:59:14][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=1920 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "grid-16",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-16.png",
+          "size": [
+            1920,
+            1920
+          ],
+          "sha256": "2b9da359fb7e184ed2456e9886d5f48c289e6e437bbea0b2d2af45b9b698bdaa"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的16个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":2,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":3,\"lines\":[\"SV385\",\"A26\",\"0147\"]},{\"id\":4,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":5,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":6,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":7,\"lines\":[\"SV385\",\"A26\",\"0147\"]},{\"id\":8,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":9,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":10,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":11,\"lines\":[\"SV385\",\"A26\",\"0147\"]},{\"id\":12,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":13,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":14,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":15,\"lines\":[\"SV385\",\"A26\",\"0147\"]},{\"id\":16,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 35.597,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 16,
+        "exact_components": 16,
+        "total": 16,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 5,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 6,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 7,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 8,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 9,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 10,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 11,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 12,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 13,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 14,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 15,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 16,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 352,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 3721,
+      "engine_log_evidence": {
+        "line": 228,
+        "text": "[2026-10-17 16:59:39][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=3721 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "grid-4-512",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-4-512.png",
+          "size": [
+            512,
+            512
+          ],
+          "sha256": "39eeb4f23c67965e8679e0b7fead2fc53688aa6445dd774542d9d46d60e2f97c"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":2,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":3,\"lines\":[\"SV385\",\"A26\",\"0147\"]},{\"id\":4,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 5.467,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 93,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 376,
+      "engine_log_evidence": {
+        "line": 244,
+        "text": "[2026-10-17 17:00:18][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=376 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "probe-960",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-4.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241"
+        }
+      ],
+      "prompt": "只回答一个汉字：好。不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": null,
+      "finish_reason": "stop",
+      "text": "好",
+      "elapsed_seconds": 5.602,
+      "api_reported_usage": {
+        "prompt_tokens": 25,
+        "completion_tokens": 2,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 923,
+      "engine_log_evidence": {
+        "line": 259,
+        "text": "[2026-10-17 17:00:33][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=923 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "probe-3072",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-4-3072.png",
+          "size": [
+            3072,
+            3072
+          ],
+          "sha256": "268aa2f846e66250f2c748d9245c3869b2488285132ac5b392b49e0a78e4f9fd"
+        }
+      ],
+      "prompt": "只回答一个汉字：好。不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": null,
+      "finish_reason": "stop",
+      "text": "好",
+      "elapsed_seconds": 27.687,
+      "api_reported_usage": {
+        "prompt_tokens": 25,
+        "completion_tokens": 2,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 4119,
+      "engine_log_evidence": {
+        "line": 274,
+        "text": "[2026-10-17 17:00:42][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=4119 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "rest-probe-960",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-4.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241"
+        }
+      ],
+      "prompt": "只回答一个汉字：好。不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": "REST 默认，未声明成功关闭；仅测预处理",
+      "expected": null,
+      "finish_reason": "length",
+      "text": "",
+      "elapsed_seconds": 5.914,
+      "api_reported_usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 0,
+        "total_tokens": 65,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "engine_expanded_prompt_tokens": 963,
+      "engine_log_evidence": {
+        "line": 303,
+        "text": "[2026-10-17 17:01:13][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=963 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "rest-probe-3072",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-4-3072.png",
+          "size": [
+            3072,
+            3072
+          ],
+          "sha256": "268aa2f846e66250f2c748d9245c3869b2488285132ac5b392b49e0a78e4f9fd"
+        }
+      ],
+      "prompt": "只回答一个汉字：好。不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": "REST 默认，未声明成功关闭；仅测预处理",
+      "expected": null,
+      "finish_reason": "length",
+      "text": "",
+      "elapsed_seconds": 24.165,
+      "api_reported_usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 0,
+        "total_tokens": 65,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "engine_expanded_prompt_tokens": 4159,
+      "engine_log_evidence": {
+        "line": 363,
+        "text": "[2026-10-17 17:01:24][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=4159 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "reference-and-grid-four",
+      "input_images": [
+        {
+          "path": "fixtures/inspection/reference.png",
+          "size": [
+            1536,
+            1024
+          ],
+          "sha256": "ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97"
+        },
+        {
+          "path": "outputs/vision-batching-20261017/grid-4.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241"
+        }
+      ],
+      "prompt": "第一张是正品参考照片，第二张是4个待检元件的编号拼图。请抄录每个待检元件的全部三行丝印，并逐个与参考图比对，只有文字完全一致才PASS，存在明确文字差异为FAIL，看不清为UNCERTAIN。不要把参考文字抄成待检文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"],\"verdict\":\"PASS或FAIL或UNCERTAIN\"}]}。按拼图外的#编号，不把编号当成丝印。忽略拍摄角度和光照差异，本轮只测试文字比对。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"],\"verdict\":\"PASS\"},{\"id\":2,\"lines\":[\"SV358\",\"A26\",\"0147\"],\"verdict\":\"PASS\"},{\"id\":3,\"lines\":[\"SV385\",\"A26\",\"0147\"],\"verdict\":\"FAIL\"},{\"id\":4,\"lines\":[\"SV358\",\"A26\",\"0147\"],\"verdict\":\"PASS\"}]}\n```",
+      "elapsed_seconds": 19.45,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "verdict": "FAIL"
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          }
+        ],
+        "verdicts_exact": true
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 155,
+        "completion_tokens": 110,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 2588,
+      "engine_log_evidence": {
+        "line": 419,
+        "text": "[2026-10-17 17:01:51][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=2588 lifetime_efficiency=0.00%"
+      }
+    },
+    {
+      "id": "grid-16-wide",
+      "input_images": [
+        {
+          "path": "outputs/vision-batching-20261017/grid-16-wide.png",
+          "size": [
+            7680,
+            480
+          ],
+          "sha256": "ac192f0cc1dd78098338a54e531d7ac6c6fe586fd018c9881146319d1a21a95f"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的16个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "model": "hr-qwen",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "finish_reason": "stop",
+      "text": "```json\n{\"items\":[{\"id\":1,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":2,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":3,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":4,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":5,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":6,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":7,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":8,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":9,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":10,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":11,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":12,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":13,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":14,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":15,\"lines\":[\"SV358\",\"A26\",\"0147\"]},{\"id\":16,\"lines\":[\"SV358\",\"A26\",\"0147\"]}]}\n```",
+      "elapsed_seconds": 13.39,
+      "score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 16,
+        "exact_components": 12,
+        "total": 16,
+        "all_exact": false,
+        "text_difference_ids_exact": false,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 5,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 6,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 7,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 8,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 9,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 10,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 11,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 12,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 13,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 14,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 15,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 16,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_reported_usage": {
+        "prompt_tokens": 123,
+        "completion_tokens": 352,
+        "reasoning_tokens": 0
+      },
+      "engine_expanded_prompt_tokens": 377,
+      "engine_log_evidence": {
+        "line": 434,
+        "text": "[2026-10-17 17:02:34][DEBUG][coordinator][INFO]: Prompt cache restore: cached_tokens=0 uncached_tokens=377 lifetime_efficiency=0.00%"
+      }
+    }
+  ]
+}

@@ -1,0 +1,2200 @@
+{
+  "date": "2026-10-17",
+  "scope": "初步选型、CPU OCR 与传统定位基线；不是生产验收",
+  "unique_vlm_test_components": 4,
+  "synthetic": true,
+  "repeats_per_setting": 1,
+  "environment": {
+    "hardware": "Apple M2 Ultra",
+    "memory_bytes": 68719476736,
+    "os": "macOS 15.7.4",
+    "lmstudio_version": "0.4.12+1",
+    "model": "mlx-community/Qwen3.5-4B-4bit",
+    "model_download_revision_from_existing_manifest": "0e7ffd5c629ef7719d4cbc04069232580bfa9d9c",
+    "model_files_size_bytes": 3061129077,
+    "model_files_size_is_not_peak_ram": true,
+    "context_length": 8192,
+    "parallel": 1,
+    "model_unloaded_after_test": true,
+    "original_hr_qwen_left_idle": true,
+    "template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+    "preprocessor_config": {
+      "size": {
+        "longest_edge": 16777216,
+        "shortest_edge": 65536
+      },
+      "patch_size": 16,
+      "temporal_patch_size": 2,
+      "merge_size": 2,
+      "image_mean": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "image_std": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "processor_class": "Qwen3VLProcessor",
+      "image_processor_type": "Qwen2VLImageProcessorFast"
+    },
+    "processor_config": {
+      "image_processor": {
+        "data_format": "channels_first",
+        "do_convert_rgb": true,
+        "do_normalize": true,
+        "do_rescale": true,
+        "do_resize": true,
+        "image_mean": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "image_processor_type": "Qwen2VLImageProcessorFast",
+        "image_std": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "merge_size": 2,
+        "patch_size": 16,
+        "resample": 3,
+        "rescale_factor": 0.00392156862745098,
+        "size": {
+          "longest_edge": 16777216,
+          "shortest_edge": 65536
+        },
+        "temporal_patch_size": 2
+      },
+      "processor_class": "Qwen3VLProcessor",
+      "video_processor": {
+        "data_format": "channels_first",
+        "default_to_square": true,
+        "do_convert_rgb": true,
+        "do_normalize": true,
+        "do_rescale": true,
+        "do_resize": true,
+        "do_sample_frames": true,
+        "fps": 2,
+        "image_mean": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "image_std": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "max_frames": 768,
+        "merge_size": 2,
+        "min_frames": 4,
+        "patch_size": 16,
+        "resample": 3,
+        "rescale_factor": 0.00392156862745098,
+        "return_metadata": false,
+        "size": {
+          "longest_edge": 25165824,
+          "shortest_edge": 4096
+        },
+        "temporal_patch_size": 2,
+        "video_processor_type": "Qwen3VLVideoProcessor"
+      }
+    }
+  },
+  "vlm_comparison": [
+    {
+      "id": "single-1",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-1.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "73474c2a0732d24015396d3c7138f64b402b5a8062c1dcfed79e10df1ba0906f"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n{\n    \"items\": [\n        {\n            \"id\": 1,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        }\n    ]\n}\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 2.574,
+      "original_run_score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 64,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 3.571,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 1,
+          "exact_components": 1,
+          "total": 1,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            }
+          ]
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true
+    },
+    {
+      "id": "single-2",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-2.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "5bbb9794d5574d621f6190270b7029a25cb269b7ac5735e138b9a3132e04326e"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n{\n    \"items\": [\n        {\n            \"id\": 1,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        }\n    ]\n}\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 1.017,
+      "original_run_score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 64,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 3.112,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 1,
+          "exact_components": 1,
+          "total": 1,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            }
+          ]
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true
+    },
+    {
+      "id": "single-3",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-3.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "185834aacbe9b1c3290bbf87eb55025d6ac1258c49f3216a77a9493afcca1f21"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n{\n    \"items\": [\n        {\n            \"id\": 1,\n            \"lines\": [\n                \"SV385\",\n                \"A26\",\n                \"0147\"\n            ]\n        }\n    ]\n}\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 1.046,
+      "original_run_score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 64,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 3.12,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 1,
+          "exact_components": 1,
+          "total": 1,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV385",
+                "A26",
+                "0147"
+              ]
+            }
+          ]
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true
+    },
+    {
+      "id": "single-4",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-4.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "6aada6937c17d5404a78b863494f8e0ac65e37b70474368bc1f72ae778aaaacf"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的1个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n{\n    \"items\": [\n        {\n            \"id\": 1,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        }\n    ]\n}\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 1.024,
+      "original_run_score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 64,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 3.123,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 1,
+          "exact_components": 1,
+          "total": 1,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            }
+          ]
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true
+    },
+    {
+      "id": "original-four",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "fixtures/inspection/four-components.png",
+          "size": [
+            1536,
+            1024
+          ],
+          "sha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\n        \"SV385\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    }\n  ]\n}\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 4.235,
+      "original_run_score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 16.803,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 4,
+          "exact_components": 4,
+          "total": 4,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 2,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 3,
+              "lines": [
+                "SV385",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 4,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            }
+          ]
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true
+    },
+    {
+      "id": "separate-four",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-1.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "73474c2a0732d24015396d3c7138f64b402b5a8062c1dcfed79e10df1ba0906f"
+        },
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-2.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "5bbb9794d5574d621f6190270b7029a25cb269b7ac5735e138b9a3132e04326e"
+        },
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-3.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "185834aacbe9b1c3290bbf87eb55025d6ac1258c49f3216a77a9493afcca1f21"
+        },
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/crop-4.png",
+          "size": [
+            430,
+            430
+          ],
+          "sha256": "6aada6937c17d5404a78b863494f8e0ac65e37b70474368bc1f72ae778aaaacf"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n[\n  {\n    \"id\": 1,\n    \"lines\": [\n      \"SV358\",\n      \"A26\",\n      \"0147\"\n    ]\n  },\n  {\n    \"id\": 2,\n    \"lines\": [\n      \"SV358\",\n      \"A26\",\n      \"0147\"\n    ]\n  },\n  {\n    \"id\": 3,\n    \"lines\": [\n      \"SV385\",\n      \"A26\",\n      \"0147\"\n    ]\n  },\n  {\n    \"id\": 4,\n    \"lines\": [\n      \"SV358\",\n      \"A26\",\n      \"0147\"\n    ]\n  }\n]\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 2.637,
+      "original_run_score": {
+        "json_valid": false,
+        "error": "list indices must be integers or slices, not str"
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": false,
+        "error": "期望带 items 数组的 JSON 对象"
+      },
+      "api_usage": {
+        "prompt_tokens": 155,
+        "completion_tokens": 193,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 8.083,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 4,
+          "exact_components": 4,
+          "total": 4,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 2,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 3,
+              "lines": [
+                "SV385",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 4,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            }
+          ]
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true,
+      "offline_text_inspection_only": {
+        "exact_components": 4,
+        "total": 4,
+        "note": "只为区分读字能力与输出契约；未包装成一次成功的严格响应"
+      }
+    },
+    {
+      "id": "grid-4",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/grid-4.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\n        \"SV385\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    }\n  ]\n}\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 2.963,
+      "original_run_score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "api_usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 9.357,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 4,
+          "exact_components": 4,
+          "total": 4,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 2,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 3,
+              "lines": [
+                "SV385",
+                "A26",
+                "0147"
+              ]
+            },
+            {
+              "id": 4,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ]
+            }
+          ]
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true
+    },
+    {
+      "id": "reference-and-grid-four",
+      "model": "sv-research-qwen4b",
+      "input_images": [
+        {
+          "path": "fixtures/inspection/reference.png",
+          "size": [
+            1536,
+            1024
+          ],
+          "sha256": "ccfe295230463618ac5c8c73a6e248057dd47e680d2807b095bfb2d716321b97"
+        },
+        {
+          "path": "outputs/model-selection-20261017/qwen4b/grid-4.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241"
+        }
+      ],
+      "prompt": "第一张是正品参考照片，第二张是4个待检元件的编号拼图。请抄录每个待检元件的全部三行丝印，并逐个与参考图比对，只有文字完全一致才PASS，存在明确文字差异为FAIL，看不清为UNCERTAIN。不要把参考文字抄成待检文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"],\"verdict\":\"PASS或FAIL或UNCERTAIN\"}]}。按拼图外的#编号，不把编号当成丝印。忽略拍摄角度和光照差异，本轮只测试文字比对。",
+      "temperature": 0,
+      "enable_thinking": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ],\n      \"verdict\": \"PASS\"\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ],\n      \"verdict\": \"PASS\"\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\n        \"SV385\",\n        \"A26\",\n        \"0147\"\n      ],\n      \"verdict\": \"FAIL\"\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ],\n      \"verdict\": \"PASS\"\n    }\n  ]\n}\n```",
+      "finish_reason": "stop",
+      "elapsed_seconds": 5.361,
+      "original_run_score": {
+        "json_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "verdict": "FAIL"
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          }
+        ],
+        "verdicts_exact": true
+      },
+      "validated_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "verdict": "FAIL"
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          }
+        ]
+      },
+      "api_usage": {
+        "prompt_tokens": 155,
+        "completion_tokens": 238,
+        "reasoning_tokens": 0
+      },
+      "baseline_27b": {
+        "elapsed_seconds": 19.45,
+        "score": {
+          "json_valid": true,
+          "ids_exact": true,
+          "count": 4,
+          "exact_components": 4,
+          "total": 4,
+          "all_exact": true,
+          "text_difference_ids_exact": true,
+          "items": [
+            {
+              "id": 1,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ],
+              "verdict": "PASS"
+            },
+            {
+              "id": 2,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ],
+              "verdict": "PASS"
+            },
+            {
+              "id": 3,
+              "lines": [
+                "SV385",
+                "A26",
+                "0147"
+              ],
+              "verdict": "FAIL"
+            },
+            {
+              "id": 4,
+              "lines": [
+                "SV358",
+                "A26",
+                "0147"
+              ],
+              "verdict": "PASS"
+            }
+          ],
+          "verdicts_exact": true
+        }
+      },
+      "identical_prompt_and_image_bytes_to_27b": true,
+      "verdicts_exact": true
+    }
+  ],
+  "cpu_ocr": {
+    "model": "PP-OCRv6_small_det + PP-OCRv6_small_rec",
+    "cpu_threads": 2,
+    "device": "cpu",
+    "load_seconds": 3.6816,
+    "input_rotation": "保留人工裁片原始角度，与 VLM 单件输入一致",
+    "cases": [
+      {
+        "id": 1,
+        "image": "outputs/model-selection-20261017/qwen4b/crop-1.png",
+        "sha256": "73474c2a0732d24015396d3c7138f64b402b5a8062c1dcfed79e10df1ba0906f",
+        "expected": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "observed": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "exact": true,
+        "elapsed_seconds": 0.2501,
+        "records": [
+          {
+            "text": "SV358",
+            "score": 0.9999734163284302,
+            "polygon": [
+              [
+                134,
+                157
+              ],
+              [
+                284,
+                120
+              ],
+              [
+                297,
+                173
+              ],
+              [
+                147,
+                210
+              ]
+            ]
+          },
+          {
+            "text": "A26",
+            "score": 0.9999836087226868,
+            "polygon": [
+              [
+                185,
+                199
+              ],
+              [
+                277,
+                174
+              ],
+              [
+                290,
+                224
+              ],
+              [
+                198,
+                249
+              ]
+            ]
+          },
+          {
+            "text": "0147",
+            "score": 0.9996525645256042,
+            "polygon": [
+              [
+                181,
+                248
+              ],
+              [
+                293,
+                219
+              ],
+              [
+                305,
+                268
+              ],
+              [
+                194,
+                297
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "image": "outputs/model-selection-20261017/qwen4b/crop-2.png",
+        "sha256": "5bbb9794d5574d621f6190270b7029a25cb269b7ac5735e138b9a3132e04326e",
+        "expected": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "observed": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "exact": true,
+        "elapsed_seconds": 0.2126,
+        "records": [
+          {
+            "text": "SV358",
+            "score": 0.9999550580978394,
+            "polygon": [
+              [
+                160,
+                122
+              ],
+              [
+                307,
+                167
+              ],
+              [
+                291,
+                218
+              ],
+              [
+                145,
+                173
+              ]
+            ]
+          },
+          {
+            "text": "A26",
+            "score": 0.9999940395355225,
+            "polygon": [
+              [
+                185,
+                182
+              ],
+              [
+                271,
+                209
+              ],
+              [
+                255,
+                258
+              ],
+              [
+                170,
+                231
+              ]
+            ]
+          },
+          {
+            "text": "0147",
+            "score": 0.9998836517333984,
+            "polygon": [
+              [
+                158,
+                222
+              ],
+              [
+                264,
+                255
+              ],
+              [
+                248,
+                306
+              ],
+              [
+                142,
+                273
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "image": "outputs/model-selection-20261017/qwen4b/crop-3.png",
+        "sha256": "185834aacbe9b1c3290bbf87eb55025d6ac1258c49f3216a77a9493afcca1f21",
+        "expected": [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        "observed": [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        "exact": true,
+        "elapsed_seconds": 0.2128,
+        "records": [
+          {
+            "text": "SV385",
+            "score": 0.9999756813049316,
+            "polygon": [
+              [
+                140,
+                143
+              ],
+              [
+                298,
+                143
+              ],
+              [
+                298,
+                197
+              ],
+              [
+                140,
+                197
+              ]
+            ]
+          },
+          {
+            "text": "A26",
+            "score": 0.9999859929084778,
+            "polygon": [
+              [
+                181,
+                194
+              ],
+              [
+                274,
+                194
+              ],
+              [
+                274,
+                245
+              ],
+              [
+                181,
+                245
+              ]
+            ]
+          },
+          {
+            "text": "0147",
+            "score": 0.9998452663421631,
+            "polygon": [
+              [
+                165,
+                242
+              ],
+              [
+                278,
+                242
+              ],
+              [
+                278,
+                291
+              ],
+              [
+                165,
+                291
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "image": "outputs/model-selection-20261017/qwen4b/crop-4.png",
+        "sha256": "6aada6937c17d5404a78b863494f8e0ac65e37b70474368bc1f72ae778aaaacf",
+        "expected": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "observed": [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        "exact": true,
+        "elapsed_seconds": 0.2089,
+        "records": [
+          {
+            "text": "SV358",
+            "score": 0.9999582171440125,
+            "polygon": [
+              [
+                189,
+                127
+              ],
+              [
+                323,
+                201
+              ],
+              [
+                296,
+                250
+              ],
+              [
+                162,
+                175
+              ]
+            ]
+          },
+          {
+            "text": "A26",
+            "score": 0.9999873638153076,
+            "polygon": [
+              [
+                198,
+                191
+              ],
+              [
+                280,
+                237
+              ],
+              [
+                255,
+                280
+              ],
+              [
+                173,
+                234
+              ]
+            ]
+          },
+          {
+            "text": "0147",
+            "score": 0.9997149705886841,
+            "polygon": [
+              [
+                164,
+                224
+              ],
+              [
+                261,
+                278
+              ],
+              [
+                236,
+                322
+              ],
+              [
+                139,
+                267
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "packages": {
+      "paddleocr": "3.7.0",
+      "paddlepaddle": "3.3.1",
+      "paddlex": "3.7.2",
+      "opencv-contrib-python": "4.10.0.84",
+      "Pillow": "12.3.0"
+    },
+    "local_model_files": [
+      {
+        "model": "PP-OCRv6_small_det",
+        "file": "configuration.json",
+        "bytes": 71,
+        "sha256": "2e1c5a9e1cdae7ee2a28ac27d4e25172029cfa661cbeb4418f6be9998ef02f79"
+      },
+      {
+        "model": "PP-OCRv6_small_det",
+        "file": "inference.json",
+        "bytes": 229307,
+        "sha256": "89240f689a4a77aad75ef55a8df0a15c8e1d4980a327d17e58f24bbadde5aeab"
+      },
+      {
+        "model": "PP-OCRv6_small_det",
+        "file": "inference.pdiparams",
+        "bytes": 9817888,
+        "sha256": "5043d4ccc8d63402ccea8feefcee4db57077431a873e78d2191836a178a492da"
+      },
+      {
+        "model": "PP-OCRv6_small_det",
+        "file": "inference.yml",
+        "bytes": 885,
+        "sha256": "193f435274bf9f0b5f71a929bbfbcf148282df7e633b34e7c373e8f44741b516"
+      },
+      {
+        "model": "PP-OCRv6_small_rec",
+        "file": "inference.json",
+        "bytes": 208004,
+        "sha256": "f0bf53c853937a917affdd74467472167727f8ab0f0f7bded01c4a16c27e46e6"
+      },
+      {
+        "model": "PP-OCRv6_small_rec",
+        "file": "inference.pdiparams",
+        "bytes": 21074618,
+        "sha256": "406e1e689c9a7fbb04178007a3fe10cf852afe7bf8bb3bc6dbb9d532b13bd907"
+      },
+      {
+        "model": "PP-OCRv6_small_rec",
+        "file": "inference.yml",
+        "bytes": 150579,
+        "sha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1"
+      }
+    ]
+  },
+  "geometry": {
+    "scope": "现有传统轮廓定位的正反例，不是模型检测准确率",
+    "opencv": "4.14.0",
+    "source_code": "agent-tools/image-focus/src/smartverifier_focus/inspection/vision.py",
+    "source_sha256": "bca46b7911d003c9b04950d042d313c69040b3e79cc18dd0c77a73118a7422fa",
+    "cpu_threads": 2,
+    "cases": [
+      {
+        "id": "reference",
+        "expected_components": 1,
+        "returned_regions": 1,
+        "count_matches": true,
+        "flags": [],
+        "crops": [
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/reference-1.png",
+            "region": {
+              "center": [
+                772.0,
+                542.5
+              ],
+              "size": [
+                514.0,
+                513.0
+              ],
+              "angle": 0.0,
+              "box": [
+                [
+                  515.0,
+                  799.0
+                ],
+                [
+                  515.0,
+                  286.0
+                ],
+                [
+                  1029.0,
+                  286.0
+                ],
+                [
+                  1029.0,
+                  799.0
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 328.44,
+              "source_body_size": [
+                514,
+                513
+              ],
+              "rotation_ccw_degrees": 0.0,
+              "crop_size": [
+                842,
+                841
+              ],
+              "padding_pixels": 164.16
+            }
+          }
+        ],
+        "elapsed_seconds": 0.094,
+        "input": "outputs/model-selection-20261017/preprocessing/reference-input.png",
+        "input_sha256": "79e177b687105bd7ae07ffe21a3b44191b00d2d86697881e293315cdc33c3b6d",
+        "note": "原有合成照片"
+      },
+      {
+        "id": "mismatch",
+        "expected_components": 1,
+        "returned_regions": 1,
+        "count_matches": true,
+        "flags": [],
+        "crops": [
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/mismatch-1.png",
+            "region": {
+              "center": [
+                778.6890869140625,
+                522.8626708984375
+              ],
+              "size": [
+                493.96746826171875,
+                499.6009216308594
+              ],
+              "angle": -13.223068237304688,
+              "box": [
+                [
+                  595.3900146484375,
+                  822.5399780273438
+                ],
+                [
+                  481.1099853515625,
+                  336.17999267578125
+                ],
+                [
+                  961.97998046875,
+                  223.19000244140625
+                ],
+                [
+                  1076.260009765625,
+                  709.5399780273438
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 500.66,
+              "source_body_size": [
+                494,
+                500
+              ],
+              "rotation_ccw_degrees": -13.22,
+              "crop_size": [
+                810,
+                816
+              ],
+              "padding_pixels": 158.07
+            }
+          }
+        ],
+        "elapsed_seconds": 0.087,
+        "input": "outputs/model-selection-20261017/preprocessing/mismatch-input.png",
+        "input_sha256": "d27d58d6c999a95eeee088879e1697fbd1654e4929ade2e9b78da1d3a5fd2dbf",
+        "note": "原有合成照片"
+      },
+      {
+        "id": "four-components",
+        "expected_components": 4,
+        "returned_regions": 4,
+        "count_matches": true,
+        "flags": [],
+        "crops": [
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/four-components-1.png",
+            "region": {
+              "center": [
+                450.00927734375,
+                297.03826904296875
+              ],
+              "size": [
+                296.3848876953125,
+                296.3060607910156
+              ],
+              "angle": -13.671307563781738,
+              "box": [
+                [
+                  341.0299987792969,
+                  476.0199890136719
+                ],
+                [
+                  271.0,
+                  188.11000061035156
+                ],
+                [
+                  558.989990234375,
+                  118.05999755859375
+                ],
+                [
+                  629.02001953125,
+                  405.9700012207031
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 378.54,
+              "source_body_size": [
+                296,
+                296
+              ],
+              "rotation_ccw_degrees": -13.67,
+              "crop_size": [
+                486,
+                486
+              ],
+              "padding_pixels": 94.82
+            }
+          },
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/four-components-2.png",
+            "region": {
+              "center": [
+                1098.7288818359375,
+                312.3583984375
+              ],
+              "size": [
+                297.1999816894531,
+                297.8800048828125
+              ],
+              "angle": 16.260208129882812,
+              "box": [
+                [
+                  914.3699951171875,
+                  413.7300109863281
+                ],
+                [
+                  997.780029296875,
+                  127.7699966430664
+                ],
+                [
+                  1283.0899658203125,
+                  210.97999572753906
+                ],
+                [
+                  1199.6800537109375,
+                  496.95001220703125
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 421.02,
+              "source_body_size": [
+                297,
+                298
+              ],
+              "rotation_ccw_degrees": 16.26,
+              "crop_size": [
+                487,
+                488
+              ],
+              "padding_pixels": 95.1
+            }
+          },
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/four-components-3.png",
+            "region": {
+              "center": [
+                456.354736328125,
+                756.2752685546875
+              ],
+              "size": [
+                302.593994140625,
+                295.9648132324219
+              ],
+              "angle": 0.400665283203125,
+              "box": [
+                [
+                  304.0299987792969,
+                  903.2000122070312
+                ],
+                [
+                  306.1000061035156,
+                  607.239990234375
+                ],
+                [
+                  608.6799926757812,
+                  609.3499755859375
+                ],
+                [
+                  606.6099853515625,
+                  905.3099975585938
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 645.38,
+              "source_body_size": [
+                303,
+                296
+              ],
+              "rotation_ccw_degrees": 0.4,
+              "crop_size": [
+                492,
+                485
+              ],
+              "padding_pixels": 94.71
+            }
+          },
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/four-components-4.png",
+            "region": {
+              "center": [
+                1088.495361328125,
+                750.6085205078125
+              ],
+              "size": [
+                301.5842590332031,
+                324.40948486328125
+              ],
+              "angle": 29.05459976196289,
+              "box": [
+                [
+                  877.9099731445312,
+                  819.1699829101562
+                ],
+                [
+                  1035.449951171875,
+                  535.5800170898438
+                ],
+                [
+                  1299.0799560546875,
+                  682.0499877929688
+                ],
+                [
+                  1141.5400390625,
+                  965.6300048828125
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 496.04,
+              "source_body_size": [
+                302,
+                324
+              ],
+              "rotation_ccw_degrees": 29.05,
+              "crop_size": [
+                495,
+                517
+              ],
+              "padding_pixels": 96.51
+            }
+          }
+        ],
+        "elapsed_seconds": 0.1201,
+        "input": "outputs/model-selection-20261017/preprocessing/four-components-input.png",
+        "input_sha256": "942f062feb273e5ebb62ac6f13c49bda64eca269fc4ccb09f8b7764a9e94551a",
+        "note": "原有合成照片"
+      },
+      {
+        "id": "empty",
+        "expected_components": 0,
+        "returned_regions": 0,
+        "count_matches": true,
+        "flags": [
+          "没有可靠定位到器件，请换纯色背景或重新拍照"
+        ],
+        "crops": [],
+        "elapsed_seconds": 0.0222,
+        "input": "outputs/model-selection-20261017/preprocessing/empty-input.png",
+        "input_sha256": "7698fe5de1f2977362f5d621ba70e67c290cdc7351ab028c36854fd02c4491cd",
+        "note": "空背景"
+      },
+      {
+        "id": "non-component-rectangle",
+        "expected_components": 0,
+        "returned_regions": 1,
+        "count_matches": false,
+        "flags": [],
+        "crops": [
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/non-component-rectangle-1.png",
+            "region": {
+              "center": [
+                750.0,
+                499.99993896484375
+              ],
+              "size": [
+                499.99993896484375,
+                299.99993896484375
+              ],
+              "angle": 0.0,
+              "box": [
+                [
+                  500.0,
+                  650.0
+                ],
+                [
+                  500.0,
+                  350.0
+                ],
+                [
+                  1000.0,
+                  350.0
+                ],
+                [
+                  1000.0,
+                  650.0
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [
+              "文字区域可能模糊，请核对清晰度"
+            ],
+            "transform": {
+              "laplacian_variance": 0.0,
+              "source_body_size": [
+                500,
+                300
+              ],
+              "rotation_ccw_degrees": 0.0,
+              "crop_size": [
+                692,
+                492
+              ],
+              "padding_pixels": 96.0
+            }
+          }
+        ],
+        "elapsed_seconds": 0.0232,
+        "input": "outputs/model-selection-20261017/preprocessing/non-component-rectangle-input.png",
+        "input_sha256": "0cefc080694100b9e5882c55c4c8b8390f31e03b6cd6b2582b3235c27efab2e9",
+        "note": "无元件，只有深色矩形干扰物"
+      },
+      {
+        "id": "eight-repeated",
+        "expected_components": 8,
+        "returned_regions": 4,
+        "count_matches": false,
+        "flags": [
+          "定位到 8 个目标，请每张最多拍四个器件"
+        ],
+        "crops": [
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/eight-repeated-1.png",
+            "region": {
+              "center": [
+                449.6565625,
+                297.825859375
+              ],
+              "size": [
+                296.47552734375,
+                294.92330078125
+              ],
+              "angle": -14.036243438720703,
+              "box": [
+                [
+                  341.6099853515625,
+                  476.8399963378906
+                ],
+                [
+                  270.0799865722656,
+                  190.72000122070312
+                ],
+                [
+                  557.7000122070312,
+                  118.80999755859375
+                ],
+                [
+                  629.22998046875,
+                  404.92999267578125
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 572.5,
+              "source_body_size": [
+                296,
+                295
+              ],
+              "rotation_ccw_degrees": -14.04,
+              "crop_size": [
+                485,
+                484
+              ],
+              "padding_pixels": 94.38
+            }
+          },
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/eight-repeated-2.png",
+            "region": {
+              "center": [
+                1097.0203906250001,
+                314.348671875
+              ],
+              "size": [
+                296.6108984375,
+                292.21537109375
+              ],
+              "angle": 15.945396423339844,
+              "box": [
+                [
+                  914.280029296875,
+                  414.0899963378906
+                ],
+                [
+                  994.5599975585938,
+                  133.1199951171875
+                ],
+                [
+                  1279.760009765625,
+                  214.61000061035156
+                ],
+                [
+                  1199.47998046875,
+                  495.5799865722656
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 493.26,
+              "source_body_size": [
+                297,
+                292
+              ],
+              "rotation_ccw_degrees": 15.95,
+              "crop_size": [
+                484,
+                479
+              ],
+              "padding_pixels": 93.51
+            }
+          },
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/eight-repeated-3.png",
+            "region": {
+              "center": [
+                456.32,
+                756.48
+              ],
+              "size": [
+                303.36,
+                294.40000000000003
+              ],
+              "angle": 0.0,
+              "box": [
+                [
+                  304.6400146484375,
+                  903.6799926757812
+                ],
+                [
+                  304.6400146484375,
+                  609.280029296875
+                ],
+                [
+                  608.0,
+                  609.280029296875
+                ],
+                [
+                  608.0,
+                  903.6799926757812
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 886.67,
+              "source_body_size": [
+                303,
+                294
+              ],
+              "rotation_ccw_degrees": 0.0,
+              "crop_size": [
+                492,
+                483
+              ],
+              "padding_pixels": 94.21
+            }
+          },
+          {
+            "path": "outputs/model-selection-20261017/preprocessing/eight-repeated-4.png",
+            "region": {
+              "center": [
+                1088.2525781250001,
+                750.500390625
+              ],
+              "size": [
+                302.795546875,
+                322.32115234375
+              ],
+              "angle": 29.538780212402344,
+              "box": [
+                [
+                  877.0800170898438,
+                  816.0700073242188
+                ],
+                [
+                  1035.989990234375,
+                  535.6500244140625
+                ],
+                [
+                  1299.4300537109375,
+                  684.9299926757812
+                ],
+                [
+                  1140.52001953125,
+                  965.3499755859375
+                ]
+              ],
+              "flags": []
+            },
+            "warnings": [],
+            "transform": {
+              "laplacian_variance": 698.26,
+              "source_body_size": [
+                303,
+                322
+              ],
+              "rotation_ccw_degrees": 29.54,
+              "crop_size": [
+                497,
+                516
+              ],
+              "padding_pixels": 96.89
+            }
+          }
+        ],
+        "elapsed_seconds": 0.1589,
+        "input": "outputs/model-selection-20261017/preprocessing/eight-repeated-input.png",
+        "input_sha256": "e7dc9c5a0333a13c06c6010ab6cfe0db777e446cfadb3ad5113a1bc4a25f0963",
+        "note": "重复排布验证现有定位代码的数量上限"
+      }
+    ]
+  },
+  "resources": {
+    "checks": 31,
+    "minimum_sampled_available_gib": 16.2,
+    "maximum_sampled_cpu_percent": 21.1,
+    "system_thermal_warning_observed": false,
+    "exact_temperature_available": false,
+    "not_peak_gpu_or_model_memory_measurement": true
+  },
+  "scoring_correction": "原评分器混淆 JSON 语法与结构。保留 original_run_score，并用 validated_score 区分 json_valid 与 schema_valid；原模型文字不改写。"
+}

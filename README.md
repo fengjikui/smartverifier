@@ -1,72 +1,64 @@
-# 观微 · SmartVerifier
+# 鉴微 · 丝印检测系统
 
-面向来料检验的平板工作台：任务草稿与续拍、自动器件定位裁剪、千问双图结构化比对、异常复核、批次汇总，以及 MES 检测项回填适配。另保留图片多轮对话、Agent 图像工具和历史 UI 原型。
+面向工厂来料检验的平板 Web 应用：维护正品图片与说明，拍摄待检元件，自动定位、裁剪、转正后调用 VLM 比对，展示结论、不良数量和可追溯报告。
 
-## 新版平板工作台（当前开发入口）
+当前版本支持正品管理、批量导入、自主检测和模拟 MES 任务。**公司 IDaaS 与 MES 尚未接通**：自主检测结果由检验员手工录入 MES，模拟回填不代表真实保存；整张检验单始终由人员在 MES 最终提交。
 
-新版代码独立位于 `next/`，已接入本机 LM Studio 千问真实双图比对，以及绿色防静电台面的自动定位、裁剪和几何转正。企业身份、任务列表和MES仍为模拟。
+## 快速开始
 
-```sh
-npm run build:next
-npm run start:next:real
-```
-
-[打开平板真实识别试用](http://127.0.0.1:5190/tablet-preview?demo=real) · [试用与部署说明](next/docs/本机真实识别试用与部署.md) · [实验与调研材料](next/research/real-vision/README.md)。需要先在LM Studio加载视觉模型，默认已加载标识为 `hr-qwen`。普通 `npm run start:next` 可离线体验预设流程。
-
-## 旧版平板丝印检验工作台
-
-先在本机开发试用，后续部署到公司电脑。界面面向华为平板，也兼容手机和电脑。常规流程不需要手动选区；自动定位的首轮范围为浅色纯色背景、分离摆放、单张最多四件。
-
-- [产品需求与交互方案](docs/平板丝印检验工作台PRD.md)
-- [MES 接口协作方案：可直接交接口人评审](docs/MES接口协作方案.md)
-- [使用、安装与公司电脑迁移说明](docs/平板工作台使用与部署.md)
-- [交付与验证记录](docs/平板工作台交付与验证.md)
-
-默认 MES 是本地模拟，企业登录和真实任务接口尚待双方联调；只保存丝印检测项，整单最终提交仍由人在 MES 完成。工作台普通启动不填充演示数据，点击“试用合成样例”才会创建测试任务。
-
-业务评审材料：[业务需求评审与实施讨论清单](docs/业务需求评审与实施讨论清单.md)，包含会议优先决策、完整问题清单、验收口径和可填写的会议记录。
-
-## 启动方式与旧版图片对话
-
-`lan/` 默认打开检验工作台；`/?view=chat` 保留按小米 13 Ultra 设计的图片对话，也支持电脑：拍照或选相册 → 整图发送 / 拖动、双指缩放、任意旋转取景 → 确认实际图片 → 提问与连续追问。支持切换已加载的本地模型、历史对话和停止生成。
+需要 Node.js 24.x、Python 3.12，以及可用的 npm / Python 包源。从仓库根目录执行：
 
 ```sh
-npm install
-cd agent-tools/image-focus
-uv sync --extra mcp --extra lmstudio --extra web
-cd ../..
-npm run lan
-```
-
-LM Studio 需开启本地服务并加载视觉模型。启动后在 `outputs/lan-state/connection-qr.png` 查看手机连接二维码，手机和电脑使用同一局域网。连接地址保存在 `outputs/lan-state/connection.json`；浏览器通过二维码配对，之后保持登录。首次启动只显示空白工作区。
-
-详细使用、取景参数和边界见 [局域网使用说明](lan/README.md)，新部署的 4B 与专用 OCR 实测见 [模型部署记录](agent-tools/image-focus/MODEL-DEPLOYMENT.md)。
-
-## 原有外观对比演示范围
-
-- 桌面：参考图、待检图、差异说明同屏。
-- 手机：待检/参考切换，滑动比较，局部放大和拍照文件入口。
-- 点击预设差异定位；切换六个演示器件，包括正常、差异、模糊状态。
-- 新建对比，选择自有图片；自有图片明确显示待分析，不套用演示结果。
-- 人工复核意见在当前会话中保存，可导出 JSON。
-- 正品参考页与手机预览页 `/mobile`。
-
-## 运行原有 UI 演示
-
-```sh
-npm install
-npm run dev
+npm ci
+python3.12 -m venv .venv
+./.venv/bin/python -m pip install -r requirements.txt
 npm run build
+npm start
 ```
 
-## 重要边界
+Windows 使用 `py -3.12 -m venv .venv` 和 `./.venv/Scripts/python.exe -m pip ...`。启动前在 `.env.local` 中设置 `SV_VISION_PYTHON=./.venv/Scripts/python.exe`。没有 VLM 配置时可离线体验明确标注的模拟流程，真实上传不会生成虚假的模型结论。
 
-原有外观对比网页是 UI 原型，尚未连接检测模型。示例照片由 ImageGen 生成，虚构 NOVA 元件与差异用于交互演示；不是正品标样或真实鉴定证据。自有图片通过浏览器 Object URL 本地展示，不传给检测服务。照片及复核状态仅在本次页面会话中保留，刷新后重置。图片上传支持 JPG/PNG/WebP，单张最多 20 MB。
+- 检验工作台：<http://127.0.0.1:5190/inspections/marking>
+- 正品管理：<http://127.0.0.1:5190/inspections/marking/admin/standards>
+- 平板预览：<http://127.0.0.1:5190/inspections/marking/preview/tablet>
+- 模型调试：`/inspections/marking/debug/model`，需配置启用，限服务端本机访问。
 
-后续接模型时应由服务端保存原图、校验裁剪坐标、回传真实图像质量与差异证据。本段只描述历史 UI 演示，自动定位、逐件识别和持久化已经在新的平板工作台实现；企业身份、真实 MES 和 WeLink SDK 仍待接入。
+管理端本机试用账号 `admin` / `admin123`，仅允许服务器本机登录；这不是生产认证方案。局域网管理员使用临时授权配置，见[部署说明](docs/部署说明.md)。
 
-## Agent 图像工具
+## 使用真实 VLM
 
-新增独立的 [image-focus 工具与两轮识别 Agent](agent-tools/image-focus/README.md)，提供从原始分辨率裁剪、旋转、插值放大、整图分块和局部坐标回溯。包含 Python/CLI 接口、返回真实图片的 MCP 服务、本地 LM Studio 全图/自主裁剪识别对照和离线测试。Agent 已验证本地千问的图片识别与真实工具调用，会保存模型原文、裁片和选区供人工核对；自主裁剪 Agent 尚未接入网页；旧版图片对话继续支持人工取景与模型问答，新工作台自动裁剪后进行可见差异比对；均不提供真伪鉴定或校准的假货概率。
+复制 `config/company-trial.env.example` 为根目录 `.env.local`，填写 `SV_VLM_ENDPOINT`、`SV_VLM_MODEL`、认证及 Python 路径，再运行 `npm run start:real`。可连接本机 LM Studio 或公司兼容 HTTP VLM，无需业务电脑安装模型权重。密钥及运行数据不进入 Git。
 
-现场照片放在 `images/`，识别结果放在 `outputs/`；两者与本地虚拟环境均已排除出 Git。仓库只包含代码、文档、依赖锁文件及虚构的网页演示图片。
+首次使用建议：管理员新增并启用一份正品标准 → 检验端按物料及供应商选正品 → 上传照片 → 检测 → 查看结果与不良数。详见[检验员使用说明](docs/检验员使用说明.md)、[正品管理](docs/正品管理.md)和[VLM 配置](docs/VLM配置.md)。
+
+## 仓库结构
+
+```text
+web/           平板检验端、电脑管理端、调试页和共用 UI
+server/        Node HTTP / SQLite 业务服务、OpenCV 工作器、VLM 客户端
+shared/        数据类型、业务规则、接口路径和结果汇总
+config/        可复制的环境配置模板
+scripts/       启动、离线测试、显式烟测和演示工具
+tests/        业务、HTTP、图像处理和传输测试
+fixtures/      虚构生成样片及人工核对真值
+templates/    正品导入模板
+docs/         当前需求、使用、部署、架构和接口说明
+research/      当前版本相关实验脚本、精简结果与汇报材料索引
+var/           本机数据（忽略）
+dist/          前端构建（忽略）
+```
+
+当前代码直接位于根目录，不再分 `next/`、旧聊天程序和早期网页原型。旧实现可通过 Git 历史恢复。默认分支 `main` 是当前版本入口。
+
+## 开发与验证
+
+```sh
+npm run check
+npm run build
+npm test
+npm run test:python
+```
+
+测试使用临时目录，不调用真实模型。`npm run probe:real` 才会显式运行本机 VLM 烟测，请预先配置模型并检查资源。前端开发时，在一个终端运行 `npm start`，另一个终端运行 `npm run dev`；开发页地址由 Vite 输出，默认代理 API 到 5190，非默认端口可通过 `SV_DEV_API_TARGET` 指定。
+
+完整资料从[文档索引](docs/README.md)开始。性能与准确度以现场实拍验收为准，生成样片不能代表真实业务准确率。

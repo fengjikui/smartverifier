@@ -1,0 +1,782 @@
+{
+  "date": "2026-10-17",
+  "experiment_id": "EXP-005",
+  "purpose": "照片质量、编码大小和画幅的受控对照；不等于华为平板实拍",
+  "synthetic": true,
+  "camera_capture_test": false,
+  "model": "mlx-community/Qwen3.5-4B-4bit",
+  "context_length": 8192,
+  "parallel": 1,
+  "temperature": 0,
+  "thinking_enabled": false,
+  "unique_components": 4,
+  "repeats_per_condition": 1,
+  "jpeg_path_note": "候选JPEG先解码成无损PNG，再用既有SDK传输；模型测试视觉退化，候选JPEG字节只用于体积比较。未测JPEG直接网络传输。",
+  "manifest": {
+    "synthetic": true,
+    "source": "outputs/model-selection-20261017/qwen4b/grid-4.png",
+    "source_sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241",
+    "camera_capture_test": false,
+    "model": "sv-quality-qwen4b",
+    "variants": [
+      {
+        "id": "clear-png",
+        "size": [
+          960,
+          960
+        ],
+        "description": "原四件紧凑白板",
+        "candidate_file": "outputs/capture-quality-20261017/clear-png.png",
+        "candidate_bytes": 1196355,
+        "candidate_sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241",
+        "sdk_input": "outputs/capture-quality-20261017/clear-png-sdk.png",
+        "sdk_input_bytes": 1196355,
+        "jpeg_redecoded_to_png_for_sdk": false
+      },
+      {
+        "id": "jpeg-85",
+        "size": [
+          960,
+          960
+        ],
+        "description": "同像素JPEG，quality=85，subsampling=0",
+        "candidate_file": "outputs/capture-quality-20261017/jpeg-85.jpg",
+        "candidate_bytes": 168809,
+        "candidate_sha256": "bb7d5ef01289f0f0c2f3dad9c471d12baf3d42075702b45767c28f44fec5aefa",
+        "sdk_input": "outputs/capture-quality-20261017/jpeg-85-sdk.png",
+        "sdk_input_bytes": 829347,
+        "jpeg_redecoded_to_png_for_sdk": true
+      },
+      {
+        "id": "jpeg-60",
+        "size": [
+          960,
+          960
+        ],
+        "description": "同像素JPEG，quality=60，subsampling=0",
+        "candidate_file": "outputs/capture-quality-20261017/jpeg-60.jpg",
+        "candidate_bytes": 102279,
+        "candidate_sha256": "6eda3ac7b9cdf7a47ac1e35b00eaa85031bf81da6fec72a92302310388c78cf9",
+        "sdk_input": "outputs/capture-quality-20261017/jpeg-60-sdk.png",
+        "sdk_input_bytes": 688674,
+        "jpeg_redecoded_to_png_for_sdk": true
+      },
+      {
+        "id": "blur-1.2-jpeg85",
+        "size": [
+          960,
+          960
+        ],
+        "description": "高斯半径1.2，再JPEG85",
+        "candidate_file": "outputs/capture-quality-20261017/blur-1.2-jpeg85.jpg",
+        "candidate_bytes": 116180,
+        "candidate_sha256": "a798d43e5c2799997178a2ecbc05aad8ddd4724211a76a8c2b319c440c239478",
+        "sdk_input": "outputs/capture-quality-20261017/blur-1.2-jpeg85-sdk.png",
+        "sdk_input_bytes": 590519,
+        "jpeg_redecoded_to_png_for_sdk": true
+      },
+      {
+        "id": "blur-3-jpeg85",
+        "size": [
+          960,
+          960
+        ],
+        "description": "高斯半径3，再JPEG85",
+        "candidate_file": "outputs/capture-quality-20261017/blur-3-jpeg85.jpg",
+        "candidate_bytes": 80256,
+        "candidate_sha256": "b6763e8bcc00f6664889590041164462cb6d793f11f72ed46ccacb1d2b2c1934",
+        "sdk_input": "outputs/capture-quality-20261017/blur-3-jpeg85-sdk.png",
+        "sdk_input_bytes": 380717,
+        "jpeg_redecoded_to_png_for_sdk": true
+      },
+      {
+        "id": "resize-320-jpeg85",
+        "size": [
+          320,
+          320
+        ],
+        "description": "先Lanczos缩至320，再JPEG85",
+        "candidate_file": "outputs/capture-quality-20261017/resize-320-jpeg85.jpg",
+        "candidate_bytes": 25882,
+        "candidate_sha256": "647441cf994a0f2ed4c6bdc6070a5449fbcff1a1984969ba037f9b2c8c046075",
+        "sdk_input": "outputs/capture-quality-20261017/resize-320-jpeg85-sdk.png",
+        "sdk_input_bytes": 114754,
+        "jpeg_redecoded_to_png_for_sdk": true
+      },
+      {
+        "id": "large-frame-13mp",
+        "size": [
+          4160,
+          3120
+        ],
+        "description": "四张相同原裁片放入4160×3120画布；原裁片像素不变，无图外编号",
+        "candidate_file": "outputs/capture-quality-20261017/large-frame-13mp.png",
+        "candidate_bytes": 1350694,
+        "candidate_sha256": "1699bb801c8ef2a829f3da0123f4642576eaba44fa255d8f0cd8534ab466576d",
+        "sdk_input": "outputs/capture-quality-20261017/large-frame-13mp-sdk.png",
+        "sdk_input_bytes": 1350694,
+        "jpeg_redecoded_to_png_for_sdk": false
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "clear-png",
+      "size": [
+        960,
+        960
+      ],
+      "description": "原四件紧凑白板",
+      "candidate_file": "outputs/capture-quality-20261017/clear-png.png",
+      "candidate_bytes": 1196355,
+      "candidate_sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241",
+      "sdk_input": "outputs/capture-quality-20261017/clear-png-sdk.png",
+      "sdk_input_bytes": 1196355,
+      "jpeg_redecoded_to_png_for_sdk": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "model_text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\n        \"SV385\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    }\n  ]\n}\n```",
+      "strict_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "offline_text_only": {
+        "exact_components": 4,
+        "total": 4,
+        "ids_exact": true
+      },
+      "elapsed_seconds": 3.089,
+      "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "input_images": [
+        {
+          "path": "outputs/capture-quality-20261017/clear-png-sdk.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "3b20e52d8beb0dbdccd080609b36234805b5f4aef2e6edcd4ee632a9d72c6241"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "finish_reason": "stop"
+    },
+    {
+      "id": "jpeg-85",
+      "size": [
+        960,
+        960
+      ],
+      "description": "同像素JPEG，quality=85，subsampling=0",
+      "candidate_file": "outputs/capture-quality-20261017/jpeg-85.jpg",
+      "candidate_bytes": 168809,
+      "candidate_sha256": "bb7d5ef01289f0f0c2f3dad9c471d12baf3d42075702b45767c28f44fec5aefa",
+      "sdk_input": "outputs/capture-quality-20261017/jpeg-85-sdk.png",
+      "sdk_input_bytes": 829347,
+      "jpeg_redecoded_to_png_for_sdk": true,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "model_text": "```json\n{\n    \"items\": [\n        {\n            \"id\": 1,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        },\n        {\n            \"id\": 2,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        },\n        {\n            \"id\": 3,\n            \"lines\": [\n                \"SV385\",\n                \"A26\",\n                \"0147\"\n            ]\n        },\n        {\n            \"id\": 4,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        }\n    ]\n}\n```",
+      "strict_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "offline_text_only": {
+        "exact_components": 4,
+        "total": 4,
+        "ids_exact": true
+      },
+      "elapsed_seconds": 2.959,
+      "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "input_images": [
+        {
+          "path": "outputs/capture-quality-20261017/jpeg-85-sdk.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "a1aa49f405b77529649a1df7bb8290737f07ff996f38abe77d18d49046403586"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "finish_reason": "stop"
+    },
+    {
+      "id": "jpeg-60",
+      "size": [
+        960,
+        960
+      ],
+      "description": "同像素JPEG，quality=60，subsampling=0",
+      "candidate_file": "outputs/capture-quality-20261017/jpeg-60.jpg",
+      "candidate_bytes": 102279,
+      "candidate_sha256": "6eda3ac7b9cdf7a47ac1e35b00eaa85031bf81da6fec72a92302310388c78cf9",
+      "sdk_input": "outputs/capture-quality-20261017/jpeg-60-sdk.png",
+      "sdk_input_bytes": 688674,
+      "jpeg_redecoded_to_png_for_sdk": true,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "model_text": "```json\n{\n    \"items\": [\n        {\n            \"id\": 1,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        },\n        {\n            \"id\": 2,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        },\n        {\n            \"id\": 3,\n            \"lines\": [\n                \"SV385\",\n                \"A26\",\n                \"0147\"\n            ]\n        },\n        {\n            \"id\": 4,\n            \"lines\": [\n                \"SV358\",\n                \"A26\",\n                \"0147\"\n            ]\n        }\n    ]\n}\n```",
+      "strict_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "offline_text_only": {
+        "exact_components": 4,
+        "total": 4,
+        "ids_exact": true
+      },
+      "elapsed_seconds": 2.941,
+      "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "input_images": [
+        {
+          "path": "outputs/capture-quality-20261017/jpeg-60-sdk.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "7803a2f52a1b864ce2f374b6b80a6be58f8c5005b2a527a3823c4337a5207fa9"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "finish_reason": "stop"
+    },
+    {
+      "id": "blur-1.2-jpeg85",
+      "size": [
+        960,
+        960
+      ],
+      "description": "高斯半径1.2，再JPEG85",
+      "candidate_file": "outputs/capture-quality-20261017/blur-1.2-jpeg85.jpg",
+      "candidate_bytes": 116180,
+      "candidate_sha256": "a798d43e5c2799997178a2ecbc05aad8ddd4724211a76a8c2b319c440c239478",
+      "sdk_input": "outputs/capture-quality-20261017/blur-1.2-jpeg85-sdk.png",
+      "sdk_input_bytes": 590519,
+      "jpeg_redecoded_to_png_for_sdk": true,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "model_text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\n        \"SV385\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    }\n  ]\n}\n```",
+      "strict_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "offline_text_only": {
+        "exact_components": 4,
+        "total": 4,
+        "ids_exact": true
+      },
+      "elapsed_seconds": 2.963,
+      "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "input_images": [
+        {
+          "path": "outputs/capture-quality-20261017/blur-1.2-jpeg85-sdk.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "48bcc442ebdb6cba056b03300e30ed4a74d857b34375fa42ad63bf24b5a91eeb"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "finish_reason": "stop"
+    },
+    {
+      "id": "blur-3-jpeg85",
+      "size": [
+        960,
+        960
+      ],
+      "description": "高斯半径3，再JPEG85",
+      "candidate_file": "outputs/capture-quality-20261017/blur-3-jpeg85.jpg",
+      "candidate_bytes": 80256,
+      "candidate_sha256": "b6763e8bcc00f6664889590041164462cb6d793f11f72ed46ccacb1d2b2c1934",
+      "sdk_input": "outputs/capture-quality-20261017/blur-3-jpeg85-sdk.png",
+      "sdk_input_bytes": 380717,
+      "jpeg_redecoded_to_png_for_sdk": true,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "model_text": "```json\n[\n\t{\"id\": 1, \"lines\": [\"SV358\", \"A26\", \"0147\"]},\n\t{\"id\": 2, \"lines\": [\"SV358\", \"A26\", \"0147\"]},\n\t{\"id\": 3, \"lines\": [\"SV385\", \"A26\", \"0147\"]},\n\t{\"id\": 4, \"lines\": [\"SV358\", \"A26\", \"0147\"]}\n]\n```",
+      "strict_score": {
+        "json_valid": true,
+        "schema_valid": false,
+        "error": "期望带 items 数组的 JSON 对象"
+      },
+      "offline_text_only": {
+        "exact_components": 4,
+        "total": 4,
+        "ids_exact": true
+      },
+      "elapsed_seconds": 2.394,
+      "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 124,
+        "reasoning_tokens": 0
+      },
+      "input_images": [
+        {
+          "path": "outputs/capture-quality-20261017/blur-3-jpeg85-sdk.png",
+          "size": [
+            960,
+            960
+          ],
+          "sha256": "04e248e1ec4a68381e5ff464f516dfe7973e9514d96b84f1c2a60cc82afd93ce"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "finish_reason": "stop"
+    },
+    {
+      "id": "resize-320-jpeg85",
+      "size": [
+        320,
+        320
+      ],
+      "description": "先Lanczos缩至320，再JPEG85",
+      "candidate_file": "outputs/capture-quality-20261017/resize-320-jpeg85.jpg",
+      "candidate_bytes": 25882,
+      "candidate_sha256": "647441cf994a0f2ed4c6bdc6070a5449fbcff1a1984969ba037f9b2c8c046075",
+      "sdk_input": "outputs/capture-quality-20261017/resize-320-jpeg85-sdk.png",
+      "sdk_input_bytes": 114754,
+      "jpeg_redecoded_to_png_for_sdk": true,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "model_text": "```json\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 3,\n      \"lines\": [\n        \"SV385\",\n        \"A26\",\n        \"0147\"\n      ]\n    },\n    {\n      \"id\": 4,\n      \"lines\": [\n        \"SV358\",\n        \"A26\",\n        \"0147\"\n      ]\n    }\n  ]\n}\n```",
+      "strict_score": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      },
+      "offline_text_only": {
+        "exact_components": 4,
+        "total": 4,
+        "ids_exact": true
+      },
+      "elapsed_seconds": 1.924,
+      "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 202,
+        "reasoning_tokens": 0
+      },
+      "input_images": [
+        {
+          "path": "outputs/capture-quality-20261017/resize-320-jpeg85-sdk.png",
+          "size": [
+            320,
+            320
+          ],
+          "sha256": "45f431b6c98c9974726b49769c0e38dbb96cb44c8b56538cf0a5d450a66e0a2f"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "finish_reason": "stop"
+    },
+    {
+      "id": "large-frame-13mp",
+      "size": [
+        4160,
+        3120
+      ],
+      "description": "四张相同原裁片放入4160×3120画布；原裁片像素不变，无图外编号",
+      "candidate_file": "outputs/capture-quality-20261017/large-frame-13mp.png",
+      "candidate_bytes": 1350694,
+      "candidate_sha256": "1699bb801c8ef2a829f3da0123f4642576eaba44fa255d8f0cd8534ab466576d",
+      "sdk_input": "outputs/capture-quality-20261017/large-frame-13mp-sdk.png",
+      "sdk_input_bytes": 1350694,
+      "jpeg_redecoded_to_png_for_sdk": false,
+      "expected": [
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV385",
+          "A26",
+          "0147"
+        ],
+        [
+          "SV358",
+          "A26",
+          "0147"
+        ]
+      ],
+      "model_text": "```json\n[\n  {\n    \"id\": 1,\n    \"lines\": [\n      \"SV358\",\n      \"A26\",\n      \"0147\"\n    ]\n  },\n  {\n    \"id\": 2,\n    \"lines\": [\n      \"SV358\",\n      \"A26\",\n      \"0147\"\n    ]\n  },\n  {\n    \"id\": 3,\n    \"lines\": [\n      \"SV385\",\n      \"A26\",\n      \"0147\"\n    ]\n  },\n  {\n    \"id\": 4,\n    \"lines\": [\n      \"SV358\",\n      \"A26\",\n      \"0147\"\n    ]\n  }\n]\n```",
+      "strict_score": {
+        "json_valid": true,
+        "schema_valid": false,
+        "error": "期望带 items 数组的 JSON 对象"
+      },
+      "offline_text_only": {
+        "exact_components": 4,
+        "total": 4,
+        "ids_exact": true
+      },
+      "elapsed_seconds": 6.468,
+      "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 193,
+        "reasoning_tokens": 0
+      },
+      "input_images": [
+        {
+          "path": "outputs/capture-quality-20261017/large-frame-13mp-sdk.png",
+          "size": [
+            4160,
+            3120
+          ],
+          "sha256": "1699bb801c8ef2a829f3da0123f4642576eaba44fa255d8f0cd8534ab466576d"
+        }
+      ],
+      "prompt": "请逐个抄录图片中的4个电子元件表面可见的全部丝印文字。只输出JSON：{\"items\":[{\"id\":1,\"lines\":[\"第一行\",\"第二行\",\"第三行\"]}]}。多张独立图片按传入顺序编号；拼图按图外#编号；无编号原图按先上后下、同行左到右编号。保持字母大小写、字符和顺序，不根据其他元件推测，不把图外编号当丝印。看不清写?，不要补字、不要解释。",
+      "finish_reason": "stop"
+    }
+  ],
+  "resources": {
+    "checks": 14,
+    "minimum_sampled_available_gib": 16.4,
+    "maximum_sampled_cpu_percent": 14.3,
+    "thermal_warning_observed": false,
+    "exact_temperature_available": false
+  },
+  "test_model_unloaded_after_run": true
+}

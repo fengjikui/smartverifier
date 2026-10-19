@@ -1,59 +1,25 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/.vinext/
-/out/
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-next-env.d.ts
+# Dependencies and generated builds
+/node_modules/
+/.venv/
 /dist/
-/.wrangler/
-# Checkout-local execution profile and tool state; never publish them.
-/.sites-runtime/
+/coverage/
+*.tsbuildinfo
+**/__pycache__/
+**/*.pyc
+**/*.egg-info/
+
+# Local configuration, credentials and runtime records
+.env*
+*.pem
+*.key
+/var/
+/outputs/
+/images/
+/work/
+*.sqlite
+*.sqlite-*
+*.db
+*.log
+.DS_Store
 /.agents/
 /.codex/
-/outputs/
-/work/
-
-# Local TypeScript incremental state
-*.tsbuildinfo
-
-# Local image-tool environments and private inspection photos
-**/.venv/
-**/__pycache__/
-**/*.egg-info/
-/agent-tools/image-focus/.image-workspace/
-
-# User-provided local inspection photos, not website assets
-/images/
-/next/丝印照片/
