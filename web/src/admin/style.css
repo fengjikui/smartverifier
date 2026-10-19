@@ -17,3 +17,8 @@
 .adm-filename-example{display:block;margin:18px 0 10px;padding:14px 18px;background:var(--canvas);border-radius:8px;font-size:18px;color:var(--ink);width:fit-content}
 .adm-bound-tasks a{display:flex;flex-direction:column;gap:6px}.adm-bound-tasks a small{font-weight:400}
 .adm-optional>p,.adm-optional>.adm-import-choose{margin-top:16px}
+
+.adm-access-tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:10px}.adm-access-tabs .sv-btn[aria-pressed=true]{color:var(--brand);background:var(--brand-soft)}
+.adm-user-fields{display:grid;grid-template-columns:1fr 1fr;gap:20px}.adm-user-fields label{display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:14px;min-width:0}.adm-user-form-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.adm-user-form-actions p{flex:1;min-width:180px}.adm-user-disable.sv-btn{color:var(--brand)}
+.adm-users-table{min-width:760px}.adm-users-table td{vertical-align:middle}.adm-users-table td p{max-width:42ch;overflow-wrap:anywhere}.adm-access-event summary{color:var(--brand);min-height:40px;align-content:center;cursor:pointer}.adm-access-event p{font-size:12px;color:var(--muted);line-height:1.8}.adm-access-help{font-size:13px;color:var(--muted);line-height:1.8}.adm-access-help summary{cursor:pointer;min-height:44px;align-content:center}.adm-access-help p{max-width:80ch;margin-top:8px}.adm-access-help code{color:var(--ink)}
+@media(max-width:800px){.adm-user-fields{grid-template-columns:1fr}.adm-sidebar nav{overflow:auto;justify-content:flex-start;white-space:nowrap}.adm-sidebar nav>button{flex-shrink:0}.adm-user-form-actions p{flex:1 0 100%}}

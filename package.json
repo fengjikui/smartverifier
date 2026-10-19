@@ -11,6 +11,7 @@
     "start": "node scripts/start.ts",
     "start:real": "node scripts/start-real.ts",
     "admin:account": "node scripts/admin-account.ts",
+    "admin:owner": "node scripts/admin-account.ts --owner",
     "admin:access": "node scripts/admin-access.ts",
     "check": "tsc -p tsconfig.json",
     "test": "node --test --test-concurrency=1 tests/*.test.ts",

@@ -25,7 +25,7 @@ export class Store {
   round(id: string): Round | null { const row = this.db.prepare('SELECT data FROM rounds WHERE id=?').get(id); return row ? JSON.parse(String(row.data)) : null; }
   rounds(): Round[] { return this.db.prepare('SELECT data FROM rounds').all().map(row => JSON.parse(String(row.data))); }
   saveRound(round: Round) { this.db.prepare('INSERT INTO rounds VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(round.id, round.taskId, JSON.stringify(round)); }
-  transaction(fn: () => void) { this.db.exec('BEGIN IMMEDIATE'); try { fn(); this.db.exec('COMMIT'); } catch (e) { this.db.exec('ROLLBACK'); throw e; } }
+  transaction<T>(fn: () => T):T { this.db.exec('BEGIN IMMEDIATE'); try { const value=fn(); this.db.exec('COMMIT');return value; } catch (e) { this.db.exec('ROLLBACK'); throw e; } }
   audit(round: Round, person: Person, action: string, data: unknown) { this.db.prepare('INSERT INTO audit(round_id,actor,action,data,at) VALUES(?,?,?,?,?)').run(round.id, person.id, action, JSON.stringify(data), new Date().toISOString()); }
   close() { this.db.close(); }
 }

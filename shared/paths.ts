@@ -43,7 +43,7 @@ export function canonicalPage(pathname: string): string | null {
   if (path === MARKING_BASE || path === markingPaths.preview || path === markingPaths.loginPreview || path === markingPaths.debug) return path;
   if (path === MARKING_BASE + '/admin') return markingPaths.standards;
   const admin = MARKING_BASE + '/admin/';
-  if (['standards','standards/new','standards/trash','imports','audit-logs','tasks'].some(route => path === admin + route)) return path;
+  if (['standards','standards/new','standards/trash','imports','audit-logs','tasks','users'].some(route => path === admin + route)) return path;
   if (path.startsWith(admin) && /^standards\/[a-f0-9-]{36}(?:\/(?:edit|copy))?$/.test(path.slice(admin.length))) return path;
   if (path.startsWith(MARKING_BASE + '/assets/')) return path;
   return null;

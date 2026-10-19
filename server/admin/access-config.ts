@@ -8,6 +8,7 @@ export const adminUsersSchema=z.array(z.object({
   name:z.string().trim().min(1).max(80),
   salt:z.string().min(16).max(256),
   hash:z.string().regex(/^[a-f0-9]{64}$/i),
+  role:z.enum(['owner','standard_admin']).optional(),
 }).strict()).min(1).max(100).superRefine((users,ctx)=>{
   if(new Set(users.map(u=>u.id)).size!==users.length)ctx.addIssue({code:'custom',message:'管理员账号不能重复。'});
 });
@@ -24,7 +25,7 @@ export function readAdminAccess(env:NodeJS.ProcessEnv=process.env,root=process.c
   let users:AdminUser[]|null=null;
   if(filename){
     try{users=adminUsersSchema.parse(JSON.parse(readFileSync(path.resolve(root,filename),'utf8')));}
-    catch{throw new Error('管理员账号文件无法读取或格式不正确，请运行 npm run admin:account 配置账号。');}
+    catch{throw new Error('管理员账号文件无法读取或格式不正确，请检查或恢复配置文件；首次初始化运行 npm run admin:owner。');}
   }
   if(!localOnly&&!users)throw new Error('开放管理员远程访问前，请先运行 npm run admin:account 设置独立账号密码；不允许远程使用默认试用账号。');
   return {localOnly,users};

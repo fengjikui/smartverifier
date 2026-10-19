@@ -6,6 +6,8 @@ import { ApiError } from '../errors.ts';
 import { AdminFiles } from './files.ts';
 import { AdminAuth } from './auth.ts';
 import { readAdminAccess } from './access-config.ts';
+import { accountName } from './accounts.ts';
+import { accountPassword } from './password.ts';
 
 type Helpers={body:(req:http.IncomingMessage,max?:number)=>Promise<Buffer>;json:(req:http.IncomingMessage)=>Promise<Record<string,unknown>>;send:(res:http.ServerResponse,data:unknown,status?:number)=>void;file:(res:http.ServerResponse,path:string,priv?:boolean)=>Promise<void>};
 const paging=z.coerce.number().int().min(1).max(100000).default(1);
@@ -27,6 +29,18 @@ export function adminRoutes(service:InspectionService,root:string,directory:stri
     const actor=auth.require(req);
     if(p==='/admin/session'&&method==='GET'){send(res,auth.current(req));return true;}
     if(p==='/admin/session'&&method==='DELETE'){auth.logout(req,res);send(res,{ok:true});return true;}
+    if(p==='/admin/users'||p.startsWith('/admin/users/')||p==='/admin/access-events'){
+      auth.requireOwner(req);
+      const authorize=()=>auth.requireOwner(req),version=z.number().int().positive();
+      if(p==='/admin/users'&&method==='GET'){send(res,auth.accounts.page(z.string().max(160).parse(url.searchParams.get('q')??''),z.enum(['all','active','disabled']).parse(url.searchParams.get('status')??'all'),paging.parse(url.searchParams.get('page')??1)));return true;}
+      if(p==='/admin/users'&&method==='POST'){send(res,await auth.accounts.create(await json(req),authorize),201);return true;}
+      if(p==='/admin/access-events'&&method==='GET'){send(res,auth.accounts.events(z.string().max(160).parse(url.searchParams.get('q')??''),paging.parse(url.searchParams.get('page')??1)));return true;}
+      const target=p.match(/^\/admin\/users\/([A-Za-z0-9_.@-]{1,80})(?:\/(status|password))?$/);
+      if(target&&method==='POST'&&target[2]==='status'){const input=z.object({version,status:z.enum(['active','disabled']),reason:z.string().trim().min(1).max(500)}).strict().parse(await json(req));send(res,auth.accounts.status(target[1],input.version,input.status,input.reason,authorize));return true;}
+      if(target&&method==='POST'&&target[2]==='password'){const input=z.object({version,password:accountPassword}).strict().parse(await json(req));send(res,await auth.accounts.resetPassword(target[1],input.version,input.password,authorize));return true;}
+      if(target&&method==='PUT'&&!target[2]){const input=z.object({version,name:accountName}).strict().parse(await json(req));send(res,auth.accounts.rename(target[1],input.version,input.name,authorize));return true;}
+      throw new ApiError(405,'人员管理不支持此操作；系统负责人账号仅由服务器端配置。');
+    }
     if(p==='/admin/assets'&&method==='POST'){const data=await form(req,22*1024*1024),image=data.get('image');if(!(image instanceof File))throw new ApiError(400,'请选择正品图片。');send(res,await files.upload(image),201);return true;}
     if(p==='/admin/standards'&&method==='GET'){const q=z.string().max(200).parse(url.searchParams.get('q')??''),status=z.enum(['all','active','draft','trash']).parse(url.searchParams.get('status')??'all'),page=paging.parse(url.searchParams.get('page')??1),size=z.coerce.number().int().min(1).max(50).parse(url.searchParams.get('size')??25);send(res,registry.page(q,status,page,size));return true;}
     if(p==='/admin/standards'&&method==='POST'){send(res,registry.save(await json(req),actor),201);return true;}
