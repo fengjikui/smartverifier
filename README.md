@@ -31,6 +31,12 @@ Windows 使用 `py -3.12 -m venv .venv` 创建环境，再执行 `npm run python
 
 首次使用建议：管理员新增并启用一份正品标准 → 检验端按物料及供应商选正品 → 上传照片 → 检测 → 查看结果与不良数。详见[检验员使用说明](docs/检验员使用说明.md)、[正品管理](docs/正品管理.md)和[VLM 配置](docs/VLM配置.md)。
 
+## Windows 已有版本更新
+
+在**原项目目录**更新：停止服务 → 备份 `.env.local` 和整个 `var/`（自定义数据／账号路径另行备份）→ 拉取 `main` → 更新依赖并构建 → 按原方式启动。原来的正品、图片、管理员账号及密码沿用，不需要重新录入或初始化管理员。
+
+按 [Windows 更新步骤：保留正品和管理员账号](docs/部署说明.md#windows-update) 逐步操作，包含 PowerShell 命令、备份清单和 ZIP 安装的更新方式。本次还需检查旧的 `SV_VISION_PYTHON=./.venv/bin/python` 配置，注释后由系统自动选择 Windows 解释器。不要用模板覆盖已有 `.env.local`。
+
 ## 仓库结构
 
 ```text
