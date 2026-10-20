@@ -1,6 +1,7 @@
 import { apiPath, assetPath, publicUrl } from '../../shared/paths.ts';
 import { spawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
+import { pythonExecutable, pythonEnvironment } from '../python-runtime.ts';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
@@ -31,7 +32,7 @@ export class LocalVisionPipeline implements VisionPipeline {
   root:string;directory:string;python:string;model:string;endpoint:string;template:string;provider:VlmProvider;apiKey:string;caFile:string;extraBody:Record<string,unknown>;timeoutSeconds:number;traceDirectory?:string;inputLayout:'legacy'|'prefix-first';structured:boolean;
   children=new Set<ChildProcess>();
   constructor(root:string,directory:string,options:VlmOptions&{python?:string;traceDirectory?:string;inputLayout?:'legacy'|'prefix-first';structured?:boolean}={}){
-    this.root=root;this.directory=directory;this.python=options.python??process.env.SV_VISION_PYTHON??path.join(root,'.venv/bin/python');
+    this.root=root;this.directory=directory;this.python=pythonExecutable(root,options.python??process.env.SV_VISION_PYTHON);
     const config=vlmConfig(options);this.model=config.model;this.endpoint=config.endpoint;this.template=config.template;
     this.provider=config.provider;this.apiKey=config.apiKey;this.caFile=config.caFile;this.extraBody=config.extraBody;this.timeoutSeconds=config.timeoutSeconds;
     this.traceDirectory=options.traceDirectory;
@@ -40,7 +41,8 @@ export class LocalVisionPipeline implements VisionPipeline {
   }
   async worker(request:Record<string,unknown>,timeout:number):Promise<unknown>{
     return await new Promise((resolve,reject)=>{
-      const child=spawn(this.python,[path.join(this.root,'server/vision/local_worker.py')],{stdio:['pipe','pipe','pipe'],env:{...process.env,OMP_NUM_THREADS:'2',OPENBLAS_NUM_THREADS:'2',SV_VLM_API_KEY:this.apiKey,SV_VLM_CA_FILE:this.caFile}});
+      const child=spawn(this.python,[path.join(this.root,'server/vision/local_worker.py')],{cwd:this.root,stdio:['pipe','pipe','pipe'],env:pythonEnvironment({SV_VLM_API_KEY:this.apiKey,SV_VLM_CA_FILE:this.caFile})});
+      child.stdout.setEncoding('utf8');child.stderr.setEncoding('utf8');
       this.children.add(child);child.once('close',()=>this.children.delete(child));
       let out='',err='',settled=false;
       const fail=(error:Error)=>{if(settled)return;settled=true;clearTimeout(timer);reject(error);};

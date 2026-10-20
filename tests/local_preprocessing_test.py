@@ -12,6 +12,13 @@ spec=importlib.util.spec_from_file_location('worker', ROOT/'server/vision/local_
 worker=importlib.util.module_from_spec(spec);spec.loader.exec_module(worker)
 
 class PreprocessingTest(unittest.TestCase):
+    def test_lmstudio_cli_uses_path_without_assuming_macos_location(self):
+        with patch.object(worker.shutil, 'which', return_value='C:/模型工具/lms.exe'), patch.object(worker.sys, 'platform', 'win32'):
+            self.assertEqual(worker.lmstudio_cli(), 'C:/模型工具/lms.exe')
+        with tempfile.TemporaryDirectory() as tmp, patch.object(worker.shutil, 'which', return_value=None), patch.object(worker.Path, 'home', return_value=Path(tmp)):
+            with self.assertRaisesRegex(RuntimeError, 'PATH'):
+                worker.lmstudio_cli()
+
     def test_load_unavailable_on_windows(self):
         with patch.object(worker.os, 'getloadavg', create=True, side_effect=AttributeError('unavailable')):
             self.assertIsNone(worker.load_averages())

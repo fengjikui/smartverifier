@@ -6,6 +6,7 @@ import path from 'node:path';
 import { once } from 'node:events';
 import { setTimeout as delay } from 'node:timers/promises';
 import { spawnSync } from 'node:child_process';
+import { pythonExecutable, pythonEnvironment } from '../server/python-runtime.ts';
 import { startServer } from '../server/index.ts';
 import { InspectionService, person } from '../server/service.ts';
 import { LocalVisionPipeline } from '../server/vision/local-pipeline.ts';
@@ -44,7 +45,7 @@ test('标准库：版本冲突、重复、任务自动绑定、软删除与历�
 });
 
 test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复跳过、错误阻断、幂等导入、关联检验',async t=>{
-  const directory=await mkdtemp(path.join(tmpdir(),'sv-admin-http-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1});await once(server,'listening');const addr=server.address();assert.ok(addr&&typeof addr!=='string');const base='http://127.0.0.1:'+addr.port;
+  const directory=await mkdtemp(path.join(tmpdir(),'sv-admin-中文 空格-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1});await once(server,'listening');const addr=server.address();assert.ok(addr&&typeof addr!=='string');const base='http://127.0.0.1:'+addr.port;
   t.after(async()=>{admin.files.close();service.closing=true;server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await delay(30);service.store.close();await rm(directory,{recursive:true,force:true});});
   let cookie='';async function call(route:string,data?:unknown,status=200,method?:string){const res=await fetch(base+'/api/v1/inspections/marking'+route,{method:method??(data===undefined?'GET':'POST'),headers:{...(cookie?{Cookie:cookie}:{}),...(data===undefined||data instanceof FormData?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:data instanceof FormData?data:JSON.stringify(data)});const v=await res.json();assert.equal(res.status,status,JSON.stringify(v));return v;}
   await call('/admin/standards',undefined,401);await call('/admin/session',{id:'admin',code:'wrong'},401);
@@ -76,14 +77,14 @@ test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复
   const missing=new FormData();missing.append('files',new File([JSON.stringify({schemaVersion:'1.0',records:[{materialCode:'NEW',supplierName:'S',imagePath:'lost.png'}]})],'standards.json'));
   const bad=await poll((await call('/admin/imports',missing,202)).id);assert.equal(bad.counts.error,1);await call('/admin/imports/'+bad.id+'/commit',{},409);
   // 真正生成工作簿，验证前导零与公式不会被悄悄改写。
-  const generated=path.join(directory,'excel.xlsx');const python=process.env.SV_VISION_PYTHON??path.join(root,'.venv/bin/python');
-  const result=spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.Workbook();s=w.active;s.title='标准清单';s.append(['物料编号','供应商名称','正品图片路径','检测说明']);s.append(['000007','Excel供应商','正品.png','允许日期变化']);s.append([123,'Excel供应商','正品.png','不允许数字类型编号']);s.append(['FORMULA','Excel供应商','正品.png','=1+1']);w.save(sys.argv[1])",generated]);assert.equal(result.status,0);
+  const generated=path.join(directory,'excel.xlsx');const python=pythonExecutable(root),pythonOptions={env:pythonEnvironment(),encoding:'utf8' as const};
+  const result=spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.Workbook();s=w.active;s.title='标准清单';s.append(['物料编号','供应商名称','正品图片路径','检测说明']);s.append(['000007','Excel供应商','正品.png','允许日期变化']);s.append([123,'Excel供应商','正品.png','不允许数字类型编号']);s.append(['FORMULA','Excel供应商','正品.png','=1+1']);w.save(sys.argv[1])",generated],pythonOptions);assert.equal(result.status,0,result.error?.message??result.stderr);
   const excel=new FormData();excel.append('files',new File([await readFile(generated)],'标准.xlsx'));excel.append('files',new File([bytes],'正品.png'));
   const ej=await poll((await call('/admin/imports',excel,202)).id);assert.equal(ej.rows[0].material,'000007');assert.equal(ej.counts.ready,1);assert.equal(ej.counts.error,2);assert.match(ej.rows[1].message,/文本/);assert.match(ej.rows[2].message,/公式/);
-  assert.equal(spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.load_workbook(sys.argv[1]);w.active.delete_rows(3,2);w.save(sys.argv[1])",generated]).status,0);
+  assert.equal(spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.load_workbook(sys.argv[1]);w.active.delete_rows(3,2);w.save(sys.argv[1])",generated],pythonOptions).status,0);
   const corrected=new FormData();corrected.append('files',new File([await readFile(generated)],'已修正.xlsx'));corrected.append('files',new File([bytes],'正品.png'));
   const clean=await poll((await call('/admin/imports',corrected,202)).id);assert.equal(clean.counts.error,0);assert.equal((await call('/admin/imports/'+clean.id+'/commit',{})).receipt.created,1);assert.equal((await call('/admin/standards?q=000007')).items[0].material,'000007');
-  const traversal=path.join(directory,'unsafe.zip');assert.equal(spawnSync(python,['-c',"import zipfile,sys;z=zipfile.ZipFile(sys.argv[1],'w');z.writestr('../escape.png',b'x');z.close()",traversal]).status,0);
+  const traversal=path.join(directory,'unsafe.zip');assert.equal(spawnSync(python,['-c',"import zipfile,sys;z=zipfile.ZipFile(sys.argv[1],'w');z.writestr('../escape.png',b'x');z.close()",traversal],pythonOptions).status,0);
   const malicious=new FormData();malicious.append('files',new File([await readFile(traversal)],'unsafe.zip'));const unsafe=await poll((await call('/admin/imports',malicious,202)).id);assert.equal(unsafe.status,'failed');assert.match(unsafe.message,/不安全/);
   await call('/admin/session',{},200,'DELETE');await call('/admin/standards',undefined,401);
 });

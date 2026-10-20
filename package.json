@@ -14,8 +14,9 @@
     "admin:owner": "node scripts/admin-account.ts --owner",
     "admin:access": "node scripts/admin-access.ts",
     "check": "tsc -p tsconfig.json",
-    "test": "node --test --test-concurrency=1 tests/*.test.ts",
+    "test": "node scripts/test.mjs",
     "test:python": "node scripts/test-python.mjs",
+    "python": "node scripts/python.mjs",
     "probe:real": "node scripts/probe-real-vision.ts",
     "demo:prepare": "node scripts/prepare-twenty-demo.ts"
   },

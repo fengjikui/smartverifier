@@ -12,6 +12,7 @@ import sys
 import time
 import uuid
 import subprocess
+import shutil
 
 os.environ["OMP_NUM_THREADS"] = "2"
 os.environ["OPENBLAS_NUM_THREADS"] = "2"
@@ -31,6 +32,17 @@ def load_averages():
         return None
 
 
+def lmstudio_cli():
+    # 优先尊重 LM Studio CLI 的 PATH 配置，不假定用户目录或可执行文件后缀。
+    command = shutil.which('lms')
+    if command:
+        return command
+    candidate = Path.home() / '.lmstudio/bin' / ('lms.exe' if sys.platform == 'win32' else 'lms')
+    if candidate.is_file():
+        return str(candidate)
+    raise RuntimeError('找不到 LM Studio CLI（lms），请安装 CLI 并加入 PATH 后再运行空闲检查。')
+
+
 def check_resources():
     import psutil
     available = psutil.virtual_memory().available / 2**30
@@ -40,7 +52,7 @@ def check_resources():
     if cpu>90:raise RuntimeError('RESOURCE_PRESSURE: CPU负载过高，请稍后重试。')
     thermal = "unavailable"
     if sys.platform == "darwin":
-        thermal = subprocess.check_output(["pmset", "-g", "therm"], text=True, timeout=3)
+        thermal = subprocess.check_output(["pmset", "-g", "therm"], text=True, timeout=3, encoding="utf-8")
         if any("No " not in line and ("warning level" in line or "Speed_Limit" in line) for line in thermal.splitlines()):
             raise RuntimeError("RESOURCE_PRESSURE: 系统报告热或性能压力，请冷却后重试。")
     return {"availableGiB":round(available,2),"thermal":thermal.strip(),"cpuThreads":2,"cpuPercent":cpu,"load":load_averages()}
@@ -184,7 +196,7 @@ async def recognize(req):
     provider=req.get('provider','lmstudio')
     if provider not in ('lmstudio','openai-compatible'):raise ValueError('VLM协议配置无效')
     if provider=='lmstudio' and req.get('requireIdle'):
-        status=subprocess.check_output([str(Path.home()/'.lmstudio/bin/lms'),'ps'],text=True,timeout=5)
+        status=subprocess.check_output([lmstudio_cli(),'ps'],text=True,timeout=5, encoding="utf-8")
         row=next((line for line in status.splitlines() if line.split() and line.split()[0]==req['model']),'')
         if 'IDLE' not in row:raise RuntimeError('目标模型未空闲，未发起调试请求。')
     metrics=[]
@@ -243,6 +255,10 @@ async def recognize(req):
 
 
 if __name__ == "__main__":
+    # 即使直接用解释器运行，管道也不能继承 Windows 的 GBK 或终端代码页。
+    sys.stdin.reconfigure(encoding="utf-8-sig")
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     try:
         req=json.load(sys.stdin)
         resources=check_resources()

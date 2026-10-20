@@ -31,7 +31,7 @@ ARMS=[('A','legacy',False),('B','legacy',True),('C','prefix-first',False),('D','
 def dump(path,data):
     path.parent.mkdir(parents=True,exist_ok=True)
     temporary=path.with_suffix(path.suffix+'.tmp')
-    temporary.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n');temporary.replace(path)
+    temporary.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n', encoding="utf-8");temporary.replace(path)
 
 
 def prepare(folder):
@@ -55,7 +55,7 @@ def prepare(folder):
         cases.append({'number':number,'warmup':number==0,'brightness':brightness,'order':orders[number],
                       'componentIds':[c['componentId'] for c in components],'image':image})
     schema_code='import {replyJsonSchema} from '+json.dumps((ROOT/'server/vision/reply-json-schema.ts').as_uri())+';let s="";for await(const chunk of process.stdin)s+=chunk;console.log(JSON.stringify(JSON.parse(s).map(replyJsonSchema)));'
-    schemas=json.loads(subprocess.check_output(['node','--input-type=module','-e',schema_code],input=json.dumps([c['componentIds'] for c in cases]),text=True,timeout=10))
+    schemas=json.loads(subprocess.check_output(['node','--input-type=module','-e',schema_code],input=json.dumps([c['componentIds'] for c in cases]),text=True,timeout=10, encoding="utf-8"))
     for case,schema in zip(cases,schemas):case['schema']=schema
     experiment_id=str(uuid.uuid4())
     manifest={'experiment':'EXP-008','id':experiment_id,'date':'2026-10-18','syntheticOnly':True,'inputBuilderVersion':'split-prefix-v1',
@@ -74,7 +74,7 @@ def image_block(folder,asset):
 def prepare_followup(source,folder):
     """保留同一固定前缀，连续测试旧图/全新图/原样重复，排除交错调度的影响。"""
     if folder.exists():raise RuntimeError('补充实验目录必须不存在')
-    manifest=json.loads((source/'manifest.json').read_text());folder.mkdir(parents=True)
+    manifest=json.loads((source/'manifest.json').read_text(encoding="utf-8"));folder.mkdir(parents=True)
     assets=[manifest['reference'],*(c['image'] for c in manifest['cases']),*(c['image'] for c in manifest['components'])]
     for asset in assets:
         target=folder/asset['file'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source/asset['file'],target)
@@ -86,7 +86,7 @@ def prepare_followup(source,folder):
     case={**manifest['cases'][0],'number':5,'warmup':False,'brightness':.935,'order':[2,3,0,1],'componentIds':[c['componentId'] for c in components],
           'image':board.compose(folder,components,[components[i]['componentId'] for i in [2,3,0,1]],'photo-5.png')}
     code='import {replyJsonSchema} from '+json.dumps((ROOT/'server/vision/reply-json-schema.ts').as_uri())+';console.log(JSON.stringify(replyJsonSchema('+json.dumps(case['componentIds'])+')));'
-    case['schema']=json.loads(subprocess.check_output(['node','--input-type=module','-e',code],text=True,timeout=10))
+    case['schema']=json.loads(subprocess.check_output(['node','--input-type=module','-e',code],text=True,timeout=10, encoding="utf-8"))
     manifest['components']+=components;manifest['cases'].append(case)
     manifest['probeSchedule']=[[4,'A'],[5,'A'],[5,'A'],[4,'D'],[5,'D'],[5,'D']]
     manifest['phase']='sequential-cache-probe';manifest['limitations'].append('补充连续探针：旧图重复、从未推理的新图、同一新图重复；不与正式4次换图中位数混算')
@@ -109,12 +109,12 @@ def cache_evidence(log,offset,inode):
 def validate(response,ids):
     choice=response.get('choices',[{}])[0]
     code='import {parseBatchReply} from '+json.dumps((ROOT/'server/vision/local-pipeline.ts').as_uri())+';let s="";for await(const chunk of process.stdin)s+=chunk;const d=JSON.parse(s);parseBatchReply(d.content,d.ids);'
-    checked=subprocess.run(['node','--input-type=module','-e',code],input=json.dumps({'content':choice.get('message',{}).get('content',''),'ids':ids}),capture_output=True,text=True,timeout=10)
+    checked=subprocess.run(['node','--input-type=module','-e',code],input=json.dumps({'content':choice.get('message',{}).get('content',''),'ids':ids}),capture_output=True,text=True,timeout=10, encoding="utf-8")
     return choice.get('finish_reason')=='stop' and checked.returncode==0
 
 
 async def run(folder,args):
-    manifest=json.loads((folder/'manifest.json').read_text())
+    manifest=json.loads((folder/'manifest.json').read_text(encoding="utf-8"))
     if (folder/'run-config.json').exists():raise RuntimeError('拒绝覆盖已有实验；新实验使用新目录')
     for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):os.environ.pop(key,None)
     # 预热四条件；4张变化照片中每个条件恰好先跑一次。
@@ -130,7 +130,7 @@ async def run(folder,args):
     for sequence,(number,name) in enumerate(schedule):
         case=manifest['cases'][number];arm=next(a for a in manifest['arms'] if a['name']==name)
         before=board.resources()
-        status=subprocess.check_output([str(Path.home()/'.lmstudio/bin/lms'),'ps'],text=True,timeout=5)
+        status=subprocess.check_output([board.vision.lmstudio_cli(),'ps'],text=True,timeout=5, encoding="utf-8")
         row=next((line for line in status.splitlines() if line.split() and line.split()[0]==args.model),'')
         if 'IDLE' not in row:raise RuntimeError('模型不空闲，停止后续实验，不抢占用户推理')
         scope='\n本次必须返回的componentId列表：'+json.dumps(case['componentIds'],ensure_ascii=False)

@@ -10,7 +10,7 @@ def resource_check():
     if psutil.virtual_memory().available < 3 * 1024**3 or psutil.cpu_percent(interval=.1) > 90:
         raise ValueError('电脑资源紧张，暂停图片预检，请稍后重试。')
     if sys.platform == 'darwin':
-        result = subprocess.run(['pmset', '-g', 'therm'], capture_output=True, text=True, timeout=3).stdout
+        result = subprocess.run(['pmset', '-g', 'therm'], capture_output=True, text=True, timeout=3, encoding="utf-8").stdout
         if any(int(v.strip().split('=')[-1]) < 90 for v in result.splitlines() if 'CPU_Speed_Limit' in v):
             raise ValueError('电脑热压力较高，暂停预检，请稍后重试。')
 
@@ -34,6 +34,9 @@ def asset(data, filename, folder):
     return dict(id=name,filename=Path(filename).name[:160],width=w,height=h,bytes=len(data),sha256=sha,thumbnail='/api/v1/inspections/marking/reference-assets/'+thumb)
 
 if __name__ == '__main__':
+    sys.stdin.reconfigure(encoding='utf-8-sig')
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8', errors='backslashreplace')
     try:
         r=json.load(sys.stdin);resource_check();result=asset(Path(r['source']).read_bytes(),r['filename'],r['folder']);print(json.dumps(result,ensure_ascii=False))
     except Exception as e:

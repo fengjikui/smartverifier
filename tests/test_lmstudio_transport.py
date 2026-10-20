@@ -67,9 +67,9 @@ class LmStudioTransportTests(unittest.IsolatedAsyncioTestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "chat_template.jinja"
             text = "{% if enable_thinking %}<think>{% endif %}"
-            path.write_text(text)
+            path.write_text(text, encoding="utf-8")
             template, checksum = request_template(str(path))
-            self.assertEqual(text, path.read_text())
+            self.assertEqual(text, path.read_text(encoding="utf-8"))
             self.assertTrue(template["jinjaPromptTemplate"]["template"].startswith("{% set enable_thinking = false %}"))
             self.assertEqual(64, len(checksum))
             with self.assertRaisesRegex(ValueError, "local LM Studio"):
@@ -86,11 +86,11 @@ class LmStudioTransportTests(unittest.IsolatedAsyncioTestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "chat_template.jinja"
             source = "{% if enable_thinking %}<think>{% endif %}{% if args_value is sequence %}{{ args_value | safe }}{% endif %}"
-            path.write_text(source)
+            path.write_text(source, encoding="utf-8")
             template, _ = request_template(str(path))
             self.assertIn("args_value is iterable", template["jinjaPromptTemplate"]["template"])
             self.assertNotIn(" | safe", template["jinjaPromptTemplate"]["template"])
-            self.assertEqual(source, path.read_text())
+            self.assertEqual(source, path.read_text(encoding="utf-8"))
 
     async def test_history_preserves_tool_result_and_actual_image_bytes(self):
         import lmstudio

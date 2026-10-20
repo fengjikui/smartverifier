@@ -28,6 +28,7 @@ from PIL import Image, ImageDraw, ImageFont
 import httpx
 import psutil
 from vlm_client.lmstudio_transport import LmStudioTransport
+from local_worker import load_averages
 
 OUT = ROOT / "outputs/vision-batching-20261017"
 TEMPLATE = Path.home() / ".lmstudio/models/lmstudio-community/Qwen3.8-27B-MLX-4bit/chat_template.jinja"
@@ -37,11 +38,11 @@ EXPECTED = [["SV358", "A26", "0147"], ["SV358", "A26", "0147"],
 
 
 def resources():
-    thermal = subprocess.check_output(["pmset", "-g", "therm"], text=True, stderr=subprocess.STDOUT)
+    thermal = subprocess.check_output(["pmset", "-g", "therm"], text=True, stderr=subprocess.STDOUT, encoding="utf-8") if sys.platform == 'darwin' else 'unavailable'
     mem = psutil.virtual_memory()
-    snapshot = {"time": time.time(), "load": os.getloadavg(), "available_gib": round(mem.available / 2**30, 2),
+    snapshot = {"time": time.time(), "load": load_averages(), "available_gib": round(mem.available / 2**30, 2),
                 "cpu_percent": psutil.cpu_percent(interval=.3), "thermal": thermal.strip()}
-    with (OUT / "resources.jsonl").open("a") as f:
+    with (OUT / "resources.jsonl").open("a", encoding="utf-8") as f:
         f.write(json.dumps(snapshot, ensure_ascii=False) + "\n")
     if mem.available < 8 * 2**30 or snapshot["cpu_percent"] > 90:
         raise RuntimeError("内存或 CPU 压力较高，停止本次测试")
@@ -61,7 +62,7 @@ def prepare():
         path = OUT / f"crop-{i+1}.png"
         crop.save(path)
         paths.append(path)
-    font = ImageFont.truetype("/System/Library/Fonts/Menlo.ttc", 25)
+    font = ImageFont.load_default(size=25)
 
     def grid(count, *, wide=False):
         cols = count if wide else (2 if count == 4 else 4)
@@ -87,7 +88,7 @@ def prepare():
                 "source_sha256": hashlib.sha256((ROOT / "fixtures/inspection/four-components.png").read_bytes()).hexdigest(),
                 "crop_boxes_xyxy": boxes, "rotation": "保留相同原始角度，隔离布局变量", "interpolation": "拼图不缩放裁片；512压力图和3072探针用Lanczos",
                 "ground_truth": EXPECTED, "repeated_images_for_8_16": True}
-    (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+    (OUT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     cases = [{"id": f"single-{i+1}", "paths": [path], "expected": [EXPECTED[i]]} for i, path in enumerate(paths)]
     cases += [
         {"id": "original-four", "paths": [ROOT / "fixtures/inspection/four-components.png"], "expected": EXPECTED},
@@ -189,7 +190,7 @@ async def run(case):
         result["error"] = f"{type(exc).__name__}: {exc}"
     result["elapsed_seconds"] = round(time.monotonic() - started, 3)
     result["resources_after"] = resources()
-    (OUT / f"{case['id']}.json").write_text(json.dumps(result, ensure_ascii=False, indent=2))
+    (OUT / f"{case['id']}.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print("DONE", case["id"], result["elapsed_seconds"], result.get("score", {}), result.get("error", ""), flush=True)
     if "error" in result:
         raise RuntimeError("本轮请求失败；保留原始结果并停止，避免盲目重试")
@@ -215,9 +216,9 @@ async def main():
     selected = set(args.cases.split(",")) if args.cases else {c["id"] for c in cases}
     for case in cases:
         saved = OUT / f"{case['id']}.json"
-        if saved.exists() and json.loads(saved.read_text()).get("model") != MODEL:
+        if saved.exists() and json.loads(saved.read_text(encoding="utf-8")).get("model") != MODEL:
             raise RuntimeError("已有结果属于不同模型，请使用独立输出目录")
-        if args.retry_errors and case["id"] in selected and saved.exists() and "error" in json.loads(saved.read_text()):
+        if args.retry_errors and case["id"] in selected and saved.exists() and "error" in json.loads(saved.read_text(encoding="utf-8")):
             saved.rename(OUT / f"{case['id']}.error-{time.time_ns()}.json")
         if case["id"] in selected and not (OUT / f"{case['id']}.json").exists():
             await run(case)

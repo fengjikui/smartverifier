@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
+import { pythonExecutable, pythonEnvironment } from '../python-runtime.ts';
 import { ApiError } from '../errors.ts';
 import type { Registry } from './registry.ts';
 import type { Person } from '../../shared/types.ts';
@@ -15,7 +16,8 @@ export class AdminFiles {
     }
   }
   async worker(script:string,input:unknown,timeout=120000):Promise<any>{
-    return await new Promise((resolve,reject)=>{const child=spawn(process.env.SV_VISION_PYTHON??path.join(this.root,'.venv/bin/python'),[path.join(this.root,'server/admin',script)],{stdio:['pipe','pipe','pipe'],env:{...process.env,OMP_NUM_THREADS:'2',OPENBLAS_NUM_THREADS:'2',PYTHONUTF8:'1'}});this.children.add(child);
+    return await new Promise((resolve,reject)=>{const child=spawn(pythonExecutable(this.root),[path.join(this.root,'server/admin',script)],{cwd:this.root,stdio:['pipe','pipe','pipe'],env:pythonEnvironment()});this.children.add(child);
+      child.stdout.setEncoding('utf8');child.stderr.setEncoding('utf8');
       let out='',err='',done=false;const finish=(e?:Error,data?:unknown)=>{if(done)return;done=true;clearTimeout(timer);this.children.delete(child);e?reject(e):resolve(data);};
       const timer=setTimeout(()=>{child.kill();finish(new ApiError(503,'图片预检超时，已保留录入内容，请拆小批次重试。'));},timeout);
       child.on('error',()=>finish(new ApiError(503,'图片处理环境未安装，请按部署说明安装 Python 依赖。')));child.stdin.on('error',()=>{});

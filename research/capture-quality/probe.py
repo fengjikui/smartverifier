@@ -51,7 +51,7 @@ def prepare():
         cases.append({"id": name, "paths": [transport], "expected": batch.EXPECTED})
     (OUT / "manifest.json").write_text(json.dumps({"synthetic": True, "source": str(source.relative_to(ROOT)),
         "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(), "camera_capture_test": False,
-        "model": "sv-quality-qwen4b", "variants": manifest}, ensure_ascii=False, indent=2))
+        "model": "sv-quality-qwen4b", "variants": manifest}, ensure_ascii=False, indent=2), encoding="utf-8")
     return cases
 
 

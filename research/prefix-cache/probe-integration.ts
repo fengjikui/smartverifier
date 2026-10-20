@@ -5,6 +5,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import { pythonEnvironment } from '../../server/python-runtime.ts';
 import { InspectionService, person } from '../../server/service.ts';
 import { LocalVisionPipeline } from '../../server/vision/local-pipeline.ts';
 const root=fileURLToPath(new URL('../../',import.meta.url));
@@ -13,11 +14,12 @@ const state=await mkdtemp(path.join(out,'state-')),traces=path.join(state,'visio
 const pipeline=new LocalVisionPipeline(root,state,{traceDirectory:traces});
 const service=new InspectionService(state,root,1,pipeline),samples:unknown[]=[];
 const code='import importlib.util,json; s=importlib.util.spec_from_file_location("v","server/vision/local_worker.py");v=importlib.util.module_from_spec(s);s.loader.exec_module(v); print(json.dumps(v.check_resources()))';
-function resources(){const sample=JSON.parse(execFileSync(pipeline.python,['-c',code],{cwd:root,encoding:'utf8',timeout:5000}));samples.push(sample);return sample;}
+function resources(){const sample=JSON.parse(execFileSync(pipeline.python,['-c',code],{cwd:root,encoding:'utf8',env:pythonEnvironment(),timeout:5000}));samples.push(sample);return sample;}
 let pressure='';resources();
 const timer=setInterval(()=>{try{resources();}catch(error){pressure=String(error);service.closing=true;pipeline.close();}},3000);
 try{
-  assert.match(execFileSync(path.join(process.env.HOME!,'.lmstudio/bin/lms'),['ps'],{encoding:'utf8'}).split('\n').find(s=>s.split(/\s+/)[0]===pipeline.model)??'',/IDLE/);
+  const status=execFileSync(pipeline.python,['-c','from server.vision.local_worker import lmstudio_cli; import subprocess; print(subprocess.check_output([lmstudio_cli(),"ps"],text=True,encoding="utf-8",timeout=5))'],{cwd:root,encoding:'utf8',env:pythonEnvironment(),timeout:10000});
+  assert.match(status.split('\n').find(s=>s.split(/\s+/)[0]===pipeline.model)??'',/IDLE/);
   let view=service.open('REALVISION2');view=await service.addRealTrial(view.round!.id,view.round!.revision,person);
   service.analyze(view.round!.id,view.round!.revision);while(service.worker)await delay(100);
   if(pressure)throw new Error(pressure);view=service.view('REALVISION2');

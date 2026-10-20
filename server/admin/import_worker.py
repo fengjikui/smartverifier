@@ -117,5 +117,8 @@ def main(r):
     return {'rows':output,'assets':list(assets.values())}
 
 if __name__=='__main__':
+    sys.stdin.reconfigure(encoding='utf-8-sig')
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8', errors='backslashreplace')
     try: print(json.dumps(main(json.load(sys.stdin)),ensure_ascii=False))
     except Exception as e: print(json.dumps({'error':str(e)},ensure_ascii=False));sys.exit(1)

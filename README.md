@@ -16,7 +16,7 @@ npm run build
 npm start
 ```
 
-Windows 使用 `py -3.12 -m venv .venv` 和 `./.venv/Scripts/python.exe -m pip ...`。启动前在 `.env.local` 中设置 `SV_VISION_PYTHON=./.venv/Scripts/python.exe`。没有 VLM 配置时可离线体验明确标注的模拟流程，真实上传不会生成虚假的模型结论。
+Windows 使用 `py -3.12 -m venv .venv` 创建环境，再执行 `npm run python -- -m pip install -r requirements.txt`。应用和测试自动选择 Windows 的 `.venv/Scripts/python.exe` 或 macOS/Linux 的 `.venv/bin/python`，**无需激活虚拟环境**；只有自定义环境才需填写 `SV_VISION_PYTHON`。没有 VLM 配置时可离线体验明确标注的模拟流程，真实上传不会生成虚假的模型结论。
 
 - 检验工作台：<http://127.0.0.1:5190/inspections/marking>
 - 正品管理：<http://127.0.0.1:5190/inspections/marking/admin/standards>
@@ -60,5 +60,7 @@ npm run test:python
 ```
 
 测试使用临时目录，不调用真实模型。`npm run probe:real` 才会显式运行本机 VLM 烟测，请预先配置模型并检查资源。前端开发时，在一个终端运行 `npm start`，另一个终端运行 `npm run dev`；开发页地址由 Vite 输出，默认代理 API 到 5190，非默认端口可通过 `SV_DEV_API_TARGET` 指定。
+
+运行单独 Python 脚本可用 `npm run python -- 脚本路径`，统一解释器选择和 UTF-8 编码。Windows 迁移排查与验证边界见 [Windows 兼容性检查](docs/Windows兼容性检查.md)。
 
 完整资料从[文档索引](docs/README.md)开始。性能与准确度以现场实拍验收为准，生成样片不能代表真实业务准确率。

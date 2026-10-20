@@ -32,7 +32,7 @@ class TraceTests(unittest.TestCase):
             trace.observe('fragment',{'content':'{"items":[{"componentId":"fake"}]}','reasoningType':'reasoning'})
             trace.observe('fragment',{'content':'{"items":[{"componentId":"C01","lines":["S5"]}]}','reasoningType':'none'})
             trace.close()
-            events=[json.loads(line) for line in (trace.folder/'events.ndjson').read_text().splitlines()]
+            events=[json.loads(line) for line in (trace.folder/'events.ndjson').read_text(encoding="utf-8").splitlines()]
             self.assertEqual(data,(trace.folder/'image-0.png').read_bytes())
             self.assertEqual(9,events[0]['images'][0]['width'])
             items=[e for e in events if e['type']=='item_complete'];self.assertEqual(['C01'],[e['componentId'] for e in items])

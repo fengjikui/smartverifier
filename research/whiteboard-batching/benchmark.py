@@ -32,7 +32,7 @@ from vlm_client.silkscreen_prompts import BATCH_PROMPT as PROMPT
 def dump(path,data):
     path.parent.mkdir(parents=True,exist_ok=True)
     temporary=path.with_suffix(path.suffix+'.tmp')
-    temporary.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+    temporary.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n', encoding="utf-8")
     temporary.replace(path)
 
 
@@ -69,7 +69,7 @@ def compose(folder,components,ids,filename):
 def prepare(folder):
     folder.mkdir(parents=True,exist_ok=True);(folder/'files').mkdir(exist_ok=True)
     manifest_source=ROOT/'fixtures/inspection/green-mat-v1/manifest.json'
-    truth=json.loads(manifest_source.read_text())['expected'];components=[];sources=[]
+    truth=json.loads(manifest_source.read_text(encoding="utf-8"))['expected'];components=[];sources=[]
     for name in ['single','pair','dim-three']:
         vision.check_resources()
         source=ROOT/f'fixtures/inspection/green-mat-v1/{name}.png'
@@ -97,7 +97,7 @@ def resources():
     import psutil
     before=vision.check_resources();cpu=psutil.cpu_percent(interval=.2)
     if cpu>90:raise RuntimeError('RESOURCE_PRESSURE: CPU总利用率超过90%，暂停实验')
-    return {**before,'cpuPercent':cpu,'load':os.getloadavg()}
+    return {**before,'cpuPercent':cpu,'load':vision.load_averages()}
 
 
 def image_block(folder,asset,metrics):
@@ -111,7 +111,7 @@ def image_block(folder,asset,metrics):
 async def run(folder,args,permutation=False):
     config_file=folder/('permutation-config.json' if permutation else 'run-config.json')
     if config_file.exists():raise RuntimeError('已有实验配置，禁止覆盖；请创建新的输出目录')
-    manifest=json.loads((folder/'manifest.json').read_text());components=manifest['components'];allids=manifest['groups']['six']
+    manifest=json.loads((folder/'manifest.json').read_text(encoding="utf-8"));components=manifest['components'];allids=manifest['groups']['six']
     for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):os.environ.pop(key,None)
     if permutation:
         # 只换排布，不换图片或标签，兼测串号，并避免把立即重复输入的缓存收益当新照片性能。
@@ -136,7 +136,7 @@ async def run(folder,args,permutation=False):
         if recordfile.exists():raise RuntimeError('已有调用记录，禁止覆盖；请创建新的输出目录')
         before=resources()
         # 确保没有抢占用户主动发起的推理，不改变共享模型加载状态。
-        status=subprocess.check_output([str(Path.home()/'.lmstudio/bin/lms'),'ps'],text=True,timeout=5)
+        status=subprocess.check_output([vision.lmstudio_cli(),'ps'],text=True,timeout=5, encoding="utf-8")
         modelrow=next((line for line in status.splitlines() if line.split() and line.split()[0]==args.model),'')
         if 'IDLE' not in modelrow:raise RuntimeError('目标模型未处于空闲加载状态，停止实验，请稍后重跑')
         sample=next(c['image'] for c in components if c['componentId']==ids[0]) if mode in ('single','warmup') else manifest['permutedSheets' if permutation else 'sheets']['four' if mode in ('board4','permuted4') else 'six']
@@ -164,7 +164,7 @@ async def run(folder,args,permutation=False):
                     choice=record.get('response',{}).get('choices',[{}])[0]
                     if not record.get('error'):
                         code='import {parseBatchReply} from '+json.dumps((ROOT/'server/vision/local-pipeline.ts').as_uri())+'; let input=""; for await(const chunk of process.stdin)input+=chunk; const data=JSON.parse(input); parseBatchReply(data.content,data.ids);'
-                        checked=subprocess.run(['node','--input-type=module','-e',code],input=json.dumps({'content':choice.get('message',{}).get('content',''),'ids':ids}),text=True,capture_output=True,timeout=10)
+                        checked=subprocess.run(['node','--input-type=module','-e',code],input=json.dumps({'content':choice.get('message',{}).get('content',''),'ids':ids}),text=True,capture_output=True,timeout=10, encoding="utf-8")
                         valid=choice.get('finish_reason')=='stop' and checked.returncode==0
                         trace.emit('validation',{'valid':valid,'message':'完整JSON与编号校验通过。' if valid else '生成未结束或合同校验失败，原文已保留。'})
                 except Exception as exc:
@@ -183,7 +183,7 @@ async def run(folder,args,permutation=False):
 def time_composition(folder):
     result_file=folder/'composition-timings.json'
     if result_file.exists():raise RuntimeError('已有合成计时，禁止覆盖；请在新的实验目录测量')
-    manifest=json.loads((folder/'manifest.json').read_text())
+    manifest=json.loads((folder/'manifest.json').read_text(encoding="utf-8"))
     result={'resources':resources(),'rows':[]}
     for group,ids in manifest['groups'].items():
         durations=[]
