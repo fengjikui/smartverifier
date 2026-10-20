@@ -41,9 +41,9 @@ SV_VISION_PYTHON="D:/检验 系统/.venv/Scripts/python.exe"
 ```powershell
 npm run python -- -c "import sys; print(sys.executable); print(sys.stdin.encoding, sys.stdout.encoding)"
 npm run check
+npm run build
 npm test
 npm run test:python
-npm run build
 ```
 
 解释器检查应显示本机的 `Scripts\python.exe`，管道编码为 UTF-8。单独执行 Python 脚本时用 `npm run python -- 脚本路径 参数`；依赖更新用 `npm run python -- -m pip install -r requirements.txt`。配置修改后重启业务服务，再测试正品录入、批量导入及真实图片识别。
