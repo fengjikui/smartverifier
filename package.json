@@ -10,6 +10,8 @@
     "build": "vite build --config vite.config.ts",
     "start": "node scripts/start.ts",
     "start:real": "node scripts/start-real.ts",
+    "https": "node scripts/start-https.ts",
+    "https:prepare": "node scripts/prepare-https.ts",
     "admin:account": "node scripts/admin-account.ts",
     "admin:owner": "node scripts/admin-account.ts --owner",
     "admin:access": "node scripts/admin-access.ts",
