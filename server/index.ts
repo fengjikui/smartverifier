@@ -14,6 +14,7 @@ import { adminRoutes } from './admin/http.ts';
 import { DebugRuns } from './vision/debug-runs.ts';
 import { directLoopback } from './network.ts';
 import { MARKING_BASE, MARKING_API, canonicalPage, apiRoute, publicLinkReplacer } from '../shared/paths.ts';
+import { acquireLease, assertLeaseFree, updateLeasePath, stateUpdateLeasePath, serviceLeasePath } from './local-lease.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const revisionSchema = z.number().int().positive();
@@ -172,7 +173,13 @@ export function startServer(options: { state?: string; port?: number; host?: str
 }
 
 export function runStandalone(){
-  const {server,service,admin}=startServer();
+  const state=path.resolve(process.env.SV_STATE_DIR??path.join(root,'var/data'));
+  assertLeaseFree(updateLeasePath(root));assertLeaseFree(stateUpdateLeasePath(state));
+  const release=acquireLease(serviceLeasePath(state),root);
+  let started:ReturnType<typeof startServer>;
+  try{assertLeaseFree(updateLeasePath(root));assertLeaseFree(stateUpdateLeasePath(state));started=startServer();}catch(error){release();throw error;}
+  const {server,service,admin}=started;
+  process.once('exit',release);
   for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>{
     service.closing=true;admin.files.close();service.vision?.close?.();server.closeAllConnections();server.close();
     setTimeout(()=>{service.store.close();process.exit(0);},service.interval+100).unref();

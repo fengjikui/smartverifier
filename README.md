@@ -33,9 +33,11 @@ Windows 使用 `py -3.12 -m venv .venv` 创建环境，再执行 `npm run python
 
 ## Windows 已有版本更新
 
+推荐先停止业务服务，再**双击根目录 `update-windows.cmd`**：自动备份正品、账号及配置，校验备份后快进更新代码、安装依赖、检查并构建，失败立即停止并保存脱敏日志。第一次先拉取代码取得脚本，详见 [Windows 一键更新](docs/Windows一键更新.md)。更新成功后按原方式启动，原账号和正品继续使用。
+
 在**原项目目录**更新：停止服务 → 备份 `.env.local` 和整个 `var/`（自定义数据／账号路径另行备份）→ 拉取 `main` → 更新依赖并构建 → 按原方式启动。原来的正品、图片、管理员账号及密码沿用，不需要重新录入或初始化管理员。
 
-按 [Windows 更新步骤：保留正品和管理员账号](docs/部署说明.md#windows-update) 逐步操作，包含 PowerShell 命令、备份清单和 ZIP 安装的更新方式。本次还需检查旧的 `SV_VISION_PYTHON=./.venv/bin/python` 配置，注释后由系统自动选择 Windows 解释器。不要用模板覆盖已有 `.env.local`。
+也可按 [手工更新步骤：保留正品和管理员账号](docs/部署说明.md#windows-update) 操作，包含 PowerShell 命令、备份清单和 ZIP 安装的更新方式。手工更新时还需检查旧的 `SV_VISION_PYTHON=./.venv/bin/python` 配置，注释后由系统自动选择 Windows 解释器。不要用模板覆盖已有 `.env.local`。
 
 ## 仓库结构
 
