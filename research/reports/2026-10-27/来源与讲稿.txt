@@ -1,0 +1,76 @@
+鉴微技术探索｜两页汇报
+整理日期：2026-10-27
+历史实验：2026-10-17～18；证据版本 a0def3a。今天未重新运行模型推理。
+“U”按此前讨论中的 YOLO 理解，候选定位器采用 OBB 旋转框路线。
+
+第1页：元件定位与丝印比对
+
+本页讲稿
+这条链路把“找器件”和“判断丝印是否符合标准”拆开。前者先用传统图像处理，后者使用正品图、待检裁片和检验说明进行视觉语言模型比对。定位在降采样图上计算，把坐标映回原图后再做旋转采样；原图始终保留。图中是项目生成样片，并非工厂来料照片。右侧“SV385 / SV358”是已有 EXP-006 模型原文与人工真值共同支持的差异示例，不是本次重新进行推理。
+
+为什么目前使用 OpenCV
+绿色台面使前景与背景有较明确的颜色差异。当前实现用 HSV 绿色掩码、灰度门、闭运算、轮廓面积/长宽比/填充率筛选，再用 minAreaRect 估计小角度。这里只做几何裁片，不是学习得到的通用语义分割。当前配置最多处理6件，超出或质量异常会标记问题；本页不承诺任意背景、任意器件都能可靠定位。
+历史 CPU 探针：single 245ms / 140.00MiB；pair 311ms / 138.02MiB；dim-three 270ms / 133.88MiB。口径含该工作器的定位、裁片和派生图生成，不含 Node、VLM 或系统总内存。图示在2026-10-27由当前分离器重新生成，用于解释流程；没有用这次单次耗时替换历史性能数据。
+旋转插值改变采样像素，因此不称“完全无损”；保留引脚和边距，不用生成式超分辨率补造笔画。矩形角度本身有180度歧义，不保证文字向上，也不等同于透视矫正。
+
+为什么考虑 YOLO，为什么暂未采用
+YOLO OBB输出带角度的目标框，可学习封装外形与局部纹理，工程上有望减少对台面颜色阈值的依赖，但需要真实标注和跨背景验证；不声称已经提升了本项目召回率。优先做旋转框检测，只有精细mask明确改善下游识别时再增加实例分割，避免损伤细引脚。YOLO11n-OBB官方配置为2,695,747参数，约2.7M；这不是2.6M的普通检测版本，也不等于峰值内存。仅FP16参数理论约5.4MB，运行时/激活另计，本页没有承诺设备时延或显存。
+通用COCO类别没有集成电路；OBB常用DOTA权重针对航拍等类别。两者都不能直接等同于现成的IC检测器。下一步先收集真实平板照片及旋转框标注，评估漏件、误检、框是否保全文字和引脚，再决定是否替换。采用Ultralytics实现还需检查AGPL-3.0/Enterprise许可。
+
+来源（核验于2026-10-27）
+[E1] 项目 EXP-006，2026-10-18；3张1536×1024生成图，共6个不同裁片；6件输出与人工观察相符，但不作为生产准确率。
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/real-vision/README.md
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/real-vision/results.json
+图示原图：fixtures/inspection/green-mat-v1/pair.png；标准：reference-crop.png；生成属性与真值见同目录manifest.json。
+当前算法：server/vision/local_worker.py，green-contours-v1。
+[1] OpenCV, Contour Features（轮廓与minAreaRect）
+https://docs.opencv.org/4.13.0/dd/d49/tutorial_py_contour_features.html
+[2] Ultralytics, Oriented Bounding Box Detection（模型输出语义）
+https://docs.ultralytics.com/tasks/obb/
+YOLO11-OBB官方配置（n型2,695,747参数）
+https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/models/11/yolo11-obb.yaml
+COCO类别配置
+https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/datasets/coco.yaml
+许可
+https://www.ultralytics.com/license
+
+
+第2页：模型与输入策略的实验结果
+
+本页讲稿
+本页的数值来自2026-10-17至18日本机历史受控实验；2026-10-27只核对记录并制作汇报，没有重跑模型，不把今天的系统版本当作当时的实验版本。基线模型API标识hr-qwen，本地目录标注qwen3.8-27b-mlx，架构配置qwen3_5，MLX 4bit；这不是对官方模型命名或版本沿革的额外认定。设备Apple M2 Ultra / 64GiB，串行请求，temperature=0，请求关闭thinking，输出和输入哈希留存。
+
+[E2] 白板对照，EXP-007
+同一组自动裁片，逐件串行与一次白板使用同一套规则及输出字段，4件含一件错序和暗光裁片，6件含一件错序及三件暗光裁片。图表使用首次输入该白板的首轮，不使用重复输入的缓存成绩：4件32.158s→23.211s，降27.8%；6件44.424s→32.152s，降27.6%。白板合成每组另测3次，中位56.29/77.44ms；不计入图表模型调用墙钟，加回不改变主要判断。墙钟包含SDK连接、输入准备上传、预填充和生成，不包含共用定位/裁剪及轮间休息。所有请求串行；没有对比并行吞吐。
+先预热一次；6件逐件含预热用的C01，且C01与标准来自同一原图，首轮并非全冷。4件子集不含C01；各条件每轮只有一次，不报告统计显著性。随后重复与换位均读对，仍只有6个不同生成裁片，不能把重复观察累计成独立样本或准确率100%。当前主流程逐件识别，批量未上线。
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/whiteboard-batching/README.md
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/whiteboard-batching/results.json
+
+[E3] 小模型和OCR，EXP-002/003
+同样4张430×430裁片、相同提示和图片字节，27B / Qwen3.5-4B均为本地MLX 4bit，各使用原生模板关闭thinking。逐件抄录27B合计12.9s，4B5.7s；正品+4件白板文字比对27B19.5s，4B5.4s，两者该次全文与判定均正确。每条件仅一次，存在预热和输出长度影响，不承诺稳定倍速。一例4B独立多图把要求的对象包装成数组，文字对但对象结构不合约定。
+PP-OCRv6 small检测+识别，CPU两线程、batch1，同4张裁片读对；推理0.8844s，初始化3.6816s另计。OCR不执行完整VLM的外观和自然语言检验，不能把这三列当作同一种完整任务的速度排名。4B和OCR表格只是模块探索。
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/model-selection/results-2026-10-17.json
+https://huggingface.co/Qwen/Qwen3.5-4B
+https://github.com/PaddlePaddle/PaddleOCR/blob/main/docs/version3.x/algorithm/PP-OCRv6/PP-OCRv6.en.md
+2B、InternVL3.5、Gemma、SAM等此前只做资料筛选，未在本页写成已实测结果。
+
+[E4] 输入尺寸与布局，EXP-001
+同4块源裁片重复排16件；方形1920×1920全文16/16；长条7680×480触发本机2048长边限制，经约2048×128后全文12/16，四个SV385均被读成SV358，但仍返回16个编号。它是抄录实验：若据这些抄录直接判定，会漏掉4处差异；不是已经观测到4次生产误放行。本实验同时改变布局和有效缩放，不能把误差都归因于插值算法。
+本机SDK与REST的3072方形探针展开视觉token均对应2048方形，而非原3072；这是本机配置的实测，不是所有千问部署都固定2048。原照片与模型最终有效细节不同；按请求前尺寸/视觉token和最小字尺寸约束批量，不使用生成式“修复”。
+https://github.com/fengjikui/smartverifier/blob/a0def3a/docs/research/模型图片预处理与批量识别调研-2026-10-17.md
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/vision-batching/results-2026-10-17.json
+
+[E5] 固定前缀+Schema，EXP-008
+A旧顺序+提示词，B旧顺序+Schema，C新顺序+提示词，D新顺序+Schema。预热每条件1次排除，4张变化白板各跑四条件，执行首条件轮换，正式16次。表述25.29s是D的中位25.2935，22.08s是A中位22.0815；两者同时改变输入编排和约束，不能归因于单一变量。两组换图均0/4缓存命中，文字/判定均16/16来自4块重复源裁片，不能证明等效准确率。A原样重复可命中，而D原样重复仍0，说明不能简单归因“用户未开缓存”；最终根因仍待排查。没有修改引擎验证唯一根因。
+首token约11s、解码约31 token/s，不能将首token等待都称为思考；本轮thinking关闭。Schema以真实response_format传递，输出后仍校验编号、字段和结束状态。它不保证OCR/语义正确，现场说明冲突数组仍曾漏填。固定规则与标准前置为后续服务优化留边界，不把它宣传为本机提速。
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/prefix-cache/README.md
+https://github.com/fengjikui/smartverifier/blob/a0def3a/research/prefix-cache/results.json
+[3] vLLM官方Structured Outputs：response_format/json_schema示例仅为部署方向依据，不声称本机实验由vLLM执行。
+https://docs.vllm.ai/en/latest/features/structured_outputs/
+[4] Bai et al., Qwen3-VL Technical Report, arXiv:2511.21631, 2025，§2及多图/细粒度评测。支持动态分辨率、可变视觉token及多图能力的技术背景，不将其公开榜单当本项目准确率，也不将Qwen3-VL与本机qwen3_5架构或Qwen3.5-4B混为同一型号。
+https://arxiv.org/abs/2511.21631
+另参考Wang et al., Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution, arXiv:2409.12191, 2024，动态分辨率机制。
+https://arxiv.org/abs/2409.12191
+
+后续验收
+建立真实平板照片及逐件真值，按物理元件和拍摄批次分组，覆盖长型号、S/5/O/0/I/1、反光、粘连、不同封装和允许变动字段。主要指标：不合格误判为合格、漏件、误报、需重拍、字符差异和P95时延；模型自报置信度不是已校准概率。本机结果不能直接用于购买NVIDIA服务器或承诺百人并发。

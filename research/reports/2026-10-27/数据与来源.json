@@ -1,0 +1,459 @@
+{
+  "preparedOn": "2026-10-27",
+  "sourceCommit": "a0def3a",
+  "experimentDates": [
+    "2026-10-17",
+    "2026-10-18"
+  ],
+  "newVlmInferenceRun": false,
+  "sourceFiles": [
+    {
+      "path": "research/real-vision/results.json",
+      "sha256": "2fd8fea1e1e87d5c1c826c45ec5a8622061370a5ff89f0802b868ef4436dfe34"
+    },
+    {
+      "path": "research/whiteboard-batching/results.json",
+      "sha256": "67f0311213f191aa26e9fdb78302c470017aa0ceedf68fe8b817c52e707c3114"
+    },
+    {
+      "path": "research/model-selection/results-2026-10-17.json",
+      "sha256": "1079745f45e1e5a49be523abe76ca98be12e578e69a4362dc1009a2a32692f07"
+    },
+    {
+      "path": "research/vision-batching/results-2026-10-17.json",
+      "sha256": "5145d083c9515eebe9920aa135a46fd787261bfe12de241eebb521c713d850bc"
+    },
+    {
+      "path": "research/prefix-cache/results.json",
+      "sha256": "ff80a78210ad61f2db4363fbc99f4e9d6617054204b8d674577dbcb255fdf628"
+    }
+  ],
+  "cpuProbe": [
+    {
+      "case": "single",
+      "count": 1,
+      "elapsedMs": 245,
+      "workerPeakRssMiB": 140.0
+    },
+    {
+      "case": "pair",
+      "count": 2,
+      "elapsedMs": 311,
+      "workerPeakRssMiB": 138.02
+    },
+    {
+      "case": "dim-three",
+      "count": 3,
+      "elapsedMs": 270,
+      "workerPeakRssMiB": 133.88
+    }
+  ],
+  "whiteboardFirstRound": [
+    {
+      "group": "four",
+      "stats": {
+        "repeat": 1,
+        "singleWallMs": 32158,
+        "batchWallMs": 23211,
+        "singleSentPixels": 1412155,
+        "batchSentPixels": 1418849,
+        "singleProtocolValid": 4,
+        "batchProtocolValid": true,
+        "singleCounts": {
+          "expected": 4,
+          "textExact": 4,
+          "verdictCorrect": 4,
+          "falsePass": 0,
+          "falseFail": 0,
+          "unreadable": 0,
+          "missing": 0,
+          "invalid": 0,
+          "characterErrors": 0,
+          "characterCount": 48
+        },
+        "batchCounts": {
+          "expected": 4,
+          "textExact": 4,
+          "verdictCorrect": 4,
+          "falsePass": 0,
+          "falseFail": 0,
+          "unreadable": 0,
+          "missing": 0,
+          "invalid": 0,
+          "characterErrors": 0,
+          "characterCount": 48
+        }
+      }
+    },
+    {
+      "group": "six",
+      "stats": {
+        "repeat": 1,
+        "singleWallMs": 44424,
+        "batchWallMs": 32152,
+        "singleSentPixels": 2046943,
+        "batchSentPixels": 2028171,
+        "singleProtocolValid": 6,
+        "batchProtocolValid": true,
+        "singleCounts": {
+          "expected": 6,
+          "textExact": 6,
+          "verdictCorrect": 6,
+          "falsePass": 0,
+          "falseFail": 0,
+          "unreadable": 0,
+          "missing": 0,
+          "invalid": 0,
+          "characterErrors": 0,
+          "characterCount": 72
+        },
+        "batchCounts": {
+          "expected": 6,
+          "textExact": 6,
+          "verdictCorrect": 6,
+          "falsePass": 0,
+          "falseFail": 0,
+          "unreadable": 0,
+          "missing": 0,
+          "invalid": 0,
+          "characterErrors": 0,
+          "characterCount": 72
+        }
+      }
+    }
+  ],
+  "modelSelection": [
+    {
+      "case": "single-1",
+      "seconds4B": 2.574,
+      "seconds27B": 3.571,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "single-2",
+      "seconds4B": 1.017,
+      "seconds27B": 3.112,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "single-3",
+      "seconds4B": 1.046,
+      "seconds27B": 3.12,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "single-4",
+      "seconds4B": 1.024,
+      "seconds27B": 3.123,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 1,
+        "exact_components": 1,
+        "total": 1,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "original-four",
+      "seconds4B": 4.235,
+      "seconds27B": 16.803,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "separate-four",
+      "seconds4B": 2.637,
+      "seconds27B": 8.083,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": false,
+        "error": "期望带 items 数组的 JSON 对象"
+      }
+    },
+    {
+      "case": "grid-4",
+      "seconds4B": 2.963,
+      "seconds27B": 9.357,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ]
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "reference-and-grid-four",
+      "seconds4B": 5.361,
+      "seconds27B": 19.45,
+      "score4B": {
+        "json_valid": true,
+        "schema_valid": true,
+        "ids_exact": true,
+        "count": 4,
+        "exact_components": 4,
+        "total": 4,
+        "all_exact": true,
+        "text_difference_ids_exact": true,
+        "items": [
+          {
+            "id": 1,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 2,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          },
+          {
+            "id": 3,
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "verdict": "FAIL"
+          },
+          {
+            "id": 4,
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "verdict": "PASS"
+          }
+        ]
+      }
+    }
+  ],
+  "cpuOcr": {
+    "loadSeconds": 3.6816,
+    "cases": [
+      {
+        "id": 1,
+        "exact": true,
+        "elapsed_seconds": 0.2501
+      },
+      {
+        "id": 2,
+        "exact": true,
+        "elapsed_seconds": 0.2126
+      },
+      {
+        "id": 3,
+        "exact": true,
+        "elapsed_seconds": 0.2128
+      },
+      {
+        "id": 4,
+        "exact": true,
+        "elapsed_seconds": 0.2089
+      }
+    ]
+  },
+  "prefixSummary": [
+    {
+      "arm": "A",
+      "changingPhotoCalls": 4,
+      "medianWallMs": 22081.5,
+      "medianFirstTokenMs": 10657.5,
+      "medianOutputTokens": 348,
+      "medianCachedTokens": 0,
+      "expected": 16,
+      "textExact": 16,
+      "verdictCorrect": 16
+    },
+    {
+      "arm": "B",
+      "changingPhotoCalls": 4,
+      "medianWallMs": 24943.5,
+      "medianFirstTokenMs": 10662.5,
+      "medianOutputTokens": 428.5,
+      "medianCachedTokens": 0,
+      "expected": 16,
+      "textExact": 16,
+      "verdictCorrect": 16
+    },
+    {
+      "arm": "C",
+      "changingPhotoCalls": 4,
+      "medianWallMs": 29517.5,
+      "medianFirstTokenMs": 11008,
+      "medianOutputTokens": 583.5,
+      "medianCachedTokens": 0,
+      "expected": 16,
+      "textExact": 16,
+      "verdictCorrect": 16
+    },
+    {
+      "arm": "D",
+      "changingPhotoCalls": 4,
+      "medianWallMs": 25287,
+      "medianFirstTokenMs": 10998,
+      "medianOutputTokens": 432,
+      "medianCachedTokens": 0,
+      "expected": 16,
+      "textExact": 16,
+      "verdictCorrect": 16
+    }
+  ]
+}
