@@ -89,7 +89,7 @@ test('管理HTTP使用配置账号录入并记录人员；公开配置不泄密�
   await once(server,'listening');const address=server.address();assert.ok(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port+MARKING_API,headers={'Content-Type':'application/json','X-Forwarded-For':'192.168.1.20'};
   const config=await(await fetch(base+'/admin/config')).json();assert.deepEqual(config,{accessMode:'password',localOnly:false});assert.ok(!JSON.stringify(config).includes(user.hash));
   const login=await fetch(base+'/admin/session',{method:'POST',headers,body:JSON.stringify(credentials)});assert.equal(login.status,200);const cookie=login.headers.get('set-cookie')!.split(';')[0];
-  const record=await fetch(base+'/admin/standards',{method:'POST',headers:{...headers,Cookie:cookie},body:JSON.stringify({material:'TEST-LAN',supplier:'测试供应商',status:'draft'})});assert.equal(record.status,201);const standard=await record.json();assert.equal(standard.updatedBy.id,user.id);
+  const record=await fetch(base+'/admin/standards',{method:'POST',headers:{...headers,Cookie:cookie},body:JSON.stringify({material:'TEST-LAN',modelNumber:'M1',supplier:'测试供应商',status:'draft'})});assert.equal(record.status,201);const standard=await record.json();assert.equal(standard.updatedBy.id,user.id);
   const audit=await(await fetch(base+'/admin/audit-logs',{headers:{...headers,Cookie:cookie}})).json();assert.ok(audit.items.some((item:{actor:{id:string}})=>item.actor.id===user.id));
   const inspector=await fetch(base+'/session',{method:'POST',headers,body:'{}'});const inspectorCookie=inspector.headers.get('set-cookie')!.split(';')[0];
   assert.equal((await fetch(base+'/admin/standards',{headers:{...headers,Cookie:inspectorCookie}})).status,401);

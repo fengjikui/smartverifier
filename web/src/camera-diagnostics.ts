@@ -1,0 +1,10 @@
+import { clientId } from '../../shared/client-id.ts';
+import { apiPath } from '../../shared/paths.ts';
+export interface CameraEvent {at:string;phase:string;captureId?:string;ms?:number;width?:number;height?:number;bytes?:number;source?:string;message?:string}
+const key='sv-camera-diagnostics-v1';let events:CameraEvent[]=[];try{events=JSON.parse(localStorage.getItem(key)??'[]').slice(-200);}catch{/* node tests or private storage */}
+let pending:CameraEvent[]=[],timer:ReturnType<typeof setTimeout>|undefined;const ids=new WeakMap<File,string>();
+export function captureId(file:File){let id=ids.get(file);if(!id){id=clientId();ids.set(file,id);}return id;}
+function scheduleFlush(){if(timer||typeof window==='undefined')return;timer=setTimeout(()=>{timer=undefined;const batch=pending.splice(0,20);void fetch(apiPath('/client-events'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({events:batch}),keepalive:true}).catch(()=>{});if(pending.length)scheduleFlush();},400);}
+export function cameraEvent(phase:string,data:Omit<CameraEvent,'at'|'phase'>={}){const event={at:new Date().toISOString(),phase:phase.slice(0,60),...data,...(data.message?{message:data.message.slice(0,180)}:{})};events.push(event);events=events.slice(-200);try{localStorage.setItem(key,JSON.stringify(events));}catch{/* diagnostics must not block capture */}pending.push(event);pending=pending.slice(-100);scheduleFlush();}
+export function downloadCameraDiagnostics(){const url=URL.createObjectURL(new Blob([JSON.stringify({exportedAt:new Date().toISOString(),events},null,2)],{type:'application/json'})),link=document.createElement('a');link.href=url;link.download='鉴微-拍摄诊断.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+export async function deadline<T>(promise:Promise<T>,ms:number,message:string):Promise<T>{let timer:ReturnType<typeof setTimeout>;try{return await Promise.race([promise,new Promise<T>((_,reject)=>{timer=setTimeout(()=>reject(new Error(message)),ms);})]);}finally{clearTimeout(timer!);}}

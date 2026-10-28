@@ -60,7 +60,7 @@ test('三个实际工作器在GBK管道下正确收发UTF-8，支持中文空格
   const prepared=worker('server/vision/local_worker.py',{action:'separate',source,folder:path.join(directory,'裁剪 结果🧪'),label:'P001'});
   assert.equal(prepared.components.length,1);assert.equal(prepared.coverage,'complete');
   const manifest=path.join(directory,'标准 清单🧪.json');
-  await writeFile(manifest,JSON.stringify({schemaVersion:'1.0',records:[{materialCode:'0001',supplierName:'测试供应商🧪',imagePath:'缺失🧪.png'}]}));
+  await writeFile(manifest,JSON.stringify({schemaVersion:'1.0',records:[{materialCode:'0001',modelNumber:'M1',supplierName:'测试供应商🧪',imagePath:'缺失🧪.png'}]}));
   const imported=worker('server/admin/import_worker.py',{files:[{name:'标准.json',path:manifest}],folder:path.join(directory,'导入 图片')});
   assert.equal(imported.rows[0].supplier,'测试供应商🧪');
   assert.equal(imported.rows[0].message,'图片缺失或文件名重复：缺失🧪.png');

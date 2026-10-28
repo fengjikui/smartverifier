@@ -5,9 +5,9 @@ import type { ComponentResult, Photo, Round } from '../../shared/types';
 import { ComponentNavigator } from './component-navigator';
 import { Btn, DiffTable, PhotoCrop, Pill, VerdictPill } from './ui';
 
-export function InspectionDetail({round,photo,component,onSelect,onOriginal}: {
+export function InspectionDetail({round,photo,component,onSelect,onOriginal,onReference}: {
   round:Round;photo:Photo;component:ComponentResult;
-  onSelect:(photo:Photo,component:ComponentResult)=>void;onOriginal:()=>void;
+  onSelect:(photo:Photo,component:ComponentResult)=>void;onOriginal:()=>void;onReference?:()=>void;
 }) {
   const main=useRef<HTMLElement>(null);
   useLayoutEffect(()=>{main.current?.scrollTo({top:0,behavior:'instant'});},[component.id]);
@@ -26,10 +26,10 @@ export function InspectionDetail({round,photo,component,onSelect,onOriginal}: {
       </div>
       <ComponentNavigator scope="task" components={entries.map(entry=>entry.component)} selected={component.id} onSelect={choose}/>
     </div>
-    {(ai.instructionConflicts?.length||ai.instructionWarnings?.length)?<div className="sv-photo-attention"><span>本次按现场检验人员指示进行检测：{[...(ai.instructionConflicts??[]),...(ai.instructionWarnings??[])].join('；')}</span></div>:null}<div className="sv-compare"><section className="sv-panel"><h2>待检元件</h2><div className="sv-photo-stage"><PhotoCrop photo={photo} component={component}/></div></section><section className="sv-panel"><h2>正品基准</h2><div className="sv-photo-stage"><img className="sv-reference" src={round.standard.image} alt="本轮采用的正品基准"/></div></section></div>
+    {(ai.instructionConflicts?.length||ai.instructionWarnings?.length)?<div className="sv-photo-attention"><span>本次按现场检验人员指示进行检测：{[...(ai.instructionConflicts??[]),...(ai.instructionWarnings??[])].join('；')}</span></div>:null}<div className="sv-compare"><section className="sv-panel"><h2>待检元件</h2><div className="sv-photo-stage"><button className="sv-image-open" aria-label="放大查看待检原图" onClick={onOriginal}><PhotoCrop photo={photo} component={component}/></button></div></section><section className="sv-panel"><h2>正品基准</h2><div className="sv-photo-stage"><button className="sv-image-open" aria-label="放大查看正品原图" onClick={onReference??onOriginal}><img className="sv-reference" src={round.standard.image} alt="本轮采用的正品基准"/></button></div></section></div>
     <DiffTable expected={round.standard.lines} actual={ai.lines} reason={component.review?'AI原判与识别文字保留，最终结论以人工核对结果为准。':ai.reason}/>
     <div className="sv-detail-secondary">
-      <details key={component.id}><summary>检测依据与修正记录</summary><p>AI判断把握 {Math.round(ai.confidence*100)}%{isVlmJudgement(ai)?'（模型自评）':'（样例预设）'} · AI原判{ai.verdict==='PASS'?'合格':'不合格'}</p>{isVlmJudgement(ai)?<p>{ai.model} · {((ai.elapsedMs??0)/1000).toFixed(1)}秒 · {ai.promptVersion}</p>:null}{ai.features?.length?<p>外观特征：{ai.features.join('；')}</p>:null}<p>正品标准 v{round.standard.version} · 检测说明 v{round.instructionVersion} · 元件来源 {component.label}</p>{component.review?<p>人工修正：{component.review.person.name} · {new Date(component.review.at).toLocaleString('zh-CN')} · {component.review.reason}</p>:null}</details>
+      <details key={component.id} open><summary>检测依据与修正记录</summary><p>AI判断把握 {Math.round(ai.confidence*100)}%{isVlmJudgement(ai)?'（模型自评）':'（样例预设）'} · AI原判{ai.verdict==='PASS'?'合格':'不合格'}</p>{isVlmJudgement(ai)?<p>{ai.model} · {((ai.elapsedMs??0)/1000).toFixed(1)}秒 · {ai.promptVersion}</p>:null}{ai.features?.length?<p>外观特征：{ai.features.join('；')}</p>:null}<p>正品标准 v{round.standard.version} · 检测说明 v{round.instructionVersion} · 元件来源 {component.label}</p>{component.review?<p>人工修正：{component.review.person.name} · {new Date(component.review.at).toLocaleString('zh-CN')} · {component.review.reason}</p>:null}</details>
       <Btn tone="quiet" onClick={onOriginal}>查看原始照片</Btn>
     </div>
   </main>;

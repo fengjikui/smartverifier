@@ -16,3 +16,12 @@ test('相机已停止、空文件或过大曝光不能产生可提交照片',asy
   class Large{async takePhoto(){return new Blob([new Uint8Array(20*1024*1024+1)]);}}
   await assert.rejects(()=>cameraPhoto(video,track,Large),/20MB/);
 });
+
+test('ImageCapture 一直不返回时限时回退视频帧；画面编码失败可重试，不永久卡住',async t=>{
+ const previous=Object.getOwnPropertyDescriptor(globalThis,'document');t.after(()=>{if(previous)Object.defineProperty(globalThis,'document',previous);else Reflect.deleteProperty(globalThis,'document');});
+ let drawn=0;Object.defineProperty(globalThis,'document',{configurable:true,value:{createElement:()=>({width:0,height:0,getContext:()=>({drawImage:()=>drawn++}),toBlob:(cb:(v:Blob)=>void)=>cb(new Blob([new Uint8Array([1,2])],{type:'image/jpeg'}))})}});
+ class Hanging{takePhoto(){return new Promise<Blob>(()=>{});}}
+ const result=await cameraPhoto({readyState:2,videoWidth:640,videoHeight:480} as HTMLVideoElement,track,Hanging,{timeoutMs:5});assert.equal(result.fromVideo,true);assert.equal(drawn,1);assert.equal(result.file.type,'image/jpeg');
+ Object.defineProperty(globalThis,'document',{configurable:true,value:{createElement:()=>({getContext:()=>({drawImage:()=>{}}),toBlob:()=>{}})}});
+ await assert.rejects(()=>cameraPhoto({readyState:2,videoWidth:640,videoHeight:480} as HTMLVideoElement,track,undefined,{timeoutMs:5}),/编码超时/);
+});

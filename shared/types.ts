@@ -21,7 +21,7 @@ export interface Photo {
   message: string; components: ComponentResult[];
   preparation?: Preparation;
 }
-export interface Standard { id: string; version: number; material: string; supplier: string; modelNumber?: string; image: string; lines: string[]; description: string }
+export interface Standard { id: string; version: number; material: string; supplier: string; modelNumber?: string; image: string; lines: string[]; description: string; regionDescription?:string; regions?:import('./admin.ts').ReferenceRegion[] }
 export interface Transfer { id: string; key: string; revision: number; status: 'sending' | 'success' | 'failed'; message: string; at: string; receipt?: string; reportUrl?: string }
 export interface Round {
   id: string; taskId: string; number: number; revision: number; status: RoundStatus; createdAt: string;
@@ -29,7 +29,7 @@ export interface Round {
   transfer: Transfer | null; submittedBy?: Person; completedBy?:Person; completedAt?:string;
 }
 export interface Task {
-  id: string; number: string; material: string; supplier: string; standard: Standard | null;
+  id: string; number: string; material: string; supplier: string; modelNumber?:string; standard: Standard | null;
   roundId: string | null; effectiveRoundId: string | null;
   origin?: 'local'|'mes'|'demo'|'demo-mes'|'standalone';
   referenceId?:string; ownerId?:string; clientId?:string; createdAt?:string;

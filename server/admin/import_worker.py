@@ -8,11 +8,11 @@ IMAGE_SUFFIXES=('.jpg','.jpeg','.png','.webp')
 def filename_fields(name):
     stem=PurePosixPath(name).stem.strip()
     parts=re.split(r'\s+',stem)
-    if len(parts)!=3 or not all(parts):
-        raise ValueError('图片文件名须为“物料编号 供应商 型号”三段，各字段内部不要使用空格。')
+    if len(parts) not in (2,3) or not all(parts):
+        raise ValueError('图片文件名须为“物料编号 型号 [供应商]”两段或三段，各字段内部不要使用空格。')
     if any(any(ord(c)<32 for c in s) for s in parts):
         raise ValueError('文件名不能包含控制字符。')
-    return dict(zip(('materialCode','supplierName','modelNumber'),parts))
+    return dict(materialCode=parts[0],modelNumber=parts[1],supplierName=parts[2] if len(parts)==3 else '')
 
 def zip_entries(data):
     z=zipfile.ZipFile(io.BytesIO(data)); entries={}; total=0
@@ -41,7 +41,7 @@ def manifest(data,name):
         if ws.max_row and ws.max_row>2001: raise ValueError('每次最多 2000 条标准，请拆分工作簿。')
         rows=ws.iter_rows(); headers=[str(c.value or '').strip() for c in next(rows)]
         aliases={'物料编号':'materialCode','供应商名称':'supplierName','型号':'modelNumber','正品图片路径':'imagePath','检测说明':'description','物料名称':'name','正品丝印文字':'markingText'}
-        if not all(h in headers for h in ('物料编号','供应商名称','正品图片路径')): raise ValueError('Excel 缺少必填列，请下载模板。')
+        if not all(h in headers for h in ('物料编号','型号','正品图片路径')): raise ValueError('Excel 缺少必填列，请下载模板。')
         result=[]
         for cells in rows:
             if len(result)>2000: raise ValueError('每次最多 2000 条标准。')
@@ -51,7 +51,7 @@ def manifest(data,name):
                 if i>=len(headers) or headers[i] not in aliases: continue
                 key=aliases[headers[i]]
                 if c.data_type=='f': error='不支持公式，请粘贴为文本值。'
-                if key=='materialCode' and c.value is not None and not isinstance(c.value,str): error='物料编号必须为文本，避免前导零丢失。请将单元格设为文本后重新输入。'
+                if key in ('materialCode','modelNumber') and c.value is not None and not isinstance(c.value,str): error='物料编号和型号必须为文本，避免前导零丢失。请将单元格设为文本后重新输入。'
                 row[key]=str(c.value or '').strip()
             row['_error']=error;result.append(row)
         return result
@@ -61,7 +61,19 @@ def main(r):
     files=r['files']; contents={f['name']:Path(f['path']).read_bytes() for f in files}
     filename_mode=False
     if len(contents)!=len(files): raise ValueError('上传文件名重复，请打包为 ZIP 并使用不同路径。')
-    if len(files)==1 and files[0]['name'].lower().endswith('.zip'):
+    if r.get('archiveFiles'):
+        manifests=[n for n in contents if n.lower().endswith(('.xlsx','.json'))]
+        if len(manifests)>1: raise ValueError('RAR 中最多放一个 XLSX 或 JSON 清单。')
+        if manifests: rows=manifest(contents[manifests[0]],manifests[0])
+        else:
+            filename_mode=True
+            rows=[{'_filename':n,'imagePath':n} for n in sorted(contents) if n.lower().endswith(IMAGE_SUFFIXES)]
+        def picture(name):
+            candidates=[name,str(PurePosixPath(manifests[0]).parent/name)] if manifests else [name]
+            for key in candidates:
+                if key in contents:return contents[key]
+            raise ValueError('找不到图片：'+name)
+    elif len(files)==1 and files[0]['name'].lower().endswith('.zip'):
         archive,entries=zip_entries(contents[files[0]['name']]); manifests=[n for n in entries if n.lower().endswith(('.xlsx','.json'))]
         if len(manifests)>1: raise ValueError('ZIP 中最多放一个 XLSX 或 JSON 清单，或只放按名称整理的图片。')
         if manifests:
@@ -84,14 +96,18 @@ def main(r):
             if len(matches)!=1: raise ValueError('图片缺失或文件名重复：'+name)
             return matches[0]
     if not rows or len(rows)>2000: raise ValueError('清单不能为空，单次最多 2000 条。建议每批 500 条。')
-    output=[];assets={};seen=set();cache={}
+    output=[];assets={};cache={}
     for i,raw in enumerate(rows):
         if i%20==0: resource_check()
         row={'row':i+(1 if filename_mode else 2),'material':'','supplier':'','modelNumber':'','name':'','description':'','lines':[],'imagePath':raw.get('imagePath','') if isinstance(raw,dict) else '', 'status':'ready','message':''}
         try:
             if not isinstance(raw,dict): raise ValueError('记录必须为对象。')
             if '_filename' in raw:
-                raw={**filename_fields(raw['_filename']),'imagePath':raw['imagePath']}
+                # 文件名错误也保留可解码图片，后续可在待处理详情补齐资料。
+                imagePath=raw['imagePath']
+                if imagePath not in cache: cache[imagePath]=asset(picture(imagePath),imagePath,r['folder'])
+                a=cache[imagePath];assets[a['id']]=a;row['assetId']=a['id']
+                raw={**filename_fields(raw['_filename']),'imagePath':imagePath}
             if raw.get('_error'): raise ValueError(raw['_error'])
             unknown=set(raw)-{'materialCode','supplierName','modelNumber','imagePath','description','name','markingText','markingLines','_error'}
             if unknown: raise ValueError('不支持的字段：'+', '.join(sorted(unknown)))
@@ -100,12 +116,9 @@ def main(r):
                 if not isinstance(value,str): raise ValueError(source+' 必须为文本。')
                 row[target]=unicodedata.normalize('NFC',value.strip())
                 if len(value)>maxlen: raise ValueError(source+' 过长。')
-            if not row['material'] or not row['supplier'] or not row['imagePath']: raise ValueError('物料编号、供应商名称、图片路径均必填。')
+            if not row['material'] or not row['modelNumber'] or not row['imagePath']: raise ValueError('物料编号、型号、图片路径均必填。供应商选填。')
             imagePath=row['imagePath']
             if '\\' in imagePath or imagePath.startswith('/') or ':' in imagePath or '..' in PurePosixPath(imagePath).parts: raise ValueError('图片路径必须是清单内的安全相对路径。')
-            key=(row['material'],row['supplier'])
-            if key in seen: raise ValueError('清单内物料与供应商重复，请合并后重试。')
-            seen.add(key)
             lines=raw.get('markingLines',raw.get('markingText','').splitlines())
             if not isinstance(lines,list) or len(lines)>50 or any(not isinstance(x,str) or len(x)>300 for x in lines): raise ValueError('丝印文字格式不正确。')
             row['lines']=[x.strip() for x in lines if x.strip()]

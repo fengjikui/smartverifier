@@ -16,7 +16,7 @@ export function adminPath(route = 'references'): string {
   switch (kind) {
     case 'references': return base + '/standards';
     case 'new': return base + '/standards/new';
-    case 'edit': case 'copy': return base + '/standards/' + id + '/' + kind;
+    case 'edit': case 'copy': return base + '/standards/' + id + '/' + kind + (['crop','ignore','focus'].includes(context)?'?tool='+context:'');
     case 'detail': return base + '/standards/' + id + (context === 'trash' ? '?from=trash' : '');
     case 'trash': return base + '/standards/trash';
     case 'import': return base + '/imports';
@@ -33,7 +33,7 @@ export function adminRoute(pathname: string, search = ''): string {
   if (route === 'imports') return 'import';
   if (route === 'audit-logs') return 'audit';
   const record = route.match(/^standards\/([^/]+)(?:\/(edit|copy))?$/);
-  if (record) return record[2] ? record[2] + '/' + record[1] : 'detail/' + record[1] + (new URLSearchParams(search).get('from') === 'trash' ? '/trash' : '');
+  if (record) return record[2] ? record[2] + '/' + record[1] + (['crop','ignore','focus'].includes(new URLSearchParams(search).get('tool')??'')?'/'+new URLSearchParams(search).get('tool'):'') : 'detail/' + record[1] + (new URLSearchParams(search).get('from') === 'trash' ? '/trash' : '');
   return route;
 }
 
@@ -43,7 +43,7 @@ export function canonicalPage(pathname: string): string | null {
   if (path === MARKING_BASE || path === markingPaths.preview || path === markingPaths.loginPreview || path === markingPaths.debug) return path;
   if (path === MARKING_BASE + '/admin') return markingPaths.standards;
   const admin = MARKING_BASE + '/admin/';
-  if (['standards','standards/new','standards/trash','imports','audit-logs','tasks','users'].some(route => path === admin + route)) return path;
+  if (['standards','standards/new','standards/trash','imports','audit-logs','users'].some(route => path === admin + route)) return path;
   if (path.startsWith(admin) && /^standards\/[a-f0-9-]{36}(?:\/(?:edit|copy))?$/.test(path.slice(admin.length))) return path;
   if (path.startsWith(MARKING_BASE + '/assets/')) return path;
   return null;

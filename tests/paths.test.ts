@@ -8,7 +8,7 @@ import { startServer } from '../server/index.ts';
 import { MARKING_BASE, MARKING_API, markingPaths, adminPath, adminRoute, canonicalPage, apiPath, apiRoute, publicLinkReplacer } from '../shared/paths.ts';
 
 test('公共路径：正品详情、编辑、回收站上下文及 API 命名空间往返正确',()=>{
-  for(const route of ['references','new','edit/abc','copy/abc','detail/abc','detail/abc/trash','trash','import','audit','tasks']){
+  for(const route of ['references','new','edit/abc','copy/abc','detail/abc','detail/abc/trash','trash','import','audit','edit/abc/crop','edit/abc/ignore']){
     const url=new URL(adminPath(route),'http://localhost');
     assert.equal(adminRoute(url.pathname,url.search),route);
   }

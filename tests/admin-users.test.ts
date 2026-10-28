@@ -73,7 +73,7 @@ test('管理HTTP隔离负责人权限；停用立即撤销会话，保留资料�
   await call('/admin/users/system01',rootLogin.cookie,{},405,'DELETE');
   let account:AdminAccount=await call('/admin/users',rootLogin.cookie,{id:'editor02',name:'新录入员',password},201);assert.equal(account.role,'standard_admin');
   const staff=await login(account.id);assert.equal(staff.session.role,'standard_admin');
-  const standard=await call('/admin/standards',staff.cookie,{material:'KEEP-AFTER-DISABLE',supplier:'测试供应商',status:'draft'},201);
+  const standard=await call('/admin/standards',staff.cookie,{material:'KEEP-AFTER-DISABLE',modelNumber:'M1',supplier:'测试供应商',status:'draft'},201);
   await call('/admin/users/editor02',rootLogin.cookie,{version:account.version,name:'不能改角色',role:'owner'},400,'PUT');
   account=await call('/admin/users/editor02/status',rootLogin.cookie,{version:account.version,status:'disabled',reason:'项目录入结束'});
   await call('/admin/standards',staff.cookie,undefined,401);await call('/admin/session','',{id:account.id,code:password},403);

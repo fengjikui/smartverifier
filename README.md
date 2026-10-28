@@ -2,7 +2,7 @@
 
 面向工厂来料检验的平板 Web 应用：维护正品图片与说明，拍摄待检元件，自动定位、裁剪、转正后调用 VLM 比对，展示结论、不良数量和可追溯报告。
 
-当前版本支持正品管理、批量导入、自主检测和模拟 MES 任务。**公司 IDaaS 与 MES 尚未接通**：自主检测结果由检验员手工录入 MES，模拟回填不代表真实保存；整张检验单始终由人员在 MES 最终提交。
+当前版本支持正品管理、ZIP/RAR/Excel/JSON 批量导入、自主检测和模拟 MES 任务。正品按**物料编号＋型号**匹配，供应商选填；上传后自动分析，可先保存草稿。**公司 IDaaS 与 MES 尚未接通**：自主检测结果由检验员手工录入 MES，模拟回填不代表真实保存；整张检验单始终由人员在 MES 最终提交。
 
 ## 快速开始
 
@@ -29,7 +29,7 @@ Windows 使用 `py -3.12 -m venv .venv` 创建环境，再执行 `npm run python
 
 复制 `config/company-trial.env.example` 为根目录 `.env.local`，填写 `SV_VLM_ENDPOINT`、`SV_VLM_MODEL`、认证及 Python 路径，再运行 `npm run start:real`。可连接本机 LM Studio 或公司兼容 HTTP VLM，无需业务电脑安装模型权重。密钥及运行数据不进入 Git。
 
-首次使用建议：管理员新增并启用一份正品标准 → 检验端按物料及供应商选正品 → 上传照片 → 检测 → 查看结果与不良数。详见[检验员使用说明](docs/检验员使用说明.md)、[正品管理](docs/正品管理.md)和[VLM 配置](docs/VLM配置.md)。
+首次使用建议：管理员新增并启用一份正品标准 → 检验端按物料编号＋型号选正品 → 上传照片 → 检测 → 查看结果与不良数。详见[检验员使用说明](docs/检验员使用说明.md)、[正品管理](docs/正品管理.md)和[VLM 配置](docs/VLM配置.md)。
 
 平板网页连续取景需要受信任 HTTPS。公司部署沿用公司 CA；可使用公司网关，也可配置服务器证书后另行运行 `npm run https`。本机测试入口和证书安装说明见 [HTTPS 与平板相机](docs/HTTPS与平板相机.md)。
 
@@ -69,7 +69,7 @@ npm test
 npm run test:python
 ```
 
-测试使用临时目录，不调用真实模型。`npm run probe:real` 才会显式运行本机 VLM 烟测，请预先配置模型并检查资源。前端开发时，在一个终端运行 `npm start`，另一个终端运行 `npm run dev`；开发页地址由 Vite 输出，默认代理 API 到 5190，非默认端口可通过 `SV_DEV_API_TARGET` 指定。
+测试使用临时目录，不调用真实模型。分级命令、覆盖范围和真机验收见[分级测试与验收](docs/分级测试与验收.md)，本轮结果见[10 月 29 日验证记录](docs/验证记录-2026-10-29.md)。`npm run probe:real` 或 `npm run probe:reference` 才会显式运行本机 VLM 烟测，请预先配置模型并检查资源。前端开发时，在一个终端运行 `npm start`，另一个终端运行 `npm run dev`；开发页地址由 Vite 输出，默认代理 API 到 5190，非默认端口可通过 `SV_DEV_API_TARGET` 指定。
 
 运行单独 Python 脚本可用 `npm run python -- 脚本路径`，统一解释器选择和 UTF-8 编码。Windows 迁移排查与验证边界见 [Windows 兼容性检查](docs/Windows兼容性检查.md)。
 

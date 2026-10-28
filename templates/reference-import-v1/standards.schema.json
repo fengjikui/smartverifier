@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "正品标准批量导入 v1",
-  "description": "每条对应一组物料编号与供应商名称，先预检后确认导入。",
+  "description": "每条按物料编号与型号唯一匹配，供应商选填。已有重复由管理员明确选择覆盖。",
   "type": "object",
   "required": [
     "schemaVersion",
@@ -19,7 +19,7 @@
         "type": "object",
         "required": [
           "materialCode",
-          "supplierName",
+          "modelNumber",
           "imagePath"
         ],
         "additionalProperties": false,
@@ -32,8 +32,7 @@
           },
           "supplierName": {
             "type": "string",
-            "minLength": 1,
-            "description": "与 MES 供应商名称一致",
+            "description": "供应商名称，选填，不参与匹配",
             "maxLength": 160
           },
           "imagePath": {
@@ -67,7 +66,8 @@
           "modelNumber": {
             "type": "string",
             "maxLength": 200,
-            "description": "型号，选填；图片文件名导入时为第三段"
+            "description": "必填型号，与物料编号共同唯一",
+            "minLength": 1
           }
         }
       },

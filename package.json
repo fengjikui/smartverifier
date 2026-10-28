@@ -21,12 +21,19 @@
     "python": "node scripts/python.mjs",
     "update:windows": "node scripts/update-windows.ts",
     "probe:real": "node scripts/probe-real-vision.ts",
-    "demo:prepare": "node scripts/prepare-twenty-demo.ts"
+    "demo:prepare": "node scripts/prepare-twenty-demo.ts",
+    "test:unit": "node scripts/test.mjs unit",
+    "test:admin": "node scripts/test.mjs admin",
+    "test:camera": "node scripts/test.mjs camera",
+    "test:workflow": "node scripts/test.mjs workflow",
+    "test:deployment": "node scripts/test.mjs deployment",
+    "probe:reference": "node scripts/probe-reference.ts"
   },
   "dependencies": {
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "^1.31.0",
+    "node-unrar-js": "2.0.2",
     "radix-ui": "^1.6.7",
     "react": "19.2.6",
     "react-dom": "19.2.6",

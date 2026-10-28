@@ -18,7 +18,7 @@ import { Registry } from './admin/registry.ts';
 export const person: Person = { id: 'QA018', name: '王敏' };
 const now = () => new Date().toISOString();
 const sampleFiles: Record<SampleKind, string> = { pass: 'reference.png', fail: 'mismatch.png', four: 'four-components.png', twenty: 'twenty-components.png', quality: 'reference.png' };
-const standard: Standard = { id: 'STD-358', version: 1, material: 'MAT-358-08', supplier: '华信电子', image: assetPath('detail-1.png'), lines: ['SV358', 'A26', '0147'], description: '核对型号丝印、文字顺序、Logo与外观。当前为虚构标准，仅用于本地流程试用。' };
+const standard: Standard = { id: 'STD-358', version: 1, material: 'MAT-358-08', modelNumber:'SV358', supplier: '华信电子', image: assetPath('detail-1.png'), lines: ['SV358', 'A26', '0147'], description: '核对型号丝印、文字顺序、Logo与外观。当前为虚构标准，仅用于本地流程试用。' };
 function escapeMarkdown(s: string) { return s.replace(/[\\`*_{}\[\]<>#!|]/g, '\\$&'); }
 
 export class InspectionService {
@@ -26,7 +26,7 @@ export class InspectionService {
   constructor(directory: string, root: string, interval = 1200, vision?:VisionPipeline) {
     this.directory = directory; this.root = root; this.interval = interval; this.store = new Store(directory); this.registry = new Registry(this.store);
     this.vision=vision;
-    if (!this.store.tasks().length) for (const [id, material, supplier] of [['IQCF26090500016', 'MAT-358-08', '华信电子'], ['IQCF26090500017', 'MAT-358-08', '华信电子'], ['IQCF26090500018', 'MAT-725-16', '远成电子']]) this.store.saveTask({ id, number: id, material, supplier, standard: material === 'MAT-358-08' ? standard : null, roundId: null, effectiveRoundId: null });
+    if (!this.store.tasks().length) for (const [id, material, supplier] of [['IQCF26090500016', 'MAT-358-08', '华信电子'], ['IQCF26090500017', 'MAT-358-08', '华信电子'], ['IQCF26090500018', 'MAT-725-16', '远成电子']]) this.store.saveTask({ id, number: id, material, supplier, modelNumber:material==='MAT-358-08'?'SV358':'', standard: material === 'MAT-358-08' ? standard : null, roundId: null, effectiveRoundId: null });
     if(vision)for(const [i,trialPhoto,title] of [[1,'single','单件'],[2,'pair','双件 · 含字符差异'],[3,'dim-three','三件 · 较暗光照']] as const){
       const id='REALVISION'+i;if(!this.store.task(id))this.store.saveTask({id,number:'真实比对 · '+title,material:'SYN-SV358',supplier:'模拟拍摄验证',standard:{...standard,id:'STD-SYN-GREEN-1',material:'SYN-SV358',supplier:'模拟拍摄验证',image:apiPath('/reference/green-mat-v1.png'),description:'严格核对各行丝印字符与顺序、标志和封装特征。允许正常拍照光照及角度差异。虚构样本只验证技术链路，不能据此认定真伪。'},roundId:null,effectiveRoundId:null,trialPhoto});
     }
@@ -46,7 +46,7 @@ export class InspectionService {
     if(!task){const referenceId=mockReferenceId(id),standard=referenceId?this.registry.active(referenceId):null;if(standard&&mockTask(standard).id===id)task=mockTask(standard);}
     if(!task)throw new ApiError(404,'没有找到这项检测记录。');
     if(task.origin==='standalone')task.standard=task.referenceId?this.registry.active(task.referenceId):null;
-    else if(['local','mes','demo-mes'].includes(task.origin??''))task.standard=this.registry.match(task.material,task.supplier);
+    else if(['local','mes','demo-mes'].includes(task.origin??''))task.standard=this.registry.match(task.material,task.modelNumber??task.standard?.modelNumber??'');
     return task;
   }
   authorizeTask(id:string,actor:Person){const task=this.task(id);if(task.origin==='standalone'&&task.ownerId!==actor.id)throw new ApiError(404,'没有找到这项检测记录。');return task;}
@@ -57,12 +57,15 @@ export class InspectionService {
     return {...task,status:round?.status==='completed'?'已完成':!task.standard&&!round?.standard?'缺少基准':task.effectiveRoundId?(round?.status==='submitted'?'已有结果':'重检草稿'):round?(['queued','running'].includes(round.status)?'检测中':task.origin==='standalone'&&round.status==='ready'?'检测完成':'未提交'):'未检测',summary:round?summarize(round):null};
   }
   list():TaskListItem[]{return this.store.tasks().map(stored=>this.item(this.task(stored.id)));}
-  taskPage(query='',page=1,size=25):TaskPage {
+  taskPage(query='',page=1,size=25,scope:'all'|'unfinished'|'finished'='all'):TaskPage {
     const q=query.trim().toLocaleLowerCase(),referenceQuery=['模拟','模拟mes'].includes(q)?'':query;
-    const references=this.registry.page(referenceQuery,'active',page,size);
-    const stored=this.list().filter(task=>{
+    const all=this.list(),finished=(task:TaskListItem)=>['submitted','completed'].includes((task.roundId?this.store.round(task.roundId)?.status:undefined)??'');
+    const finishedReferences=all.filter(t=>t.referenceId&&t.origin==='demo-mes'&&finished(t)).flatMap(t=>{const ref=this.registry.active(t.referenceId!);return ref&&mockTask(ref).id===t.id?[t.referenceId!]:[];});
+    const references=this.registry.page(referenceQuery,'active',page,size,scope==='all'?undefined:{values:[...new Set(finishedReferences)],exclude:scope==='unfinished'});
+    const stored=all.filter(task=>{
+      if(scope!=='all'&&finished(task)!==(scope==='finished'))return false;
       if(task.origin==='demo-mes'&&task.referenceId){const reference=this.registry.active(task.referenceId);if(reference&&mockTask(reference).id===task.id)return false;}
-      return [task.number,task.material,task.supplier].some(v=>v.toLocaleLowerCase().includes(q));
+      return [task.number,task.material,task.supplier,task.modelNumber??''].some(v=>v.toLocaleLowerCase().includes(q));
     });
     const offset=(page-1)*size,items:TaskListItem[]=[];
     if(offset<references.total)for(const record of references.items){const standard=this.registry.active(record.id)!;items.push(this.item(this.task(mockTask(standard).id)));}
@@ -75,7 +78,7 @@ export class InspectionService {
     if(retry){if(retry.referenceId!==referenceId)throw new ApiError(409,'此次请求已用于另一份标准，请重新选择。');return this.view(retry.id);}
     const standard=this.registry.active(referenceId);if(!standard)throw new ApiError(409,'该正品标准已停用或不存在，请刷新后重新选择。');
     if(standard.version!==version)throw new ApiError(409,'正品标准刚刚更新，请刷新列表后重新选择。');
-    const task:Task={id:'SELF'+randomUUID().replaceAll('-','').toUpperCase(),number:'自主检测 · '+standard.material,material:standard.material,supplier:standard.supplier,standard,origin:'standalone',referenceId,ownerId:actor.id,clientId,createdAt:now(),roundId:null,effectiveRoundId:null};
+    const task:Task={id:'SELF'+randomUUID().replaceAll('-','').toUpperCase(),number:'自主检测 · '+standard.material,material:standard.material,supplier:standard.supplier,modelNumber:standard.modelNumber,standard,origin:'standalone',referenceId,ownerId:actor.id,clientId,createdAt:now(),roundId:null,effectiveRoundId:null};
     const round:Round={id:randomUUID(),taskId:task.id,number:1,revision:1,status:'draft',createdAt:now(),standard:structuredClone(standard),instruction:'',instructionVersion:1,nextPhotoSequence:1,photos:[],transfer:null};task.roundId=round.id;
     this.store.transaction(()=>{this.store.saveTask(task);this.store.saveRound(round);this.store.audit(round,actor,'standalone.start',{standardId:referenceId,standardVersion:version});});return this.view(task.id);
   }
@@ -89,7 +92,7 @@ export class InspectionService {
   open(id: string) { const t = this.task(id); if (!t.roundId && t.standard) this.newRound(id, false); return this.view(id); }
   newRound(id: string, reuse: boolean): TaskView {
     const t = this.task(id); if (!t.standard) throw new ApiError(409, '缺少正品基准，请联系管理员');
-    if(t.origin==='standalone'&&(t.material!==t.standard.material||t.supplier!==t.standard.supplier))throw new ApiError(409,'正品物料或供应商已变化，请重新选择正品开始检测。');
+    if(t.origin==='standalone'&&(t.material!==t.standard.material||(t.modelNumber??'')!==(t.standard.modelNumber??'')))throw new ApiError(409,'正品物料或型号已变化，请重新选择正品开始检测。');
     const previous = t.roundId ? this.round(t.roundId) : null;
     if (previous && !['submitted','completed'].includes(previous.status)) throw new ApiError(409, '当前还有未提交的检测草稿，请先继续本轮。');
     const r: Round = { id: randomUUID(), taskId: id, number: (previous?.number ?? 0) + 1, revision: 1, status: 'draft', createdAt: now(), standard: structuredClone(t.standard), instruction: previous?.instruction ?? '', instructionVersion: 1, nextPhotoSequence: previous?.nextPhotoSequence ?? 1, photos: [], transfer: null };
@@ -278,7 +281,7 @@ export class InspectionService {
     const taskNumber=this.store.task(r.taskId)?.number??r.taskId,standalone=this.task(r.taskId).origin==='standalone';
     const real=r.photos.some(p=>p.components.some(c=>isVlmJudgement(c.ai)));
     const operator=r.completedBy??r.submittedBy;
-    const s = summarize(r), lines = [real?'# 丝印检测报告（VLM真实识别）':'# 丝印检测报告（本地模拟）', '', real?'> 结果来源按元件标明，可能同时包含真实模型与内置预设。身份及MES仍为本地模拟，未接通公司系统。带“模拟拍摄”名称的照片由图像生成模型生成，不用于评估现场准确率。':'> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- ${standalone?'检测记录':'检验单号'}：${escapeMarkdown(taskNumber)}`, `- 物料编号：${escapeMarkdown(r.standard.material)}；供应商：${escapeMarkdown(r.standard.supplier)}`, ...(r.standard.modelNumber?[`- 型号：${escapeMarkdown(r.standard.modelNumber)}`]:[]), `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (operator ? `${operator.name} ${operator.id}` : standalone?'尚未完成':'尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', real?'现场说明已随真实双图一起发送给模型；内置预设不执行自然语言要求。':'说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
+    const s = summarize(r), lines = [real?'# 丝印检测报告（VLM真实识别）':'# 丝印检测报告（本地模拟）', '', real?'> 结果来源按元件标明，可能同时包含真实模型与内置预设。身份及MES仍为本地模拟，未接通公司系统。带“模拟拍摄”名称的照片由图像生成模型生成，不用于评估现场准确率。':'> 仅用于流程验证。识别为内置样例预设结果，未连接真实模型与公司MES。', '', `- ${standalone?'检测记录':'检验单号'}：${escapeMarkdown(taskNumber)}`, `- 物料编号：${escapeMarkdown(r.standard.material)}；供应商：${escapeMarkdown(r.standard.supplier)}`, ...(r.standard.modelNumber?[`- 型号：${escapeMarkdown(r.standard.modelNumber)}`]:[]), `- 第${r.number}轮，标准版本：${r.standard.version}，检测说明版本：${r.instructionVersion}`, `- 结论：${s.verdict === 'PASS' ? '合格' : s.verdict === 'FAIL' ? '不合格' : '尚未完成'}`, `- 元件数：${s.total}；不良数：${s.fail}`, '- 操作人：' + (operator ? `${operator.name} ${operator.id}` : standalone?'尚未完成':'尚未回填'), '', '## 检测依据', escapeMarkdown(r.standard.description), ...(r.standard.regionDescription?['','### 区域检查说明',escapeMarkdown(r.standard.regionDescription)]:[]), '', '## 现场检测说明（本次优先）', escapeMarkdown(r.instruction || '无补充说明'), '', real?'现场说明已随真实双图一起发送给模型；内置预设不执行自然语言要求。':'说明的自然语言理解将在真实模型阶段验证，本阶段预设样例结果不会理解或执行说明。', ''];
     const conflicts=[...new Set(r.photos.flatMap(p=>p.components.flatMap(c=>[...(c.ai?.instructionConflicts??[]),...(c.ai?.instructionWarnings??[])])))];
     if(conflicts.length)lines.splice(4,0,'## 重要：现场说明优先及与标准的关系','本次按现场检验人员指示进行检测。',...conflicts.map(escapeMarkdown),'');
     for (const p of r.photos) {

@@ -200,8 +200,15 @@ async def recognize(req):
         row=next((line for line in status.splitlines() if line.split() and line.split()[0]==req['model']),'')
         if 'IDLE' not in row:raise RuntimeError('目标模型未空闲，未发起调试请求。')
     metrics=[]
-    def block(filename):
-        pic = decode(filename); stream = BytesIO(); pic.save(stream,format="PNG")
+    def block(filename, regions=None):
+        pic = decode(filename)
+        if regions:
+            draw = ImageDraw.Draw(pic)
+            for index, region in enumerate(regions):
+                x,y,w,h = (region[k] for k in ('x','y','width','height'))
+                color = (35,117,78) if region['kind']=='focus' else (210,140,0)
+                draw.rectangle((round(x*pic.width),round(y*pic.height),round((x+w)*pic.width)-1,round((y+h)*pic.height)-1),outline=color,width=max(2,round(min(pic.size)/500)))
+        stream = BytesIO(); pic.save(stream,format="PNG")
         data=stream.getvalue()
         metrics.append({"inputIndex":len(metrics),"sha256":hashlib.sha256(data).hexdigest(),"sentWidth":pic.width,"sentHeight":pic.height,"encodedBytes":len(data),"effectiveWidth":None,"effectiveHeight":None})
         return {"type":"image_url","image_url":{"url":"data:image/png;base64,"+base64.b64encode(data).decode()}}
@@ -212,8 +219,11 @@ async def recognize(req):
         from vlm_client.silkscreen_prompts import BATCH_PROMPT
         prompt=BATCH_PROMPT+'\n本次必须返回的componentId列表：'+json.dumps(req['componentIds'],ensure_ascii=False)
     layout=req.get('inputLayout','legacy')
-    reference,sample=block(req['reference']),block(req['sample'])
-    if req.get('componentIds'):
+    reference=block(req['reference'],req.get('referenceRegions'))
+    sample=block(req['sample']) if req['action']!='analyze_reference' else None
+    if req['action']=='analyze_reference':
+        messages=[{'role':'user','content':[{'type':'text','text':req['analysisPrompt']},reference]}]
+    elif req.get('componentIds'):
         fixed=BATCH_PROMPT
         scope='\n本次必须返回的componentId列表：'+json.dumps(req['componentIds'],ensure_ascii=False)
         messages=ordered_messages(fixed,scope,reference,sample,layout)

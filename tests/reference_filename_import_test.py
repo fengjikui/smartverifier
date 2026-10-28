@@ -20,19 +20,19 @@ class FilenameImportTest(unittest.TestCase):
             for name in names:z.writestr(name,image.getvalue())
         return worker.main({'files':[{'name':'图片.zip','path':str(filename)}],'folder':str(folder/'assets')})
     def test_folder_spaces_model_and_empty_description(self):
-        result=self.pack(['图片/000123  华信电子   STM32-F407.png','图片/MAT-02\u3000供应商乙\u3000SV358.PNG'])
+        result=self.pack(['图片/000123  STM32-F407   华信电子.png','图片/MAT-02\u3000SV358.PNG'])
         rows=result['rows'];self.assertEqual([r['status'] for r in rows],['ready','ready'])
         self.assertEqual((rows[0]['material'],rows[0]['supplier'],rows[0]['modelNumber']),('000123','华信电子','STM32-F407'))
-        self.assertEqual(rows[0]['description'],'');self.assertEqual(len(result['assets']),1)
+        self.assertEqual(rows[1]['supplier'],'');self.assertEqual(rows[1]['modelNumber'],'SV358');self.assertEqual(rows[0]['description'],'');self.assertEqual(len(result['assets']),1)
     def test_bad_filename_is_visible_without_guessing_or_partial_standard_writes(self):
         result=self.pack(['只有一个名字.png','001 供应商 型号 多余.png','002 供应商 型号.png'])
         self.assertEqual([r['status'] for r in result['rows']],['error','ready','error'])
         self.assertEqual(result['rows'][0]['imagePath'],'001 供应商 型号 多余.png')
         self.assertTrue(all('三段' in r['message'] for r in result['rows'] if r['status']=='error'))
-    def test_duplicate_pair_even_when_models_differ(self):
-        result=self.pack(['001 供应商 型号A.png','001 供应商 型号B.png'])
-        self.assertEqual([r['status'] for r in result['rows']],['ready','error'])
-        self.assertIn('重复',result['rows'][1]['message'])
+    def test_same_batch_candidates_are_preserved_for_explicit_selection(self):
+        result=self.pack(['第一组/001 型号A 供应商.png','另一组/001 型号A.png','001 型号B.png'])
+        self.assertEqual([r['status'] for r in result['rows']],['ready','ready','ready'])
+        self.assertEqual(len(result['rows']),3)
     def test_path_traversal_still_rejected(self):
         with self.assertRaisesRegex(ValueError,'不安全'):self.pack(['../001 供应商 型号.png'])
     def test_template_zip_is_usable(self):

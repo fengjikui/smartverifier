@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { seedAnalysis, fakeReferenceAnalysis } from './reference-fixture.ts';
 import assert from 'node:assert/strict';
 import { mkdtemp, rm } from 'node:fs/promises';
 import path from 'node:path';
@@ -12,7 +13,8 @@ import type { TaskView } from '../shared/types.ts';
 const root=path.resolve('.');
 function register(service:InspectionService,supplier='供应商甲',material='000007') {
   service.registry.addAsset({id:'11111111-1111-1111-1111-111111111111.png',filename:'测试正品.png',width:800,height:600,bytes:100,sha256:'a'.repeat(64),thumbnail:'/api/v1/inspections/marking/reference-assets/11111111-1111-1111-1111-111111111111-thumb.jpg'});
-  return service.registry.save({material,supplier,name:'测试元件',description:'',lines:['SV358','A26','0147'],assetId:'11111111-1111-1111-1111-111111111111.png',status:'active'},person);
+  seedAnalysis(service.registry,'11111111-1111-1111-1111-111111111111.png');
+  return service.registry.save({material,supplier,modelNumber:supplier==='供应商乙'?'SV359':'SV358',name:'测试元件',description:'',lines:['SV358','A26','0147'],assetId:'11111111-1111-1111-1111-111111111111.png',status:'active'},person);
 }
 async function waitFor(service:InspectionService,id:string,status:string){for(let i=0;i<200;i++){const v=service.view(id);if(v.round?.status===status)return v;await delay(5);}throw Error('等待状态超时 '+status);}
 
@@ -20,16 +22,16 @@ test('正品选择与模拟MES：两供应商、空说明、草稿排除、查�
   const directory=await mkdtemp(path.join(tmpdir(),'sv-standalone-')),service=new InspectionService(directory,root,1);
   t.after(async()=>{service.closing=true;await delay(20);service.store.close();await rm(directory,{recursive:true,force:true});});
   const first=register(service),second=register(service,'供应商乙');
-  service.registry.save({material:'DRAFT',supplier:'S',name:'',description:'',lines:[],assetId:'',status:'draft'},person);
+  service.registry.save({material:'DRAFT',modelNumber:'SV358',supplier:'S',name:'',description:'',lines:[],assetId:'',status:'draft'},person);
   assert.equal(service.registry.catalog('000007').total,2);assert.deepEqual(service.registry.catalog('000007').suppliers,['供应商乙','供应商甲'].sort());
   assert.equal(service.registry.catalog('000007','供应商甲').items[0].description,'');assert.equal(service.registry.catalog('DRAFT').total,0);
   const stored=service.store.tasks().length,selection=service.taskPage('供应商乙');assert.equal(selection.total,1);assert.equal(selection.items[0].origin,'demo-mes');assert.equal(selection.items[0].standard!.id,second.id);
   assert.equal(service.store.tasks().length,stored,'浏览标准或模拟任务不能批量生成数据库任务');
   const opened=service.open(selection.items[0].id);assert.equal(opened.round!.standard.id,second.id);assert.equal(service.open(opened.task.id).round!.id,opened.round!.id);
   assert.equal(service.taskPage('供应商乙').total,1,'选择过的模拟任务不能重复出现在列表');
-  service.registry.save({material:first.material,supplier:first.supplier,name:'更新',description:'说明更新',lines:first.lines,assetId:first.assetId,status:'active'},person,first.id,1);
+  service.registry.save({material:first.material,modelNumber:first.modelNumber,supplier:first.supplier,name:'更新',description:'说明更新',lines:first.lines,assetId:first.assetId,status:'active'},person,first.id,1);
   assert.equal(service.registry.catalog('000007','供应商甲').items[0].version,2);
-  service.store.transaction(()=>{for(let i=0;i<60;i++)service.registry.saveWithinTransaction({material:'PAGED-'+i,supplier:'供应商',name:'',description:'',lines:[],assetId:first.assetId,status:'active'},person);});
+  service.store.transaction(()=>{for(let i=0;i<60;i++)service.registry.saveWithinTransaction({material:'PAGED-'+i,modelNumber:'SV358',supplier:'供应商',name:'',description:'',lines:[],assetId:first.assetId,status:'active'},person);});
   assert.equal(service.taskPage('PAGED-',3).items.length,10);assert.equal(service.taskPage('PAGED-',3).total,60);
   assert.equal(service.store.tasks().length,stored+1,'未选择的模拟任务保持虚拟，不逐条落库');
 });
@@ -51,13 +53,13 @@ test('自主检测：独立保存、增量、质量阻断、人工改判、完�
   assert.equal(service.complete(view.round!.id,stale,person).round!.revision,view.round!.revision);assert.throws(()=>service.review(view.round!.id,view.round!.revision,bad.id,'FAIL','修改',person),/已经提交|当前轮次/);
   assert.throws(()=>service.submit(view.round!.id,view.round!.revision,person),/不能回填/);assert.equal(service.store.db.prepare('SELECT COUNT(*) n FROM receipts').get()!.n,0);
   assert.match(service.report(view.round!),/本次未关联 MES 任务/);assert.match(service.report(view.round!),/自主检测记录/);assert.match(service.report(view.round!),new RegExp('操作人：'+person.name+' '+person.id));
-  service.registry.save({material:standard.material,supplier:standard.supplier,name:standard.name,description:'新的检测说明',lines:standard.lines,assetId:standard.assetId,status:'active'},person,standard.id,1);
+  service.registry.save({material:standard.material,modelNumber:standard.modelNumber,supplier:standard.supplier,name:standard.name,description:'新的检测说明',lines:standard.lines,assetId:standard.assetId,status:'active'},person,standard.id,1);
   const old=structuredClone(view.round!);assert.equal(service.view(view.task.id).round!.standard.version,1);view=service.newRound(view.task.id,false);assert.equal(view.round!.standard.version,2);assert.deepEqual(service.store.round(old.id),old);
   assert.throws(()=>service.startStandalone(standard.id,1,'stale',person),/更新/);assert.equal(service.standaloneRecent(person).length,1);assert.equal(service.standaloneRecent({id:'OTHER',name:'其他人'}).length,0);
 });
 
 test('HTTP：正品查询、供应商选择、自主检测归属、任务写入封闭及完成/回填边界',async t=>{
-  const directory=await mkdtemp(path.join(tmpdir(),'sv-standalone-http-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1});await once(server,'listening');const address=server.address();assert.ok(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port;
+  const directory=await mkdtemp(path.join(tmpdir(),'sv-standalone-http-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1,referenceAnalyzer:fakeReferenceAnalysis});await once(server,'listening');const address=server.address();assert.ok(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port;
   t.after(async()=>{service.closing=true;admin.files.close();server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await delay(30);service.store.close();await rm(directory,{recursive:true,force:true});});
   const standard=register(service);register(service,'供应商乙');
   const login=await fetch(base+'/api/v1/inspections/marking/session',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),cookie=login.headers.get('set-cookie')!.split(';')[0];

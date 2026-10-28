@@ -5,7 +5,6 @@ import { Btn, Field, Pill, Spinner } from '../ui';
 import { request, ApiError } from '../api';
 import { ReferenceList, ReferenceDetailView, AuditView } from './references';
 import { ReferenceForm } from './reference-form';
-import { TaskList } from './tasks';
 import { ImportView } from './import-view';
 import { Users } from './users';
 import type { AdminSession, AdminLoginConfig } from '../../../shared/admin';
@@ -24,17 +23,16 @@ export function Admin(){
   if(!session)return <AdminLogin error={error} onLogin={value=>{setError('');setNotice('');setSession(value);}} onError={failed}/>;
   const kind=path.split('/')[0],id=path.split('/')[1],isForm=kind==='new'||kind==='edit'||kind==='copy';
   const owner=session.role==='owner';
-  const nav=[['references','grid','正品标准'],['tasks','grid','检验任务'],['audit','clock','维护日志'],['trash','trash','回收站'],...(owner?[['users','users','人员与权限']]:[])];
+  const nav=[['references','grid','正品标准'],['audit','clock','维护日志'],['trash','trash','回收站'],...(owner?[['users','users','人员与权限']]:[])];
   return <div className="adm-app">
     <aside className="adm-sidebar"><div className="adm-brand"><img src={assetPath('admin/scan.svg')} width="30" height="30" alt=""/><strong>鉴微</strong></div><p>正品管理工作台</p><nav aria-label="管理导航">{nav.map(([key,icon,label])=><button key={key} aria-current={kind===key||(key==='trash'&&path.endsWith('/trash'))||(key==='references'&&!path.endsWith('/trash')&&['new','edit','copy','detail','import'].includes(kind))?'page':undefined} onClick={()=>go(key)}>{key==='users'?<ShieldCheck size={22}/>:<img src={assetPath('admin/'+icon+'.svg')} width="22" height="22" alt=""/>}{label}</button>)}</nav><div className="adm-person"><strong>{session.person.name}</strong><span>{session.person.id} · {owner?'系统负责人':session.mode==='password'?'正品管理员':'管理员试用'}</span><Btn tone="quiet" onClick={()=>{if(dirty.current&&!confirm('尚有未保存的修改，仍要退出吗？'))return;void request('/admin/session',{},'DELETE').then(()=>{dirty.current=false;setNotice('');setError('');setSession(null);}).catch(failed);}}><LogOut size={16}/>退出</Btn></div></aside>
-    <div className="adm-workspace"><header className="adm-topbar"><div>{isForm||kind==='detail'||kind==='import'?<Btn tone="quiet" aria-label="返回正品标准" onClick={()=>go(kind==='detail'&&path.endsWith('/trash')?'trash':'references')}><ArrowLeft size={18}/></Btn>:null}<span>正品管理 / {kind==='users'?'人员与权限':kind==='tasks'?'检验任务':kind==='audit'?'维护日志':kind==='trash'?'回收站':'正品标准'}</span></div><Pill>{session.localOnly?'本机会话':'协作录入'}</Pill></header>
+    <div className="adm-workspace"><header className="adm-topbar"><div>{isForm||kind==='detail'||kind==='import'?<Btn tone="quiet" aria-label="返回正品标准" onClick={()=>go(kind==='detail'&&path.endsWith('/trash')?'trash':'references')}><ArrowLeft size={18}/></Btn>:null}<span>正品管理 / {kind==='users'?'人员与权限':kind==='audit'?'维护日志':kind==='trash'?'回收站':'正品标准'}</span></div><Pill>{session.localOnly?'本机会话':'协作录入'}</Pill></header>
     <main className="adm-main" key={path}>
       {notice?<div className="adm-notice" role="status">{notice}<button aria-label="关闭提示" onClick={()=>setNotice('')}>×</button></div>:null}
       {error?<div className="adm-error" role="alert">{error}<button aria-label="关闭错误提示" onClick={()=>setError('')}>×</button></div>:null}
-      {kind==='users'?(owner?<Users onError={failed} onSaved={saved}/>:<section className="adm-panel adm-empty"><ShieldCheck size={32}/><h1>无访问权限</h1><p>人员与权限仅供系统负责人使用。你仍可维护正品标准。</p><Btn onClick={()=>go('references')}>返回正品标准</Btn></section>):isForm?<ReferenceForm mode={kind} id={id} person={session.person} onDirty={v=>dirty.current=v} onSaved={saved} onError={failed} navigate={go}/>:
+      {kind==='users'?(owner?<Users onError={failed} onSaved={saved}/>:<section className="adm-panel adm-empty"><ShieldCheck size={32}/><h1>无访问权限</h1><p>人员与权限仅供系统负责人使用。你仍可维护正品标准。</p><Btn onClick={()=>go('references')}>返回正品标准</Btn></section>):isForm?<ReferenceForm mode={kind} id={id} imageTool={['crop','ignore','focus'].includes(path.split('/')[2])?path.split('/')[2] as 'crop'|'ignore'|'focus':undefined} person={session.person} onDirty={v=>dirty.current=v} onSaved={saved} onError={failed} navigate={go}/>:
       kind==='detail'?<ReferenceDetailView id={id} navigate={go} onError={failed} onSaved={saved}/>:
       kind==='import'?<ImportView person={session.person} navigate={go} onError={failed} onSaved={saved}/>:
-      kind==='tasks'?<TaskList onError={failed} revision={revision}/>:
       kind==='audit'?<AuditView onError={failed}/>:
       <ReferenceList trash={kind==='trash'} navigate={go} onError={failed} onSaved={saved} revision={revision}/>}
     </main></div>

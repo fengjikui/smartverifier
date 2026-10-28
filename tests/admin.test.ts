@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { seedAnalysis, fakeReferenceAnalysis } from './reference-fixture.ts';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -16,15 +17,15 @@ const root=path.resolve('.');
 const input={material:'00123',supplier:'测试供应商',modelNumber:'SV-358-MODEL',name:'测试器件',description:'允许批次码变化。',lines:[],assetId:'',status:'active' as const};
 
 // 模拟 MES 已同步的数据，不通过应用提供手工维护入口。
-function seedMesTask(service:InspectionService,fields:{number:string;material:string;supplier:string}):Task {
-  const task:Task={...fields,id:'MESTEST001',origin:'mes',standard:null,roundId:null,effectiveRoundId:null};
+function seedMesTask(service:InspectionService,fields:{number:string;material:string;supplier:string;modelNumber?:string}):Task {
+  const task:Task={modelNumber:input.modelNumber,...fields,id:'MESTEST001',origin:'mes',standard:null,roundId:null,effectiveRoundId:null};
   service.store.saveTask(task);return task;
 }
 
 test('标准库：版本冲突、重复、任务自动绑定、软删除与历史快照保护，15000条分页查询',async t=>{
   const directory=await mkdtemp(path.join(tmpdir(),'sv-registry-')),service=new InspectionService(directory,root),r=service.registry;
   t.after(async()=>{service.store.close();await rm(directory,{recursive:true,force:true});});
-  const asset={id:'11111111-1111-1111-1111-111111111111.png',filename:'正品.png',width:800,height:600,bytes:100,sha256:'a'.repeat(64),thumbnail:'/api/v1/inspections/marking/reference-assets/11111111-1111-1111-1111-111111111111-thumb.jpg'};r.addAsset(asset);
+  const asset={id:'11111111-1111-1111-1111-111111111111.png',filename:'正品.png',width:800,height:600,bytes:100,sha256:'a'.repeat(64),thumbnail:'/api/v1/inspections/marking/reference-assets/11111111-1111-1111-1111-111111111111-thumb.jpg'};r.addAsset(asset);seedAnalysis(r,asset.id);
   assert.throws(()=>r.save(input,person),/图片/);
   let standard=r.save({...input,assetId:asset.id},person);assert.equal(standard.material,'00123');
   assert.throws(()=>r.save({...input,assetId:asset.id},person),/已存在/);
@@ -36,7 +37,7 @@ test('标准库：版本冲突、重复、任务自动绑定、软删除与历�
   const pipeline=new LocalVisionPipeline(root,directory);assert.equal(pipeline.reference(opened.round!),path.join(directory,'files',asset.id));
   standard=r.trash(standard.id,2,false,person);assert.equal(service.task(task.id).standard,null);assert.deepEqual(service.view(task.id).round!.standard,snapshot);
   const replacement=r.save({...input,assetId:asset.id},person);assert.throws(()=>r.trash(standard.id,3,true,person),/重复/);r.trash(replacement.id,1,false,person);standard=r.trash(standard.id,3,true,person);assert.equal(standard.version,4);
-  assert.equal(r.detail(standard.id).events.length,4);assert.ok(r.detail(standard.id).tasks.some(item=>item.id===task.id));
+  assert.equal(r.detail(standard.id).events.length,4);assert.ok(!('tasks' in r.detail(standard.id)),'管理详情不拉取检验任务');
   assert.equal(r.page('%').total,0,'LIKE通配符应按文字搜索');
   const started=performance.now();service.store.transaction(()=>{for(let i=0;i<15000;i++)r.saveWithinTransaction({...input,material:'PERF-'+String(i).padStart(5,'0'),assetId:asset.id},person);});
   const insertMs=performance.now()-started,queryAt=performance.now(),result=r.page('PERF-149','active',1,25),queryMs=performance.now()-queryAt;
@@ -45,7 +46,7 @@ test('标准库：版本冲突、重复、任务自动绑定、软删除与历�
 });
 
 test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复跳过、错误阻断、幂等导入、关联检验',async t=>{
-  const directory=await mkdtemp(path.join(tmpdir(),'sv-admin-中文 空格-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1});await once(server,'listening');const addr=server.address();assert.ok(addr&&typeof addr!=='string');const base='http://127.0.0.1:'+addr.port;
+  const directory=await mkdtemp(path.join(tmpdir(),'sv-admin-中文 空格-')),{server,service,admin}=startServer({state:directory,port:0,host:'127.0.0.1',delay:1,referenceAnalyzer:fakeReferenceAnalysis});await once(server,'listening');const addr=server.address();assert.ok(addr&&typeof addr!=='string');const base='http://127.0.0.1:'+addr.port;
   t.after(async()=>{admin.files.close();service.closing=true;server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await delay(30);service.store.close();await rm(directory,{recursive:true,force:true});});
   let cookie='';async function call(route:string,data?:unknown,status=200,method?:string){const res=await fetch(base+'/api/v1/inspections/marking'+route,{method:method??(data===undefined?'GET':'POST'),headers:{...(cookie?{Cookie:cookie}:{}),...(data===undefined||data instanceof FormData?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:data instanceof FormData?data:JSON.stringify(data)});const v=await res.json();assert.equal(res.status,status,JSON.stringify(v));return v;}
   await call('/admin/standards',undefined,401);await call('/admin/session',{id:'admin',code:'wrong'},401);
@@ -62,7 +63,7 @@ test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复
   const tasksBefore=service.store.tasks();
   for(const [route,method] of [['/admin/tasks','POST'],['/admin/tasks/'+created.id,'POST'],['/admin/tasks/'+created.id,'PUT'],['/admin/tasks/'+created.id,'PATCH'],['/admin/tasks/'+created.id,'DELETE'],['/admin/tasks/T00000000000000000000000000000000','DELETE']])assert.match((await call(route,{number:'不得修改',material:'OTHER',supplier:'OTHER'},405,method)).message,/MES/);
   assert.deepEqual(service.store.tasks(),tasksBefore,'管理接口不能增删改 MES 任务');
-  assert.ok((await call('/admin/tasks')).items.some((task:Task)=>task.id===created.id&&task.standard?.id===standard.id));
+  await call('/admin/tasks',undefined,404);
   assert.equal((await fetch(base+'/api/v1/inspections/marking/tasks/'+created.id+'/open',{method:'POST',headers:{Cookie:inspectionCookie,'Content-Type':'application/json'},body:'{}'}).then(r=>r.json())).round.standard.id,standard.id);
   for(const kind of ['xlsx','json','zip','help','filenames'])assert.equal((await fetch(base+'/api/v1/inspections/marking/admin/templates/'+kind,{headers:{Cookie:cookie}})).status,200);
   async function poll(id:string){for(let i=0;i<100;i++){const j:ImportJob=await call('/admin/imports/'+id);if(j.status!=='validating')return j;await delay(100);}throw Error('预检超时');}
@@ -70,15 +71,15 @@ test('管理HTTP：独立权限、原图校验、Excel与JSON ZIP预检、重复
   let job:ImportJob=await poll((await call('/admin/imports',pack,202)).id);assert.equal(job.status,'preview',job.message);assert.equal(job.counts.ready,2);
   job=await call('/admin/imports/'+job.id+'/commit',{});assert.equal(job.receipt!.created,2);assert.deepEqual((await call('/admin/imports/'+job.id+'/commit',{})).receipt,job.receipt);
   const named=new FormData();named.append('files',new File([await readFile('templates/reference-import-v1/图片命名示例.zip')],'图片.zip'));
-  const filenameJob:ImportJob=await poll((await call('/admin/imports',named,202)).id);assert.equal(filenameJob.counts.ready,2);
+  const filenameJob:ImportJob=await poll((await call('/admin/imports',named,202)).id);assert.equal(filenameJob.counts.ready,1);assert.equal(filenameJob.counts.skip,1,'不同供应商不改变物料＋型号的重复判定');
   const namedModel=filenameJob.rows[0].modelNumber;assert.ok(namedModel);await call('/admin/imports/'+filenameJob.id+'/commit',{});
   assert.ok((await call('/admin/standards?q='+encodeURIComponent(namedModel!))).items.some((v:ReferenceRecord)=>v.modelNumber===namedModel));
   const again=new FormData();again.append('files',new File([await readFile('templates/reference-import-v1/JSON标准包示例.zip')],'示例.zip'));assert.equal((await poll((await call('/admin/imports',again,202)).id)).counts.skip,2);
-  const missing=new FormData();missing.append('files',new File([JSON.stringify({schemaVersion:'1.0',records:[{materialCode:'NEW',supplierName:'S',imagePath:'lost.png'}]})],'standards.json'));
-  const bad=await poll((await call('/admin/imports',missing,202)).id);assert.equal(bad.counts.error,1);await call('/admin/imports/'+bad.id+'/commit',{},409);
+  const missing=new FormData();missing.append('files',new File([JSON.stringify({schemaVersion:'1.0',records:[{materialCode:'NEW',supplierName:'S',modelNumber:'M1',imagePath:'lost.png'}]})],'standards.json'));
+  const bad=await poll((await call('/admin/imports',missing,202)).id);assert.equal(bad.counts.error,1);assert.equal((await call('/admin/imports/'+bad.id+'/commit',{})).counts.error,1,'错误条目保留在待处理批次');
   // 真正生成工作簿，验证前导零与公式不会被悄悄改写。
   const generated=path.join(directory,'excel.xlsx');const python=pythonExecutable(root),pythonOptions={env:pythonEnvironment(),encoding:'utf8' as const};
-  const result=spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.Workbook();s=w.active;s.title='标准清单';s.append(['物料编号','供应商名称','正品图片路径','检测说明']);s.append(['000007','Excel供应商','正品.png','允许日期变化']);s.append([123,'Excel供应商','正品.png','不允许数字类型编号']);s.append(['FORMULA','Excel供应商','正品.png','=1+1']);w.save(sys.argv[1])",generated],pythonOptions);assert.equal(result.status,0,result.error?.message??result.stderr);
+  const result=spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.Workbook();s=w.active;s.title='标准清单';s.append(['物料编号','型号','供应商名称','正品图片路径','检测说明']);s.append(['000007','M1','Excel供应商','正品.png','允许日期变化']);s.append([123,'M2','Excel供应商','正品.png','不允许数字类型编号']);s.append(['FORMULA','M3','Excel供应商','正品.png','=1+1']);w.save(sys.argv[1])",generated],pythonOptions);assert.equal(result.status,0,result.error?.message??result.stderr);
   const excel=new FormData();excel.append('files',new File([await readFile(generated)],'标准.xlsx'));excel.append('files',new File([bytes],'正品.png'));
   const ej=await poll((await call('/admin/imports',excel,202)).id);assert.equal(ej.rows[0].material,'000007');assert.equal(ej.counts.ready,1);assert.equal(ej.counts.error,2);assert.match(ej.rows[1].message,/文本/);assert.match(ej.rows[2].message,/公式/);
   assert.equal(spawnSync(python,['-c',"import openpyxl,sys;w=openpyxl.load_workbook(sys.argv[1]);w.active.delete_rows(3,2);w.save(sys.argv[1])",generated],pythonOptions).status,0);

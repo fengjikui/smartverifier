@@ -10,6 +10,8 @@ import { imageSchema, modelReplySchema } from './contracts.ts';
 import { validateReplyItems, validateSeparation } from './validation.ts';
 import { TraceStore } from './trace-store.ts';
 import { replyJsonSchema } from './reply-json-schema.ts';
+import { inModelSlot } from './model-slot.ts';
+import { referenceScope } from './reference-scope.ts';
 import { vlmConfig } from './vlm-config.ts';
 import type { VlmOptions, VlmProvider } from './vlm-config.ts';
 import type { AIJudgement, ComponentResult, Photo, Preparation, Round } from '../../shared/types.ts';
@@ -30,7 +32,7 @@ export class RecognitionProblem extends Error { kind:'quality'|'error'; construc
 /** 单个工作队列串行调用；所有图片均来自本系统文件区，不接收任意路径或远程图。 */
 export class LocalVisionPipeline implements VisionPipeline {
   root:string;directory:string;python:string;model:string;endpoint:string;template:string;provider:VlmProvider;apiKey:string;caFile:string;extraBody:Record<string,unknown>;timeoutSeconds:number;traceDirectory?:string;inputLayout:'legacy'|'prefix-first';structured:boolean;
-  children=new Set<ChildProcess>();
+  closed=false;children=new Set<ChildProcess>();
   constructor(root:string,directory:string,options:VlmOptions&{python?:string;traceDirectory?:string;inputLayout?:'legacy'|'prefix-first';structured?:boolean}={}){
     this.root=root;this.directory=directory;this.python=pythonExecutable(root,options.python??process.env.SV_VISION_PYTHON);
     const config=vlmConfig(options);this.model=config.model;this.endpoint=config.endpoint;this.template=config.template;
@@ -39,7 +41,11 @@ export class LocalVisionPipeline implements VisionPipeline {
     this.inputLayout=z.enum(['legacy','prefix-first']).parse(options.inputLayout??process.env.SV_VISION_INPUT_LAYOUT??'prefix-first');
     this.structured=options.structured??process.env.SV_VISION_SCHEMA!=='0';
   }
-  async worker(request:Record<string,unknown>,timeout:number):Promise<unknown>{
+  async worker(request:Record<string,unknown>,timeout:number,onStarted?:()=>void):Promise<unknown>{
+    const run=()=>{if(this.closed)throw new Error('图像服务已关闭。');onStarted?.();return this.runWorker(request,timeout);};
+    return request.action==='separate'?run():inModelSlot(run);
+  }
+  async runWorker(request:Record<string,unknown>,timeout:number):Promise<unknown>{
     return await new Promise((resolve,reject)=>{
       const child=spawn(this.python,[path.join(this.root,'server/vision/local_worker.py')],{cwd:this.root,stdio:['pipe','pipe','pipe'],env:pythonEnvironment({SV_VLM_API_KEY:this.apiKey,SV_VLM_CA_FILE:this.caFile})});
       child.stdout.setEncoding('utf8');child.stderr.setEncoding('utf8');
@@ -55,7 +61,7 @@ export class LocalVisionPipeline implements VisionPipeline {
       child.stdin.end(JSON.stringify(request));
     });
   }
-  close(){for(const child of this.children)child.kill('SIGTERM');}
+  close(){this.closed=true;for(const child of this.children)child.kill('SIGTERM');}
   filename(assetId:string){if(!/^[a-f0-9-]+\.(png|jpg|webp)$/.test(assetId))throw new Error('图片引用无效');return path.join(this.directory,'files',assetId);}
   async prepare(photo:Photo){
     const raw=preparedSchema.parse(await this.worker({action:'separate',source:this.filename(photo.file),folder:path.join(this.directory,'files'),label:'P'+String(photo.sequence).padStart(3,'0')},15000));
@@ -86,11 +92,11 @@ export class LocalVisionPipeline implements VisionPipeline {
     if(!c.crop)throw new Error('缺少元件裁片');
     const traceId=randomUUID(),traces=this.traceDirectory?new TraceStore(this.traceDirectory):null;
     let raw;
-    try{raw=await this.worker({action:'recognize',componentId:c.id,reference:this.reference(round),sample:this.filename(c.crop.assetId),description:round.standard.description,instruction:round.instruction,endpoint:this.endpoint,model:this.model,template:this.template,
+    try{raw=await this.worker({action:'recognize',componentId:c.id,reference:this.reference(round),sample:this.filename(c.crop.assetId),description:referenceScope(round.standard),referenceRegions:round.standard.regions??[],instruction:round.instruction,endpoint:this.endpoint,model:this.model,template:this.template,
       inputLayout:this.inputLayout,provider:this.provider,extraBody:this.extraBody,timeoutSeconds:this.timeoutSeconds,...(this.structured?{responseSchema:replyJsonSchema([c.id])}:{}),
       ...(traces?{traceDirectory:this.traceDirectory,traceId,traceMetadata:{taskId:round.taskId,roundId:round.id,photoId:photo.id,label:round.taskId+' · '+c.label,sourceHash:photo.hash,standardVersion:round.standard.version,instructionVersion:round.instructionVersion}}:{})},this.timeoutSeconds*1000+10000) as {response:{choices:{finish_reason:string;message:{content:string}}[]};elapsedMs:number;model:string;promptVersion:string};}
     catch(error){if(traces)await traces.failure(traceId,(error as Error).message,{source:'inspection',model:this.model,componentIds:[c.id],taskId:round.taskId});throw error;}
-    const record=await this.record('recognition',{taskId:round.taskId,roundId:round.id,photoId:photo.id,sourceHash:photo.hash,componentId:c.id,standardId:round.standard.id,standardVersion:round.standard.version,standardDescription:round.standard.description,instructionVersion:round.instructionVersion,onsiteInstruction:round.instruction,...raw});
+    const record=await this.record('recognition',{taskId:round.taskId,roundId:round.id,photoId:photo.id,sourceHash:photo.hash,componentId:c.id,standardId:round.standard.id,standardVersion:round.standard.version,standardDescription:round.standard.description,referenceRegions:round.standard.regions??[],instructionVersion:round.instructionVersion,onsiteInstruction:round.instruction,...raw});
     const choice=raw.response?.choices?.[0];
     let reply;
     try{if(choice?.finish_reason!=='stop')throw new Error('生成没有完整结束');reply=parsePairReply(choice.message.content,c.id);if(traces)await traces.finish(traceId,true,'完整JSON与元件编号校验通过。');}

@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { logClientEvents } from './client-events.ts';
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
@@ -37,7 +38,7 @@ async function file(res: http.ServerResponse, filename: string, privateFile=fals
   const stream=createReadStream(filename); stream.on('error',()=>res.destroy()); stream.pipe(res);
 }
 
-export function startServer(options: { state?: string; port?: number; host?: string; delay?: number; vision?:VisionPipeline; real?:boolean;debug?:boolean } = {}) {
+export function startServer(options: { state?: string; port?: number; host?: string; delay?: number; vision?:VisionPipeline; real?:boolean;debug?:boolean;referenceAnalyzer?:import('./admin/analysis.ts').ReferenceAnalyzer } = {}) {
   const state=path.resolve(options.state ?? process.env.SV_STATE_DIR ?? path.join(root,'var/data'));
   const staticDir=path.join(root,'dist');
   const debug=options.debug??process.env.SV_MODEL_DEBUG==='1',traces=new TraceStore(path.join(state,'vision-traces'));
@@ -45,7 +46,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
   const debugRuns=debug&&vision instanceof LocalVisionPipeline?new DebugRuns(vision,traces):undefined;
   const recognition=vision?{mode:'vlm' as const,model:vision.model,...(vision instanceof LocalVisionPipeline?{provider:vision.provider}:{})}:{mode:'mock' as const};
   const service=new InspectionService(state,root,options.delay ?? Number(process.env.SV_MOCK_DELAY_MS ?? 1200),vision);
-  const admin=adminRoutes(service,root,state,{body,json:jsonBody,send,file});
+  const admin=adminRoutes(service,root,state,{body,json:jsonBody,send,file},options.referenceAnalyzer);
   let uploads=0;
   const server=http.createServer(async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','same-origin'); res.setHeader('X-Frame-Options','SAMEORIGIN');
@@ -77,6 +78,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
       if(api!==null){
         if(!session||Number(session.expires)<Date.now())throw new ApiError(401,'本地试用会话已过期，请重新进入，草稿已保留。');
         const actor=JSON.parse(String(session.person));
+        if(pathname==='/client-events'&&req.method==='POST')return send(res,await logClientEvents(state,actor,await jsonBody(req)));
         if(pathname.startsWith('/debug/')){
           if(!debug)throw new ApiError(404,'本服务未启用模型调试窗口。');
           if(!directLoopback(req))throw new ApiError(403,'模型调试只允许在服务器本机直接查看。');
@@ -101,7 +103,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
           service.store.db.prepare('DELETE FROM sessions WHERE token=?').run(token!);res.setHeader('Set-Cookie','sv_next_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,{ok:true});
         }
         if(pathname==='/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',recognition,tasks:service.list()});
-        if(pathname==='/tasks'&&req.method==='GET')return send(res,service.taskPage(z.string().max(200).parse(url.searchParams.get('q')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
+        if(pathname==='/tasks'&&req.method==='GET')return send(res,service.taskPage(z.string().max(200).parse(url.searchParams.get('q')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1),25,z.enum(['all','unfinished','finished']).parse(url.searchParams.get('status')??'all')));
         if(pathname==='/standards'&&req.method==='GET')return send(res,service.registry.catalog(z.string().max(160).parse(url.searchParams.get('material')??''),z.string().max(160).parse(url.searchParams.get('supplier')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
         if(pathname==='/checks'&&req.method==='GET')return send(res,{items:service.standaloneRecent(actor)});
         if(pathname==='/checks'&&req.method==='POST'){
@@ -125,14 +127,14 @@ export function startServer(options: { state?: string; port?: number; host?: str
           if(req.method!=='POST')throw new ApiError(405,'此操作不支持该请求方式。');
           if(action==='photos'){
             if(uploads>=2){req.resume();throw new ApiError(429,'当前有其他照片正在保存，请稍后重试。');}
-            uploads++;
+            uploads++;void logClientEvents(state,actor,{events:[{at:new Date().toISOString(),phase:'server-upload-received',source:'server'}]}).catch(()=>{});
             try {
               const bytes=await body(req,22*1024*1024);
               const request=new Request('http://localhost/upload',{method:'POST',headers:{'Content-Type':req.headers['content-type']??''},body:new Uint8Array(bytes)});
               const data=await request.formData(),photo=data.get('photo');
               if(!(photo instanceof File))throw new ApiError(400,'请选择一张照片。');
-              const revision=revisionSchema.parse(Number(data.get('revision')));
-              return send(res,await service.addPhoto(id,revision,{bytes:Buffer.from(await photo.arrayBuffer()),filename:photo.name,width:Number(data.get('width')),height:Number(data.get('height')),replaceId:String(data.get('replaceId')??'')||undefined,clientId:z.string().min(1).max(100).parse(data.get('clientId'))},actor));
+              const revision=revisionSchema.parse(Number(data.get('revision'))),captureId=z.string().max(100).optional().parse(data.get('captureId')??undefined);
+              const updated=await service.addPhoto(id,revision,{bytes:Buffer.from(await photo.arrayBuffer()),filename:photo.name,width:Number(data.get('width')),height:Number(data.get('height')),replaceId:String(data.get('replaceId')??'')||undefined,clientId:z.string().min(1).max(100).parse(data.get('clientId'))},actor);void logClientEvents(state,actor,{events:[{at:new Date().toISOString(),phase:'server-photo-saved',captureId,bytes:photo.size,source:'server'}]}).catch(()=>{});return send(res,updated);
             } finally { uploads--; }
           }
           const data=await jsonBody(req),revision=revisionSchema.parse(data.revision);

@@ -1,0 +1,2 @@
+/** 只接受当前顺序，不能凭内容猜测旧三段格式。 */
+export function parseReferenceFilename(filename:string){const stem=filename.split(/[\\/]/).at(-1)!.replace(/\.[^.]*$/,'').trim().normalize('NFC'),parts=stem.split(/\s+/);if(parts.length===2||parts.length===3)return {material:parts[0],modelNumber:parts[1],supplier:parts[2]??'',message:''};return {material:parts[0]??'',modelNumber:'',supplier:'',message:'文件名未完整解析，请核对物料编号并补充型号；约定为“物料编号 型号 [供应商]”。'};}
