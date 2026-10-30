@@ -6,7 +6,7 @@ import path from 'node:path';
 import { pythonTestEnvironment } from '../server/python-runtime.ts';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const suites={
-  unit:['image-gestures','domain','vision-contracts','vlm-config','whiteboard-scoring'],
+  unit:['image-gestures','region-editor','domain','vision-contracts','vlm-config','whiteboard-scoring'],
   admin:['admin','admin-access','admin-users','reference-workflow','reference-analysis','reference-transform','rar-import'],
   camera:['camera','client-events'],
   workflow:['service','standalone','twenty-samples','paths','vlm-http','real-vision','photo-inspection'],
