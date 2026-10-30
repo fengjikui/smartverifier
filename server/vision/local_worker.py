@@ -145,7 +145,7 @@ async def recognize(req):
                 timeout_seconds=req.get('timeoutSeconds',55),on_event=trace.observe if trace else None,
                 response_format=req.get('responseSchema'))
         return {"response":response,"elapsedMs":round((time.monotonic()-start)*1000),"model":req["model"],
-                "promptVersion":"silkscreen-whole-photo-v1" if req['action']=='recognize_photo' else "silkscreen-prefix-first-v1" if layout=='prefix-first' else "silkscreen-controlled-layout-v1" if req.get('componentIds') else "silkscreen-pair-v1",
+                "promptVersion":"reference-comparison-scope-v1" if req['action']=='analyze_reference' else "silkscreen-whole-photo-v2" if req['action']=='recognize_photo' else "silkscreen-controlled-layout-v1" if req.get('componentIds') else "silkscreen-prefix-first-v2" if layout=='prefix-first' else "silkscreen-pair-v2",
                 "inputLayout":layout,"provider":provider,"outputFormat":"json-schema" if req.get('responseSchema') else "prompt-json",
                 "inputMetrics":metrics,"traceId":trace.id if trace else None}
     except BaseException as exc:

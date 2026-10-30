@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { ApiError } from '../errors.ts';
 import type { Registry } from './registry.ts';
 import type { ReferenceAnalysis, ReferenceAnalysisResult, ReferenceAsset, ReferenceRegion } from '../../shared/admin.ts';
-import { analysisIssues, analysisResultSchema } from '../../shared/reference-analysis.ts';
+import { analysisIssues, analysisResultSchema, REFERENCE_SCOPE_VERSION } from '../../shared/reference-analysis.ts';
 import { regionPoints, transformRegions } from '../../shared/reference-geometry.ts';
 import type { ReferenceTransform } from '../../shared/admin.ts';
 export const analysisKey=(assetId:string,regions:ReferenceRegion[]=[])=>createHash('sha256').update(JSON.stringify([assetId,regions])).digest('hex');
@@ -18,13 +18,14 @@ export class ReferenceAnalyses {
   if(!fresh){
    const signature=(v:ReferenceRegion[])=>JSON.stringify(v.map(r=>[r.id,r.kind,r.label,regionPoints(r).map(p=>[Math.round(p.x*1e6),Math.round(p.y*1e6)])]));
    const old=this.registry.latestAnalysis(key)??this.registry.store.db.prepare('SELECT data FROM reference_analyses WHERE asset_id=? ORDER BY rowid DESC LIMIT 40').all(assetId).map(r=>JSON.parse(String(r.data)) as ReferenceAnalysis).find(a=>signature(a.regions)===signature(regions));
-   if(old&&(old.transform||old.model===this.model&&old.state!=='failed')){
+   const currentScope=!regions.length||!old?.result||old.scopeVersion===REFERENCE_SCOPE_VERSION;
+   if(old&&currentScope&&(old.transform||old.model===this.model&&old.state!=='failed')){
     if(old.key===key)return old;
     if(old.state==='queued'||old.state==='running')return this.transformed(assetId,assetId,old.regions,regions,{angle:0,sourceWidth:asset.width,sourceHeight:asset.height,rotatedWidth:asset.width,rotatedHeight:asset.height,left:0,top:0,width:asset.width,height:asset.height});
     const alias={...old,id:randomUUID(),key,regions:structuredClone(regions)};this.save(alias);return alias;
    }
   }
-  const a:ReferenceAnalysis={id:randomUUID(),assetId,key,regions:structuredClone(regions),state:'queued',stage:'queued',message:'图片已保存，等待模型分析。',createdAt:new Date().toISOString(),model:this.model};this.save(a);this.queue.push(a.id);queueMicrotask(()=>void this.consume());return a;
+  const a:ReferenceAnalysis={id:randomUUID(),assetId,key,regions:structuredClone(regions),state:'queued',stage:'queued',message:'图片已保存，等待模型分析。',createdAt:new Date().toISOString(),model:this.model,scopeVersion:REFERENCE_SCOPE_VERSION};this.save(a);this.queue.push(a.id);queueMicrotask(()=>void this.consume());return a;
  }
  transformed(sourceId:string,assetId:string,sourceRegions:ReferenceRegion[],regions:ReferenceRegion[],transform:ReferenceTransform){
   const parent=this.registry.latestAnalysis(analysisKey(sourceId,sourceRegions));
@@ -39,7 +40,7 @@ export class ReferenceAnalyses {
     if(a.inheritedFrom){
      const source=this.registry.analysis(a.inheritedFrom);
      if(source?.state!=='completed'||!source.result||!a.transform)throw new Error('原图片分析尚未完成或失败；裁剪未触发新分析，可手动点击重新分析。');
-     a.result=structuredClone(source.result);a.inheritedIssues=analysisIssues(source);
+     a.result=structuredClone(source.result);a.scopeVersion=source.scopeVersion;a.inheritedIssues=analysisIssues(source);
      const component=a.result.component;
      if(component){try{const [mapped]=transformRegions([{...component,id:'component',kind:'focus',label:''}],a.transform);a.result.component={x:mapped.x,y:mapped.y,width:mapped.width,height:mapped.height,angle:((component.angle-a.transform.angle+540)%360)-180};}catch{a.result.component=null;}}
     }else{
