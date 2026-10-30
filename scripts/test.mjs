@@ -9,7 +9,7 @@ const suites={
   unit:['domain','vision-contracts','vlm-config','whiteboard-scoring'],
   admin:['admin','admin-access','admin-users','reference-workflow','reference-analysis','rar-import'],
   camera:['camera','client-events'],
-  workflow:['service','standalone','twenty-samples','paths','vlm-http','real-vision'],
+  workflow:['service','standalone','twenty-samples','paths','vlm-http','real-vision','photo-inspection'],
   deployment:['python-runtime','https','windows-update'],
 };
 const selected=process.argv[2];if(selected&&!suites[selected]){console.error('测试分组不存在：'+selected);process.exit(1);}

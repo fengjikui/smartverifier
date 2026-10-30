@@ -1,10 +1,9 @@
-"""CPU几何测试，不调用模型；使用生成样本及明确标注的几何反例。"""
+"""整图解码回归：不裁剪，不用传统图像指标判断质量。"""
 import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -23,27 +22,33 @@ class PreprocessingTest(unittest.TestCase):
         with patch.object(worker.os, 'getloadavg', create=True, side_effect=AttributeError('unavailable')):
             self.assertIsNone(worker.load_averages())
 
-    def test_six_generated_components(self):
-        for name,count in [('single',1),('pair',2),('dim-three',3)]:
+    def test_whole_photo_dimensions_and_pixels_untouched(self):
+        import hashlib
+        for name in ['single','pair','dim-three','reference-crop']:
             with self.subTest(name=name),tempfile.TemporaryDirectory() as folder:
-                r=worker.separate({'source':str(ROOT/f'fixtures/inspection/green-mat-v1/{name}.png'),'folder':folder,'label':'P001'})
-                self.assertEqual(len(r['components']),count);self.assertEqual(r['coverage'],'complete')
-                self.assertLessEqual(r['width'],4160);self.assertLessEqual(r['height'],3120)
-                for c in r['components']:
-                    self.assertEqual(c['quality']['state'],'usable');self.assertLessEqual(abs(c['rotationClockwiseDegrees']),45)
-                    # 裁片中心反投影必须等于定位四角的中心。
-                    a=c['modelView'];mapped=np.array(c['viewToUprightOriginal']).reshape(3,3)@np.array([(a['width']-1)/2,(a['height']-1)/2,1])
-                    np.testing.assert_allclose(mapped[:2],np.array(c['quadPx']).mean(axis=0),atol=.01)
-    def test_negative_and_exif(self):
+                source=ROOT/f'fixtures/inspection/green-mat-v1/{name}.png'
+                before=hashlib.sha256(source.read_bytes()).hexdigest()
+                result=worker.inspect_image({'source':str(source),'folder':folder})
+                with Image.open(source) as image:self.assertEqual((result['width'],result['height']),image.size)
+                self.assertEqual(result['version'],'whole-photo-v1')
+                self.assertEqual(list(Path(folder).iterdir()),[], '不能生成裁片、白板或编号图')
+                self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(),before)
+                self.assertNotIn('quality',result)
+        self.assertFalse(hasattr(worker,'separate'),'只保留分离器合同，不保留可调用的CV算法')
+
+    def test_background_size_and_blur_do_not_gate_quality(self):
         with tempfile.TemporaryDirectory() as folder:
-            folder=Path(folder);image=Image.new('RGB',(800,600),(45,115,85));source=folder/'input.png';image.save(source)
-            req={'source':str(source),'folder':str(folder),'label':'P001'}
-            self.assertEqual(worker.separate(req)['coverage'],'uncertain')
-            ImageDraw.Draw(image).rectangle((250,200,550,400),fill=(20,20,20));image.save(source)
-            r=worker.separate(req);self.assertTrue(r['components'][0]['quality']['reasons'],'无纹理黑矩形不能通过质量门')
-            real=Image.open(ROOT/'fixtures/inspection/green-mat-v1/single.png').filter(ImageFilter.GaussianBlur(14));real.save(source)
-            r=worker.separate(req);self.assertTrue(r['components'][0]['quality']['reasons'],'严重模糊需重拍')
-            original=Image.open(ROOT/'fixtures/inspection/green-mat-v1/single.png');exif=original.getexif();exif[274]=6;source=folder/'exif.jpg';original.save(source,exif=exif)
-            r=worker.separate({**req,'source':str(source)});self.assertEqual((r['width'],r['height']),(1024,1536));self.assertEqual(r['originalToUpright'],[0,-1,1023,1,0,0,0,0,1])
+            source=Path(folder)/'input.png'
+            for image in [Image.new('RGB',(16,12),'white'), Image.new('RGB',(800,600),(45,115,85)), Image.open(ROOT/'fixtures/inspection/green-mat-v1/single.png').filter(ImageFilter.GaussianBlur(30))]:
+                image.save(source);result=worker.inspect_image({'source':str(source)})
+                self.assertEqual((result['width'],result['height']),image.size)
+                self.assertNotIn('quality',result);self.assertNotIn('coverage',result)
+
+    def test_exif_only_and_format_safety(self):
+        with tempfile.TemporaryDirectory() as folder:
+            original=Image.new('RGB',(800,600),'gray');exif=original.getexif();exif[274]=6;source=Path(folder)/'exif.jpg';original.save(source,exif=exif)
+            result=worker.inspect_image({'source':str(source)});self.assertEqual((result['width'],result['height']),(600,800))
+            bmp=Path(folder)/'image.bmp';original.save(bmp)
+            with self.assertRaisesRegex(ValueError,'JPG'):worker.inspect_image({'source':str(bmp)})
 
 if __name__=='__main__':unittest.main()

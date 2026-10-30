@@ -11,7 +11,7 @@ import { LocalVisionPipeline } from '../server/vision/local-pipeline.ts';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 if(existsSync(path.join(root,'.env.local')))process.loadEnvFile(path.join(root,'.env.local'));
-const out=path.join(root,'outputs/real-vision-20261018');await mkdir(out,{recursive:true});
+const out=path.join(root,'outputs/whole-photo-20261030');await mkdir(out,{recursive:true});
 const state=await mkdtemp(path.join(out,'state-'));
 const service=new InspectionService(state,root,1,new LocalVisionPipeline(root,state));
 const records:unknown[]=[];

@@ -31,6 +31,7 @@ export function Modal({title,description,children,onClose,actions}:{title:string
   </DialogContent></Dialog>;
 }
 export function PhotoCrop({photo,component}:{photo:Photo;component:ComponentResult}){
+  if(component.viewMode==='original')return <img className="sv-reference" src={photo.preparation?.uprightUrl??photo.url} alt={'待检原始照片，元件 '+component.label+' 由VLM在整图中识别'}/>;
   if(component.crop)return <div className="sv-crop sv-rectified-crop"><img src={component.crop.url} alt={'元件 '+component.label+' 的转正裁片'}/></div>;
   const [x,y,w,h]=component.bbox;
   return <div className="sv-crop" style={{aspectRatio:`${photo.width*w}/${photo.height*h}`}}><img src={photo.url} alt={'元件 '+component.label+' 的图像'} style={{width:100/w+'%',height:100/h+'%',left:-100*x/w+'%',top:-100*y/h+'%'}}/></div>;

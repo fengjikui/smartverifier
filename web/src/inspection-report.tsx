@@ -63,7 +63,7 @@ function ReportEvidence({component,expected}:{component:ComponentResult;expected
 }
 
 function ReportOriginal({photo,onOpen}:{photo:Photo;onOpen:()=>void}) {
-  return <div className="sv-report-original"><button className="sv-report-original-button" onClick={onOpen} aria-label={'查看照片 '+photoName(photo)+' 原图'}><img src={photo.preparation?.annotatedUrl??photo.url} alt={(photo.preparation?'元件定位与编号 ':'原始照片 ')+photoName(photo)} loading="lazy"/></button>
+  return <div className="sv-report-original"><button className="sv-report-original-button" onClick={onOpen} aria-label={'查看照片 '+photoName(photo)+' 原图'}><img src={photo.preparation?.annotatedUrl??photo.url} alt={(photo.preparation&&photo.preparation.mode!=='original'?'元件定位与编号 ':'原始照片 ')+photoName(photo)} loading="lazy"/></button>
     {photo.sample==='four'?<div className="sv-sample-annotations">{[0,1,2,3].map(i=><img key={i} src={assetPath('report-frame'+(i?i:'')+'.svg')} width="626" height="310" alt=""/>)}{photo.components.map(c=><span key={c.id} className={'sv-sample-label label-'+c.index}>{String(c.index+1).padStart(2,'0')}</span>)}</div>:photo.sample==='twenty'?<svg className="sv-many-annotations" viewBox={`0 0 ${photo.width} ${photo.height}`} aria-label="20个元件的编号标记">{photo.components.map(c=>{const marker=sampleMarker(photo,c.index);return <g key={c.id} className={!c.ai?'is-pending':finalVerdict(c)==='FAIL'?'is-fail':'is-pass'}><rect x={marker.x} y={marker.y} width="152" height="100" rx="12"/><text x={marker.x+76} y={marker.y+74} textAnchor="middle">{String(c.index+1).padStart(2,'0')}</text></g>;})}</svg>:null}
   </div>;
 }

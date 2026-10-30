@@ -6,23 +6,25 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { z } from 'zod';
-import { imageSchema, modelReplySchema } from './contracts.ts';
-import { validateReplyItems, validateSeparation } from './validation.ts';
+import { modelReplySchema } from './contracts.ts';
+import { validateReplyItems } from './validation.ts';
 import { TraceStore } from './trace-store.ts';
 import { replyJsonSchema } from './reply-json-schema.ts';
+import { parsePhotoReply, photoJsonSchema } from './photo-reply.ts';
 import { inModelSlot } from './model-slot.ts';
 import { referenceScope } from './reference-scope.ts';
 import { vlmConfig } from './vlm-config.ts';
 import type { VlmOptions, VlmProvider } from './vlm-config.ts';
 import type { AIJudgement, ComponentResult, Photo, Preparation, Round } from '../../shared/types.ts';
 
-const preparedSchema=z.object({version:z.string(),width:z.number().int().positive(),height:z.number().int().positive(),originalWidth:z.number().int().positive(),originalHeight:z.number().int().positive(),originalToUpright:z.array(z.number()).length(9),upright:imageSchema,annotated:imageSchema,sheet:imageSchema,
-  components:z.array(z.object({componentId:z.string().uuid(),quadPx:z.array(z.tuple([z.number(),z.number()])).length(4),modelView:imageSchema,viewToUprightOriginal:z.array(z.number()).length(9),rotationClockwiseDegrees:z.number(),
-    quality:z.object({state:z.enum(['usable','needs_recapture']),reasons:z.array(z.string())}),routeHint:z.literal('unclassified'),bbox:z.tuple([z.number(),z.number(),z.number(),z.number()]),metrics:z.record(z.number()),label:z.string()})),
-  issues:z.array(z.string()),coverage:z.enum(['complete','uncertain']),elapsedMs:z.number(),greenRatio:z.number(),opencv:z.string(),resourcesBefore:z.unknown().optional(),resourcesAfter:z.unknown().optional(),workerPeakRssMiB:z.number().optional()});
+export interface WholePhotoInspection {
+  components:{index:number;bbox:[number,number,number,number];ai:AIJudgement|null;reason:string}[];
+  qualityReasons:string[];
+}
 
 export interface VisionPipeline {
   model:string;
+  recognizePhoto?(round:Round,photo:Photo):Promise<WholePhotoInspection>;
   prepare(photo:Photo):Promise<{preparation:Preparation;components:ComponentResult[]}>;
   recognize(round:Round,photo:Photo,component:ComponentResult):Promise<AIJudgement|null>;
   close?():void;
@@ -43,7 +45,7 @@ export class LocalVisionPipeline implements VisionPipeline {
   }
   async worker(request:Record<string,unknown>,timeout:number,onStarted?:()=>void):Promise<unknown>{
     const run=()=>{if(this.closed)throw new Error('图像服务已关闭。');onStarted?.();return this.runWorker(request,timeout);};
-    return request.action==='separate'?run():inModelSlot(run);
+    return request.action==='inspect_image'?run():inModelSlot(run);
   }
   async runWorker(request:Record<string,unknown>,timeout:number):Promise<unknown>{
     return await new Promise((resolve,reject)=>{
@@ -57,26 +59,32 @@ export class LocalVisionPipeline implements VisionPipeline {
       child.stdout.on('data',b=>{out+=b.toString();if(out.length>5*1024*1024){child.kill();fail(new Error('模型响应超出长度限制。'));}});
       child.stderr.on('data',b=>{err=(err+b.toString()).slice(-4000);});
       child.stdin.on('error',()=>{});
-      child.on('close',code=>{if(settled)return;clearTimeout(timer);try{const data=JSON.parse(out);if(code!==0||data.error){console.error('VLM或图像处理失败',data.error??err);if(request.action==='separate'&&data.type==='ValueError')throw new RecognitionProblem('quality',data.error);throw new RecognitionProblem('error',String(data.error).startsWith('RESOURCE_PRESSURE:')?String(data.error).slice(18):data.type==='TimeoutError'?`VLM本次未在${request.timeoutSeconds??this.timeoutSeconds}秒内完成，请重试或联系管理员。`:data.type==='VlmHttpError'?data.error:'图像处理或VLM调用失败，请检查服务地址、模型及部署配置后重试。');}settled=true;resolve(data);}catch(e){fail(e instanceof RecognitionProblem?e:new RecognitionProblem('error','VLM服务未返回有效结果，请检查服务后重试。'));}});
+      child.on('close',code=>{if(settled)return;clearTimeout(timer);try{const data=JSON.parse(out);if(code!==0||data.error){console.error('VLM或图像处理失败',data.error??err);throw new RecognitionProblem('error',String(data.error).startsWith('RESOURCE_PRESSURE:')?String(data.error).slice(18):data.type==='TimeoutError'?`VLM本次未在${request.timeoutSeconds??this.timeoutSeconds}秒内完成，请重试或联系管理员。`:data.type==='VlmHttpError'?data.error:'图像处理或VLM调用失败，请检查服务地址、模型及部署配置后重试。');}settled=true;resolve(data);}catch(e){fail(e instanceof RecognitionProblem?e:new RecognitionProblem('error','VLM服务未返回有效结果，请检查服务后重试。'));}});
       child.stdin.end(JSON.stringify(request));
     });
   }
   close(){this.closed=true;for(const child of this.children)child.kill('SIGTERM');}
   filename(assetId:string){if(!/^[a-f0-9-]+\.(png|jpg|webp)$/.test(assetId))throw new Error('图片引用无效');return path.join(this.directory,'files',assetId);}
   async prepare(photo:Photo){
-    const raw=preparedSchema.parse(await this.worker({action:'separate',source:this.filename(photo.file),folder:path.join(this.directory,'files'),label:'P'+String(photo.sequence).padStart(3,'0')},15000));
-    const source=await readFile(this.filename(photo.file));
-    if(createHash('sha256').update(source).digest('hex')!==photo.hash)throw new Error('原图校验不一致，停止处理。');
-    const original={...raw.upright,assetId:photo.file,sha256:photo.hash,bytes:source.length,width:raw.originalWidth,height:raw.originalHeight,mime:photo.file.endsWith('.jpg')?'image/jpeg' as const:photo.file.endsWith('.webp')?'image/webp' as const:'image/png' as const};
-    validateSeparation({photoId:photo.id,photoVersion:1,original,upright:raw.upright,originalToUpright:raw.originalToUpright as [number,number,number,number,number,number,number,number,number]}, {
-      protocol:'sv.vision.v1',photoId:photo.id,photoVersion:1,sourceSha256:photo.hash,separatorId:'opencv-green-mat',separatorVersion:raw.opencv,preprocessingVersion:raw.version,
-      status:raw.coverage==='complete'?'completed':'recapture_required',coverage:raw.coverage,
-      components:raw.components.map(({componentId,quadPx,modelView,viewToUprightOriginal,rotationClockwiseDegrees,quality,routeHint})=>({componentId,photoId:photo.id,photoVersion:1,sourceSha256:photo.hash,quadPx,modelView,viewToUprightOriginal,rotationClockwiseDegrees,quality,routeHint})),
-      issues:raw.issues.map(message=>({code:'RECAPTURE',message,componentIds:[]})),
-    });
-    const artifact={...raw,sourceSha256:photo.hash,photoId:photo.id};await this.record('separation',artifact);
-    return {preparation:{version:raw.version,sourceHash:photo.hash,uprightUrl:apiPath('/files/'+raw.upright.assetId),annotatedUrl:apiPath('/files/'+raw.annotated.assetId),sheetUrl:apiPath('/files/'+raw.sheet.assetId),width:raw.width,height:raw.height,elapsedMs:raw.elapsedMs,coverage:raw.coverage,issues:raw.issues},
-      components:raw.components.map((c,index):ComponentResult=>({id:c.componentId,label:c.label,index,bbox:c.bbox,ai:null,aiHistory:[],review:null,reviewHistory:[],crop:{url:apiPath('/files/'+c.modelView.assetId),assetId:c.modelView.assetId,width:c.modelView.width,height:c.modelView.height,rotation:c.rotationClockwiseDegrees,qualityReasons:c.quality.reasons}}))};
+    const started=performance.now(),source=await readFile(this.filename(photo.file));
+    if(createHash('sha256').update(source).digest('hex')!==photo.hash)throw new RecognitionProblem('error','原图校验不一致，停止处理。');
+    const raw=z.object({version:z.literal('whole-photo-v1'),width:z.number().int().positive(),height:z.number().int().positive()}).passthrough().parse(await this.worker({action:'inspect_image',source:this.filename(photo.file)},15000));
+    // ComponentSeparator 合同继续保留，当前不实例化分离器，也不伪造一个“整图元件”。
+    return {preparation:{mode:'original' as const,version:raw.version,sourceHash:photo.hash,uprightUrl:photo.url,annotatedUrl:photo.url,sheetUrl:photo.url,width:raw.width,height:raw.height,elapsedMs:Math.round(performance.now()-started),coverage:'complete' as const,issues:[]},components:[]};
+  }
+  async recognizePhoto(round:Round,photo:Photo):Promise<WholePhotoInspection>{
+    const traceId=randomUUID(),traces=this.traceDirectory?new TraceStore(this.traceDirectory):null;
+    let raw;
+    try{raw=await this.worker({action:'recognize_photo',componentId:photo.id,reference:this.reference(round),sample:this.filename(photo.file),description:referenceScope(round.standard),referenceRegions:round.standard.regions??[],instruction:round.instruction,endpoint:this.endpoint,model:this.model,template:this.template,
+      inputLayout:this.inputLayout,provider:this.provider,extraBody:this.extraBody,timeoutSeconds:this.timeoutSeconds,maxTokens:6000,...(this.structured?{responseSchema:photoJsonSchema()}:{}),
+      ...(traces?{traceDirectory:this.traceDirectory,traceId,traceMetadata:{taskId:round.taskId,roundId:round.id,photoId:photo.id,label:round.taskId+' · 原图 P'+String(photo.sequence).padStart(3,'0'),sourceHash:photo.hash,source:'inspection-whole-photo',standardVersion:round.standard.version,instructionVersion:round.instructionVersion}}:{})},this.timeoutSeconds*1000+10000) as {response:{choices:{finish_reason:string;message:{content:string}}[]};elapsedMs:number;model:string;promptVersion:string};}
+    catch(error){if(traces)await traces.failure(traceId,(error as Error).message,{source:'inspection-whole-photo',model:this.model,taskId:round.taskId});throw error;}
+    const record=await this.record('whole-photo-recognition',{taskId:round.taskId,roundId:round.id,photoId:photo.id,sourceHash:photo.hash,standardId:round.standard.id,standardVersion:round.standard.version,referenceRegions:round.standard.regions??[],instructionVersion:round.instructionVersion,onsiteInstruction:round.instruction,...raw});
+    let reply;
+    try{const choice=raw.response?.choices?.[0];if(choice?.finish_reason!=='stop')throw new Error('生成没有完整结束');reply=parsePhotoReply(choice.message.content);if(traces)await traces.finish(traceId,true,'整图 JSON、连续元件编号及位置校验通过。');}
+    catch{if(traces)await traces.finish(traceId,false,'整图输出结构、结束状态或元件编号不完整。');throw new RecognitionProblem('error','VLM未返回有效完整的整图结果，请重试；原照片已保留。');}
+    const qualityReasons=[...(reply.quality.state==='needs_recapture'?[reply.quality.reason||'VLM判断图片无法可靠判读，请重拍。']:[]),...(reply.coverage==='uncertain'?[reply.quality.reason||'VLM无法确认是否已识别全部元件，请重拍。']:[]),...reply.items.filter(i=>i.status==='unreadable').map(i=>i.reason)];
+    return {qualityReasons:[...new Set(qualityReasons)],components:reply.items.map((item,index)=>({index,bbox:item.bbox,reason:item.reason,ai:item.status==='unreadable'?null:{verdict:item.verdict,lines:item.lines,confidence:item.confidence!,reason:item.reason,instructionVersion:round.instructionVersion,source:'vlm',provider:this.provider,model:raw.model,elapsedMs:raw.elapsedMs,promptVersion:raw.promptVersion,rawRecord:record,features:item.features,differences:item.differences,instructionConflicts:reply.instructionConflicts,instructionWarnings:instructionPriorityWarnings(round.instruction,reply)}}))};
   }
   reference(round:Round){
     const image=publicUrl(round.standard.image),prefix=apiPath('/reference-assets/');

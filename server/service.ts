@@ -231,18 +231,35 @@ export class InspectionService {
   }
   async processReal(r:Round,p:Photo){
     try{
+      if(this.vision!.recognizePhoto){
+        if(!p.preparation||p.preparation.mode!=='original'||p.preparation.sourceHash!==p.hash){
+          p.message='正在读取原始照片…';this.store.saveRound(r);
+          const prepared=await this.vision!.prepare(p);if(this.closing)return;
+          if(p.components.length){this.store.audit(r,{id:'SYSTEM',name:'VLM识别服务'},'photo.legacy-separation-retired',{photoId:p.id,components:p.components});p.components=[];}
+          p.preparation=prepared.preparation;p.width=prepared.preparation.width;p.height=prepared.preparation.height;
+        }
+        p.message='VLM正在读取整张原图、比对丝印并判断清晰度…';r.revision++;this.store.saveRound(r);
+        const result=await this.vision!.recognizePhoto(r,p);if(this.closing)return;
+        const previous=p.components;
+        if(previous.some(c=>c.aiHistory.length||c.reviewHistory.length))this.store.audit(r,{id:'SYSTEM',name:'VLM识别服务'},'photo.previous-results',{photoId:p.id,components:previous});
+        p.components=result.components.map(item=>{
+          if(item.ai&&item.ai.instructionVersion!==r.instructionVersion)throw new RecognitionProblem('error','检测说明已更新，请重新检测。');
+          const old=previous.find(c=>c.index===item.index&&c.viewMode==='original'&&c.bbox.every((n,i)=>Math.abs(n-item.bbox[i])<.08));
+          return {id:old?.id??randomUUID(),label:'P'+String(p.sequence).padStart(3,'0')+'-'+String(item.index+1).padStart(2,'0'),index:item.index,bbox:item.bbox,viewMode:'original' as const,ai:item.ai,aiHistory:[...(old?.aiHistory??[]),...(item.ai?[structuredClone(item.ai)]:[])],review:null,reviewHistory:old?.reviewHistory??[]};
+        });
+        p.status=result.qualityReasons.length?'quality':'ready';p.message=result.qualityReasons.join(' ');return;
+      }
       if(!p.preparation||p.preparation.sourceHash!==p.hash){
         p.message='正在定位元件并生成裁片…';this.store.saveRound(r);
         const prepared=await this.vision!.prepare(p);if(this.closing)return;
         p.preparation=prepared.preparation;p.components=prepared.components;
         p.width=prepared.preparation.width;p.height=prepared.preparation.height;r.revision++;this.store.saveRound(r);
       }
-      if(p.preparation.coverage!=='complete')throw new RecognitionProblem('quality',p.preparation.issues.join(' '));
+      if(p.preparation.coverage!=='complete')throw new RecognitionProblem('error','分离器结果不完整，尚未生成有效检测结果。');
       const quality:string[]=[];
       for(const c of p.components){
         if(this.closing)return;
         if(c.ai?.instructionVersion===r.instructionVersion)continue;
-        if(c.crop?.qualityReasons.length){quality.push(...c.crop.qualityReasons);continue;}
         p.message=`已定位${p.components.length}件，正在比对第${c.index+1}件…`;r.revision++;this.store.saveRound(r);
         try{
           const ai=await this.vision!.recognize(r,p,c);if(this.closing)return;
@@ -252,7 +269,7 @@ export class InspectionService {
         }catch(error){if(error instanceof RecognitionProblem&&error.kind==='quality'){quality.push(error.message);continue;}throw error;}
       }
       p.status=quality.length?'quality':'ready';p.message=[...new Set(quality)].join(' ');
-    }catch(error){if(this.closing)return;p.status=error instanceof RecognitionProblem?error.kind:'error';p.message=error instanceof RecognitionProblem?error.message:'元件定位未完成，请调整拍摄后重试。';console.error('真实识别未完成',error);}
+    }catch(error){if(this.closing)return;p.status=error instanceof RecognitionProblem?error.kind:'error';p.message=error instanceof RecognitionProblem?error.message:'本次识别未完成，请重试或查看模型服务。';console.error('真实识别未完成',error);}
   }
   submit(id: string, revision: number, actor: Person, simulateFailure = false) {
     if(this.task(this.round(id).taskId).origin==='standalone')throw new ApiError(409,'自主检测未关联 MES 任务，不能回填或上传附件；请在电脑 MES 中手工填写结论和不良数量。');
@@ -286,7 +303,8 @@ export class InspectionService {
     if(conflicts.length)lines.splice(4,0,'## 重要：现场说明优先及与标准的关系','本次按现场检验人员指示进行检测。',...conflicts.map(escapeMarkdown),'');
     for (const p of r.photos) {
       lines.push(`## 照片 P${String(p.sequence).padStart(3,'0')}`, `![原始照片](${publicUrl(p.url)})`, '', escapeMarkdown(p.filename));
-      if(p.preparation)lines.push('',`![定位编号（原图外侧引线）](${publicUrl(p.preparation.annotatedUrl)})`,`![裁片白板（保持裁片像素）](${publicUrl(p.preparation.sheetUrl)})`,`预处理：${p.preparation.version}；${p.preparation.elapsedMs} ms；原图SHA256：${p.hash}`,'');
+      if(p.preparation?.mode==='original')lines.push('','本次直接向VLM发送完整原图，未自动定位裁剪或拼接；清晰度由VLM判断。','');
+      else if(p.preparation)lines.push('',`![定位编号（原图外侧引线）](${publicUrl(p.preparation.annotatedUrl)})`,`![裁片白板（保持裁片像素）](${publicUrl(p.preparation.sheetUrl)})`,`预处理：${p.preparation.version}；${p.preparation.elapsedMs} ms；原图SHA256：${p.hash}`,'');
       for (const c of p.components) {
         lines.push(`### ${c.label} · ${finalVerdict(c) === 'PASS' ? '合格' : finalVerdict(c) === 'FAIL' ? '不合格' : '未完成'}`, '', '| 行 | 实拍识别原文 | 正品原文 |', '| --- | --- | --- |');
         if(!r.standard.lines.length)lines.push('| — | — | 未录入文字转写，以正品图片为准 |');

@@ -1,6 +1,8 @@
 # 鉴微 · 丝印检测系统
 
-面向工厂来料检验的平板 Web 应用：维护正品图片与说明，拍摄待检元件，自动定位、裁剪、转正后调用 VLM 比对，展示结论、不良数量和可追溯报告。
+面向工厂来料检验的平板 Web 应用：维护正品图片与说明，拍摄待检元件，直接将完整照片交给 VLM 逐件识别与比对，展示结论、不良数量和可追溯报告。
+
+2026-10-30：自动 CV 定位裁剪和传统锐度门槛已撤下，分离器仅保留接口；清晰度由 VLM 判定。管理员手动图片编辑仍保留。
 
 当前版本支持正品管理、ZIP/RAR/Excel/JSON 批量导入、自主检测和模拟 MES 任务。正品按**物料编号＋型号**匹配，供应商选填；上传后自动分析，可先保存草稿。**公司 IDaaS 与 MES 尚未接通**：自主检测结果由检验员手工录入 MES，模拟回填不代表真实保存；整张检验单始终由人员在 MES 最终提交。
 
@@ -49,7 +51,7 @@ Windows 使用 `py -3.12 -m venv .venv` 创建环境，再执行 `npm run python
 
 ```text
 web/           平板检验端、电脑管理端、调试页和共用 UI
-server/        Node HTTP / SQLite 业务服务、OpenCV 工作器、VLM 客户端
+server/        Node HTTP / SQLite 业务服务、图像解码与 VLM 客户端
 shared/        数据类型、业务规则、接口路径和结果汇总
 config/        可复制的环境配置模板
 scripts/       启动、离线测试、显式烟测和演示工具
@@ -73,7 +75,7 @@ npm test
 npm run test:python
 ```
 
-测试使用临时目录，不调用真实模型。分级命令、覆盖范围和真机验收见[分级测试与验收](docs/分级测试与验收.md)，本轮结果见[10 月 29 日验证记录](docs/验证记录-2026-10-29.md)。`npm run probe:real` 或 `npm run probe:reference` 才会显式运行本机 VLM 烟测，请预先配置模型并检查资源。前端开发时，在一个终端运行 `npm start`，另一个终端运行 `npm run dev`；开发页地址由 Vite 输出，默认代理 API 到 5190，非默认端口可通过 `SV_DEV_API_TARGET` 指定。
+测试使用临时目录，不调用真实模型。分级命令、覆盖范围和真机验收见[分级测试与验收](docs/分级测试与验收.md)，本轮结果见[10 月 30 日验证记录](docs/验证记录-2026-10-30.md)。`npm run probe:real` 或 `npm run probe:reference` 才会显式运行本机 VLM 烟测，请预先配置模型并检查资源。前端开发时，在一个终端运行 `npm start`，另一个终端运行 `npm run dev`；开发页地址由 Vite 输出，默认代理 API 到 5190，非默认端口可通过 `SV_DEV_API_TARGET` 指定。
 
 运行单独 Python 脚本可用 `npm run python -- 脚本路径`，统一解释器选择和 UTF-8 编码。Windows 迁移排查与验证边界见 [Windows 兼容性检查](docs/Windows兼容性检查.md)。
 

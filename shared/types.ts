@@ -12,9 +12,10 @@ export interface ComponentResult {
   id: string; label: string; index: number; bbox: [number, number, number, number];
   ai: AIJudgement | null; aiHistory: AIJudgement[];
   review: Review | null; reviewHistory: Review[];
+  viewMode?: 'original';
   crop?: { url: string; width: number; height: number; rotation: number; qualityReasons: string[]; assetId: string };
 }
-export interface Preparation { version:string; sourceHash:string; uprightUrl:string; annotatedUrl:string; sheetUrl:string; width:number; height:number; elapsedMs:number; coverage:'complete'|'uncertain'; issues:string[] }
+export interface Preparation { mode?:'original'|'separated'; version:string; sourceHash:string; uprightUrl:string; annotatedUrl:string; sheetUrl:string; width:number; height:number; elapsedMs:number; coverage:'complete'|'uncertain'; issues:string[] }
 export interface Photo {
   id: string; sequence: number; filename: string; file: string; url: string; hash: string;
   width: number; height: number; sample: SampleKind | null; status: PhotoStatus; uploadKey?: string;

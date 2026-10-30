@@ -57,8 +57,8 @@ test('三个实际工作器在GBK管道下正确收发UTF-8，支持中文空格
   }
   const asset=worker('server/admin/asset_worker.py',{source,filename:'正品 照片🧪.png',folder:path.join(directory,'正品 图片')});
   assert.equal(asset.filename,'正品 照片🧪.png');assert.ok(asset.width>0);
-  const prepared=worker('server/vision/local_worker.py',{action:'separate',source,folder:path.join(directory,'裁剪 结果🧪'),label:'P001'});
-  assert.equal(prepared.components.length,1);assert.equal(prepared.coverage,'complete');
+  const prepared=worker('server/vision/local_worker.py',{action:'inspect_image',source});
+  assert.equal(prepared.version,'whole-photo-v1');assert.equal(prepared.width,1536);assert.equal(prepared.height,1024);
   const manifest=path.join(directory,'标准 清单🧪.json');
   await writeFile(manifest,JSON.stringify({schemaVersion:'1.0',records:[{materialCode:'0001',modelNumber:'M1',supplierName:'测试供应商🧪',imagePath:'缺失🧪.png'}]}));
   const imported=worker('server/admin/import_worker.py',{files:[{name:'标准.json',path:manifest}],folder:path.join(directory,'导入 图片')});

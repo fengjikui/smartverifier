@@ -18,7 +18,8 @@ test('公司兼容VLM通过真实HTTP及Python工作器跑通识别、报告和�
     let text='';for await(const chunk of req)text+=chunk;payload=JSON.parse(text);
     if(mode==='reject'){res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:apiKey+' should not be echoed'}}));return;}
     const id=payload.response_format.json_schema.schema.properties.items.items.properties.componentId.enum[0];
-    const output=JSON.stringify({items:[{componentId:id,status:'decided',verdict:'PASS',lines:['SV358','A26','0147'],confidence:.91,reason:'测试协议返回，非真实模型判断',features:[],differences:[]}],instructionConflicts:[]});
+    const isWhole=!!payload.response_format.json_schema.schema.properties.quality;
+    const output=JSON.stringify({...isWhole?{quality:{state:'usable',reason:''},coverage:'complete'}:{},items:[{...isWhole?{bbox:[.1,.1,.8,.8]}:{},componentId:id,status:'decided',verdict:'PASS',lines:['SV358','A26','0147'],confidence:.91,reason:'测试协议返回，非真实模型判断',features:[],differences:[]}],instructionConflicts:[]});
     res.writeHead(200,{'Content-Type':'text/event-stream'});
     for(const part of [output.slice(0,20),output.slice(20)])res.write('data: '+JSON.stringify({choices:[{index:0,delta:{content:part},finish_reason:null}]})+'\n\n');
     res.write('data: '+JSON.stringify({choices:[{index:0,delta:{},finish_reason:'stop'}]})+'\n\n');
@@ -43,7 +44,7 @@ test('公司兼容VLM通过真实HTTP及Python工作器跑通识别、报告和�
   view=service.view('REALVISION1');assert.equal(view.round!.status,'submitted');assert.equal(view.effective!.id,view.round!.id);assert.equal(view.round!.transfer!.key,key);
   assert.ok((await readFile(path.join(state,'reports',view.round!.id+'.md'),'utf8')).includes('company-fixture'));
   mode='reject';const before=calls,photo=view.round!.photos[0],component=photo.components[0];
-  await assert.rejects(pipeline.recognize(view.round!,photo,component),error=>error instanceof Error&&error.message.includes('HTTP 400')&&!error.message.includes(apiKey));
+  await assert.rejects(pipeline.recognizePhoto(view.round!,photo),error=>error instanceof Error&&error.message.includes('HTTP 400')&&!error.message.includes(apiKey));
   assert.equal(calls,before+1,'不自动重试或偷偷取消Schema');
   for(const entry of await traces.list())assert.equal(JSON.stringify(await traces.read(entry.id)).includes(apiKey),false);
 });
