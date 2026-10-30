@@ -1,6 +1,6 @@
 import { apiPath } from '../../../shared/paths';
 import { useEffect, useRef, useState } from 'react';
-import { ImagePlus, Upload, Check } from 'lucide-react';
+import { ImagePlus, Upload, Check, X } from 'lucide-react';
 import { Btn, Field, Modal, Pill, Spinner } from '../ui';
 import { request } from '../api';
 import { ReferenceImage } from '../reference-image';
@@ -44,7 +44,7 @@ export function ReferenceForm({mode,id,person,navigate,onDirty,onSaved,onError,i
     {formError?<p className="adm-error" role="alert">{formError}</p>:null}
     {importSource?.row.status==='error'?<p className="ref-edit-notice">{importSource.row.message} 请补齐资料后保存。</p>:null}
     {filenameMessage?<p className="ref-edit-notice">{filenameMessage}</p>:null}
-    {recovered?<div className="adm-notice" role="status">已恢复上次未保存的输入，请确认后保存。<button type="button" onClick={()=>{if(confirm('清除恢复的输入并重新填写？')){localStorage.removeItem(key);onDirty(false);navigate('references');}}}>放弃草稿</button></div>:null}
+    {recovered?<div className="adm-notice adm-neutral ref-recovered-notice" role="status"><span>已恢复上次未保存的输入，可继续编辑。</span><div className="ref-recovery-actions"><button type="button" onClick={()=>{if(confirm('清除恢复的输入并重新填写？')){localStorage.removeItem(key);onDirty(false);navigate('references');}}}>放弃草稿</button><button type="button" className="ref-recovery-close" aria-label="关闭恢复提示，保留输入" title="关闭提示，保留当前输入" onClick={()=>setRecovered(false)}><X size={17}/></button></div></div>:null}
     {saveMessage?<div className="adm-notice" role="status"><Check size={18}/>{saveMessage}</div>:null}
     <div className="adm-two-columns"><section className="adm-panel adm-image-editor"><div className="adm-panel-heading"><h2>正品图片 <span className="adm-required">*</span></h2>{asset?<Pill tone="success">已添加 1 张</Pill>:null}</div>
       {asset?<button type="button" className="adm-reference-image sv-image-open" aria-label="查看当前正品图片与区域标记" onClick={()=>setPreview('current')}><ReferenceImage src={apiPath('/reference-assets/'+asset.id)} alt="当前正品检测用图" width={asset.width} height={asset.height} regions={input.regions}/></button>:<button type="button" className="adm-upload-zone" disabled={uploading} onClick={()=>picker.current?.click()}><ImagePlus size={34}/><strong>点击添加正品图片</strong><span>清晰展示丝印与器件外形</span><small>JPG / PNG / WebP · 单张最多 20MB</small></button>}
@@ -56,7 +56,7 @@ export function ReferenceForm({mode,id,person,navigate,onDirty,onSaved,onError,i
       {needsRemark?<p className="ref-edit-notice">图片已变更，原来的区域标记需重新标记，或在核对后确认新图无需原标记。</p>:null}
       {analysis?.state==='completed'&&(issues.length||needsRemark)?<section className="adm-analysis-review"><strong>{analysis.result?.quality!=='clear'?'当前图片有质量问题，采用时会标记为强制采用':'请核对待确认项'}</strong><label>人工核对原因<select value={input.reviewReason??''} onChange={e=>update({reviewReason:e.target.value})}><option value="">请选择核对结果</option><option>人工已核对正品实物，确认当前字体与丝印内容可用</option><option>已核对新图片，确认不需要沿用旧区域标记</option><option>知悉图片质量问题，人工核对后强制采用该正品图片</option></select></label><label>补充原因（可选）<textarea rows={2} maxLength={1000} value={input.reviewReason??''} onChange={e=>update({reviewReason:e.target.value})}/></label></section>:null}
 
-      <div className="ref-text-fields"><label>正品丝印文字 <small>选填</small><textarea aria-label="正品丝印文字" rows={6} value={input.lines.join('\n')} onChange={e=>update({lines:e.target.value.split('\n')})} placeholder={'分析后自动填写\n每行一条，可修改'}/></label><label>检测说明 <small>选填</small><textarea aria-label="检测说明" maxLength={8000} rows={6} value={input.description} onChange={e=>update({description:e.target.value})} placeholder="自动填写分析与区域说明，也可补充特殊要求。"/></label></div><p className="adm-footnote">分析完成后自动填写；已手动修改的内容不会被覆盖。</p>
+      <div className="ref-text-fields"><label><span className="ref-field-caption">正品丝印文字 <small>选填</small></span><textarea aria-label="正品丝印文字" rows={6} value={input.lines.join('\n')} onChange={e=>update({lines:e.target.value.split('\n')})} placeholder={'分析后自动填写\n每行一条，可修改'}/></label><label><span className="ref-field-caption">检测说明 <small>选填</small></span><textarea aria-label="检测说明" maxLength={8000} rows={6} value={input.description} onChange={e=>update({description:e.target.value})} placeholder="自动填写分析与区域说明，也可补充特殊要求。"/></label></div><p className="adm-footnote">分析完成后自动填写；已手动修改的内容不会被覆盖。</p>
 
     </section></div>
     {preview&&asset?<Modal imageView title={preview==='original'?'上传原图':'当前检测用图'} description="可拖动、滚轮或双指缩放查看；原始图片保留。" onClose={()=>setPreview(null)}><ZoomImage src={apiPath('/reference-assets/'+(preview==='original'?(asset.originalId??asset.id):asset.id))} alt={preview==='original'?'上传原图':'当前正品图片与区域标记'} regions={preview==='current'?input.regions:undefined}/></Modal>:null}
