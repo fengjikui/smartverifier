@@ -1,8 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bindImageWheel, ImagePinch, pinchStart, pinchView } from '../shared/image-gestures.ts';
+import { bindImageWheel, fitImageView, ImagePinch, pinchStart, pinchView } from '../shared/image-gestures.ts';
 import { imagePoint } from '../shared/image-editor.ts';
 import type { View } from '../shared/image-editor.ts';
+
+test('预览等待有效尺寸：隐藏/挂载中的容器不产生负倍率，出现后以真实图片比例适应',()=>{
+ const image={width:3840,height:2160};
+ for(const area of [{width:0,height:0},{width:800,height:0},{width:20,height:500},{width:NaN,height:500}])assert.equal(fitImageView(image,area),null);
+ assert.equal(fitImageView({width:0,height:2160},{width:800,height:600}),null);
+ const landscape=fitImageView(image,{width:800,height:600})!;
+ assert.equal(landscape.scale,776/3840);assert.equal(landscape.x,0);assert.equal(landscape.y,0);
+ const portrait=fitImageView(image,{width:480,height:700})!;
+ assert.equal(portrait.scale,456/3840);
+ assert.ok(image.width*portrait.scale<=456&&image.height*portrait.scale<=676);
+});
+
+test('裁后小图会放大适应，长条图保留完整范围，切换图片重新按新尺寸计算',()=>{
+ const area={width:700,height:500},small={width:120,height:80};
+ const enlarged=fitImageView(small,area)!;assert.ok(enlarged.scale>1);assert.equal(small.width*enlarged.scale,676);
+ const tall={width:100,height:3000},fit=fitImageView(tall,area)!;assert.ok(Math.abs(tall.height*fit.scale-476)<1e-8);
+ assert.notEqual(fit.scale,enlarged.scale);assert.ok(fit.scale>0);
+ assert.equal(fitImageView({width:1,height:1},area)!.scale,16);
+});
 
 test('真实原生wheel绑定围绕事件位置缩放，阻止页面滚动；解绑、停用和零增量不改变图',()=>{
  class Canvas extends EventTarget {getBoundingClientRect(){return {left:30,top:70,width:800,height:600};}}

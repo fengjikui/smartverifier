@@ -1,6 +1,12 @@
 import { zoomAt } from './image-editor.ts';
 import type { Point, View } from './image-editor.ts';
 
+/** 只在图片与容器尺寸就绪后适应视口；小裁片也可放大，保持完整比例。 */
+export function fitImageView(image:{width:number;height:number},area:{width:number;height:number}):View|null{
+ if(![image.width,image.height,area.width,area.height].every(n=>Number.isFinite(n)&&n>0)||area.width<=24||area.height<=24)return null;
+ return {x:0,y:0,scale:Math.min((area.width-24)/image.width,(area.height-24)/image.height,16)};
+}
+
 export interface Pinch { view:View;center:Point;distance:number }
 export function pinchStart(view:View,a:Point,b:Point):Pinch{return {view:{...view},center:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},distance:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y))};}
 export function pinchView(pinch:Pinch,a:Point,b:Point):View{const center={x:(a.x+b.x)/2,y:(a.y+b.y)/2},next=zoomAt(pinch.view,pinch.center,pinch.view.scale*Math.hypot(a.x-b.x,a.y-b.y)/pinch.distance);return {...next,x:next.x+center.x-pinch.center.x,y:next.y+center.y-pinch.center.y};}
