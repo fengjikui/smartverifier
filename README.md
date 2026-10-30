@@ -79,4 +79,6 @@ npm run test:python
 
 运行单独 Python 脚本可用 `npm run python -- 脚本路径`，统一解释器选择和 UTF-8 编码。Windows 迁移排查与验证边界见 [Windows 兼容性检查](docs/Windows兼容性检查.md)。
 
+算法同事接入元件定位、分割或小 OCR 时，先看[接入初步方案](docs/定位分割与轻量OCR接入初步方案.md)，包含现有合同、实际接线工作及首轮交付要求。当前默认识别流程保持不变。
+
 完整资料从[文档索引](docs/README.md)开始。性能与准确度以现场实拍验收为准，生成样片不能代表真实业务准确率。
