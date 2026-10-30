@@ -38,3 +38,5 @@
 
 .ref-form-heading{position:sticky;top:-24px;z-index:3;background:var(--canvas)}
 @media(max-width:680px){.ref-form-heading{top:-16px}}
+/* 两行匹配资料；常用的保存并继续新增保持直接可见。 */
+.ref-identity-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.adm-form .adm-form-fields{gap:18px}.ref-secondary-fields{margin-top:-2px}.ref-zoom-value{font-size:12px;min-width:40px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:center}.ref-save-actions{flex-wrap:wrap}.ref-save-actions .sv-btn{white-space:nowrap}@container reference-fields (max-width:380px){.ref-identity-fields{grid-template-columns:1fr}}@media(max-width:680px){.ref-save-actions{justify-content:flex-start}}

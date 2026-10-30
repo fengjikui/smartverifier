@@ -23,10 +23,10 @@ export function PhotoPill({photo}:{photo:Photo}){
   if(photo.status==='pending')return <Pill>待检测</Pill>;
   return <VerdictPill verdict={photo.components.some(c=>finalVerdict(c)==='FAIL')?'FAIL':'PASS'}/>;
 }
-export function Modal({title,description,children,onClose,actions}:{title:string;description?:string;children?:ReactNode;onClose:()=>void;actions?:ReactNode}){
-  return <Dialog open onOpenChange={open=>{if(!open)onClose();}}><DialogContent className="sv-dialog" showCloseButton={false}>
-    <div className="sv-dialog-heading"><DialogTitle>{title}</DialogTitle><Btn tone="quiet" className="sv-icon-button" onClick={onClose} aria-label="关闭"><X size={22}/></Btn></div>
-    <DialogDescription className="sv-description">{description??'请确认后继续。'}</DialogDescription>
+export function Modal({title,description,children,onClose,actions,imageView=false}:{title:string;description?:string;children?:ReactNode;onClose:()=>void;actions?:ReactNode;imageView?:boolean}){
+  return <Dialog open onOpenChange={open=>{if(!open)onClose();}}><DialogContent className={'sv-dialog'+(imageView?' sv-image-dialog':'')} showCloseButton={false}>
+    <div className="sv-dialog-heading"><DialogTitle>{title}</DialogTitle>{imageView?<span className="sv-image-gesture-hint">拖动移动 · 滚轮 / 双指缩放</span>:null}<Btn tone="quiet" className="sv-icon-button" onClick={onClose} aria-label="关闭"><X size={22}/></Btn></div>
+    <DialogDescription className={imageView?'sv-image-description':'sv-description'}>{imageView?'可拖动图片，鼠标位置滚轮或双指缩放，双击恢复适应。':description??'请确认后继续。'}</DialogDescription>
     {children}{actions?<div className="sv-dialog-actions">{actions}</div>:null}
   </DialogContent></Dialog>;
 }
