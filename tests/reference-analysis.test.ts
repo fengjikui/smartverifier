@@ -32,7 +32,7 @@ test('质量问题与字形歧义分开，强制采用仍须已完成分析，�
 });
 test('区域说明具体引用可靠文字；读不出保留空间定位，不编字；遗漏编号拒绝',async()=>{
  const regions:ReferenceRegion[]=[{id:'ignore1',kind:'ignore',x:.2,y:.6,width:.5,height:.1,label:'可变编号'}],result={...fakeReferenceAnalysis(),regionReadings:[{id:'ignore1',text:'95678',readable:true}]};
- const pipeline:any={filename:()=>'/fixture.png',timeoutSeconds:5,worker:async()=>({response:{choices:[{finish_reason:'stop',message:{content:JSON.stringify(result)}}]}})};
+ const pipeline:any={filename:()=>'/fixture.png',timeoutSeconds:5,worker:async(req:any)=>{assert.equal(req.responseSchema.properties.regionReadings.minItems,regions.length);assert.equal(req.responseSchema.properties.regionReadings.maxItems,regions.length);assert.deepEqual(req.responseSchema.properties.regionReadings.items.properties.id.enum,regions.map(r=>r.id));return ({response:{choices:[{finish_reason:'stop',message:{content:JSON.stringify(result)}}]}});}};
  let value=await analyzeReference(pipeline,asset,regions);assert.equal(value.regionReadings[0].text,'95678');assert.match(regionInstructions(regions,{result:value} as any),/95678/);
  result.regionReadings[0].readable=false;value=await analyzeReference(pipeline,asset,regions);assert.equal(value.regionReadings[0].text,null);assert.doesNotMatch(regionInstructions(regions,{result:value} as any),/95678/);
  result.regionReadings=[];await assert.rejects(()=>analyzeReference(pipeline,asset,regions),/遗漏/);

@@ -8,7 +8,8 @@ import { ApiError } from '../errors.ts';
 import type { ReferenceAnalyses } from './analysis.ts';
 import type { Registry } from './registry.ts';
 import type { Person } from '../../shared/types.ts';
-import type { ReferenceAsset, ImportJob, ImportRow } from '../../shared/admin.ts';
+import { previewTransform, transformRegions } from '../../shared/reference-geometry.ts';
+import type { ReferenceAsset, ReferenceEditResult, ReferenceRegion, ReferenceTransform, ImportJob, ImportRow } from '../../shared/admin.ts';
 
 export class AdminFiles {
   registry:Registry;root:string;directory:string;analyses?:ReferenceAnalyses;busy=false;children=new Set<ReturnType<typeof spawn>>();
@@ -30,10 +31,19 @@ export class AdminFiles {
   async upload(file:File){if(this.busy)throw new ApiError(429,'正在预检其他图片，请稍后重试。');this.busy=true;const dir=path.join(this.directory,'admin-staging',randomUUID());
     try{if(file.size>20*1024*1024)throw new ApiError(413,'单张图片最多 20MB。');await mkdir(dir,{recursive:true,mode:0o700});const source=path.join(dir,'source');await writeFile(source,new Uint8Array(await file.arrayBuffer()),{mode:0o600});const asset:ReferenceAsset=await this.worker('asset_worker.py',{source,filename:file.name,folder:path.join(this.directory,'files')},20000);this.registry.addAsset(asset);return {...asset,...(this.analyses?{analysisId:this.analyses.start(asset.id,[],true).id}:{})};}finally{this.busy=false;await rm(dir,{recursive:true,force:true});}
   }
-  async edit(id:string,input:{angle:number;crop?:{x:number;y:number;width:number;height:number}}){
+  async edit(id:string,input:{angle:number;crop?:{x:number;y:number;width:number;height:number};regions?:ReferenceRegion[]}){
     if(this.busy)throw new ApiError(429,'正在处理其他图片，请稍后重试。');
     const original=this.registry.asset(id);if(!original)throw new ApiError(404,'正品图片不存在。');
-    this.busy=true;try{const edited:ReferenceAsset=await this.worker('edit_worker.py',{...input,source:path.join(this.directory,'files',id),filename:original.filename,folder:path.join(this.directory,'files')},30000);edited.originalId=original.originalId??original.id;this.registry.addAsset(edited);return {...edited,...(this.analyses?{analysisId:this.analyses.start(edited.id,[],true).id}:{})};}finally{this.busy=false;}
+    const sourceRegions=input.regions??[];
+    try{transformRegions(sourceRegions,previewTransform(original.width,original.height,input.angle,input.crop));}catch(e){throw new ApiError(400,(e as Error).message);}
+    this.busy=true;try{
+      const {transform,...edited}:ReferenceAsset&{transform:ReferenceTransform}=await this.worker('edit_worker.py',{...input,source:path.join(this.directory,'files',id),filename:original.filename,folder:path.join(this.directory,'files')},30000);
+      const regions=transformRegions(sourceRegions,transform);
+      if(edited.id===original.id)return {...original,regions};
+      edited.originalId=original.originalId??original.id;edited.derivation={sourceId:id,transform};this.registry.addAsset(edited);
+      const analysis=this.analyses?.transformed(id,edited.id,sourceRegions,regions,transform);
+      return {...edited,regions,...(analysis?{analysisId:analysis.id}:{})} satisfies ReferenceEditResult;
+    }finally{this.busy=false;}
   }
   async start(files:File[],actor:Person){
     if(this.busy)throw new ApiError(429,'正在处理另一批图片，请稍后再试。');if(!files.length||files.length>2001||files.reduce((n,f)=>n+f.size,0)>200*1024*1024)throw new ApiError(413,'每批总大小最多 200MB、最多 2000 条标准。');

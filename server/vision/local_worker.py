@@ -70,6 +70,18 @@ def inspect_image(req):
     return {"version": VERSION, "width": image.width, "height": image.height}
 
 
+def mark_reference(pic, regions):
+    """仅加检查范围边界，不覆盖框内丝印；预览与传输采用同一组多边形坐标。"""
+    draw = ImageDraw.Draw(pic)
+    for region in regions:
+        x,y,w,h = (region[k] for k in ('x','y','width','height'))
+        color = (35,117,78) if region['kind']=='focus' else (210,140,0)
+        points = region.get('polygon') or [dict(x=x,y=y),dict(x=x+w,y=y),dict(x=x+w,y=y+h),dict(x=x,y=y+h)]
+        pixels = [(min(pic.width-1,round(p['x']*pic.width)),min(pic.height-1,round(p['y']*pic.height))) for p in points]
+        draw.line(pixels+[pixels[0]],fill=color,width=max(2,round(min(pic.size)/500)),joint='curve')
+    return pic
+
+
 async def recognize(req):
     # 模型地址由服务端配置；不继承桌面代理，内网直连。
     for key in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"):
@@ -84,11 +96,7 @@ async def recognize(req):
     def block(filename, regions=None):
         pic = decode(filename)
         if regions:
-            draw = ImageDraw.Draw(pic)
-            for index, region in enumerate(regions):
-                x,y,w,h = (region[k] for k in ('x','y','width','height'))
-                color = (35,117,78) if region['kind']=='focus' else (210,140,0)
-                draw.rectangle((round(x*pic.width),round(y*pic.height),round((x+w)*pic.width)-1,round((y+h)*pic.height)-1),outline=color,width=max(2,round(min(pic.size)/500)))
+            mark_reference(pic, regions)
         stream = BytesIO(); pic.save(stream,format="PNG")
         data=stream.getvalue()
         metrics.append({"inputIndex":len(metrics),"sha256":hashlib.sha256(data).hexdigest(),"sentWidth":pic.width,"sentHeight":pic.height,"encodedBytes":len(data),"effectiveWidth":None,"effectiveHeight":None})

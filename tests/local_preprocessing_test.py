@@ -51,4 +51,14 @@ class PreprocessingTest(unittest.TestCase):
             bmp=Path(folder)/'image.bmp';original.save(bmp)
             with self.assertRaisesRegex(ValueError,'JPG'):worker.inspect_image({'source':str(bmp)})
 
+class MarkedReferenceTest(unittest.TestCase):
+    def test_model_input_draws_rotated_regions_without_boxing_extra_background(self):
+        from server.vision.local_worker import mark_reference
+        im=Image.new('RGB',(100,100),'white')
+        mark_reference(im,[dict(kind='focus',x=.2,y=.2,width=.6,height=.6,polygon=[dict(x=.5,y=.2),dict(x=.8,y=.5),dict(x=.5,y=.8),dict(x=.2,y=.5)]),dict(kind='ignore',x=.02,y=.02,width=.1,height=.1)])
+        self.assertEqual(im.getpixel((50,21)),(35,117,78))
+        self.assertEqual(im.getpixel((20,20)),(255,255,255))
+        self.assertEqual(im.getpixel((50,50)),(255,255,255))
+        self.assertEqual(im.getpixel((2,2)),(210,140,0))
+
 if __name__=='__main__':unittest.main()

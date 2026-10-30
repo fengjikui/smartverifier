@@ -5,18 +5,19 @@ import { commitImport, decideImport, refreshImport } from './imports.ts';
 import { analysisKey } from './analysis.ts';
 import { analysisIssues, regionInstructions } from '../../shared/reference-analysis.ts';
 import { ApiError } from '../errors.ts';
+import { regionGeometryValid, regionsOverlap } from '../../shared/reference-geometry.ts';
 import type { Store } from '../store.ts';
 import type { Person, Standard } from '../../shared/types.ts';
 import type { CatalogPage } from '../../shared/catalog.ts';
 import type { ReferenceRecord, ReferenceInput, ReferenceAsset, Page, MaintenanceEvent, ImportJob, ReferenceAnalysis, ReferenceRegion } from '../../shared/admin.ts';
 
 const text=(max:number)=>z.string().trim().max(max).transform(s=>s.normalize('NFC'));
-export const regionSchema=z.object({id:z.string().max(100),kind:z.enum(['ignore','focus']),x:z.number().min(0).max(1),y:z.number().min(0).max(1),width:z.number().positive().max(1),height:z.number().positive().max(1),label:text(300)}).strict().refine(r=>r.x+r.width<=1.000001&&r.y+r.height<=1.000001,'标记超出图片范围');
+export const regionSchema=z.object({id:z.string().max(100),kind:z.enum(['ignore','focus']),x:z.number().min(0).max(1),y:z.number().min(0).max(1),width:z.number().positive().max(1),height:z.number().positive().max(1),label:text(300),polygon:z.array(z.object({x:z.number().min(0).max(1),y:z.number().min(0).max(1)}).strict()).length(4).optional()}).strict().refine(regionGeometryValid,'区域须为图片范围内的有效矩形或旋转矩形');
 export const referenceInput=z.object({material:text(160).default(''),supplier:text(160).default(''),modelNumber:text(200).default(''),name:text(200).default(''),description:text(8000).default(''),lines:z.array(text(300)).max(50).default([]),assetId:z.string().max(100).default(''),status:z.enum(['active','draft']).default('active'),regions:z.array(regionSchema).max(30).default([]),analysisId:z.string().max(100).optional(),reviewReason:text(1000).default('')}).strict().superRefine((v,ctx)=>{
   if(v.status==='active'){if(!v.material)ctx.addIssue({code:z.ZodIssueCode.custom,message:'请填写物料编号',path:['material']});if(!v.modelNumber)ctx.addIssue({code:z.ZodIssueCode.custom,message:'请填写型号',path:['modelNumber']});}
   if(v.status==='draft'&&!v.material&&!v.modelNumber&&!v.assetId&&!v.name&&!v.description&&!v.lines.length)ctx.addIssue({code:z.ZodIssueCode.custom,message:'草稿至少添加图片或一项资料'});
   if(new Set(v.regions.map(r=>r.id)).size!==v.regions.length)ctx.addIssue({code:z.ZodIssueCode.custom,message:'区域编号不能重复',path:['regions']});
-  for(let i=0;i<v.regions.length;i++)for(let j=0;j<i;j++){const a=v.regions[i],b=v.regions[j];if(a.kind!==b.kind&&a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y)ctx.addIssue({code:z.ZodIssueCode.custom,message:'忽略区域与重点区域不能重叠',path:['regions']});}
+  for(let i=0;i<v.regions.length;i++)for(let j=0;j<i;j++){const a=v.regions[i],b=v.regions[j];if(a.kind!==b.kind&&regionsOverlap(a,b))ctx.addIssue({code:z.ZodIssueCode.custom,message:'忽略区域与重点区域不能重叠',path:['regions']});}
 });
 const stamp=()=>new Date().toISOString();
 const like=(s:string)=>'%'+s.replace(/[!%_]/g,c=>'!'+c)+'%';
@@ -62,7 +63,7 @@ export class Registry {
     if(supplier){clauses.push('supplier=?');params.push(supplier);}
     const where=clauses.join(' AND '),total=Number(this.store.db.prepare('SELECT COUNT(*) n FROM reference_records WHERE '+where).get(...params)!.n);
     const items=this.store.db.prepare('SELECT data FROM reference_records WHERE '+where+' ORDER BY updated_at DESC,id LIMIT ? OFFSET ?').all(...params,size,offset).map(row=>{
-      const r=JSON.parse(String(row.data));return {id:r.id,version:r.version,material:r.material,supplier:r.supplier,modelNumber:r.modelNumber??'',name:r.name,image:r.image,lines:r.lines,description:r.description,thumbnail:this.asset(r.assetId)?.thumbnail??r.image};
+      const r=JSON.parse(String(row.data));return {id:r.id,version:r.version,material:r.material,supplier:r.supplier,modelNumber:r.modelNumber??'',name:r.name,image:r.image,lines:r.lines,description:r.description,regions:r.regions??[],regionDescription:r.regionDescription??'',thumbnail:this.asset(r.assetId)?.thumbnail??r.image};
     });
     return {items,total,page,size,suppliers};
   }

@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Btn } from './ui';
+import { RegionOverlay } from './reference-image';
+import type { ReferenceRegion } from '../../shared/admin';
 import { zoomAt } from '../../shared/image-editor';
 import type { Point, View } from '../../shared/image-editor';
 import './image-viewer.css';
 
 /** 可查看原始像素的公共组件；浏览变换不写回文件或区域坐标。 */
-export function ZoomImage({src,alt}:{src:string;alt:string}){
+export function ZoomImage({src,alt,regions=[]}:{src:string;alt:string;regions?:ReferenceRegion[]}){
  const area=useRef<HTMLDivElement>(null),[size,setSize]=useState({width:1,height:1}),[view,setView]=useState<View>({x:0,y:0,scale:1}),[fitScale,setFitScale]=useState(1),[error,setError]=useState(false);
  const pointers=useRef(new Map<number,Point>()),gesture=useRef<{view:View;center:Point;distance:number}|null>(null),drag=useRef<{view:View;point:Point}|null>(null);
  function fit(){const r=area.current?.getBoundingClientRect();if(r){const scale=Math.min((r.width-24)/size.width,(r.height-24)/size.height,1);setFitScale(scale);setView({x:0,y:0,scale});}}
@@ -21,5 +23,5 @@ export function ZoomImage({src,alt}:{src:string;alt:string}){
  onPointerDown={e=>{if(e.button!==0)return;e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);const p=point(e);pointers.current.set(e.pointerId,p);if(pointers.current.size>1)startGesture();else drag.current={view:{...view},point:p};}}
  onPointerMove={e=>{if(!pointers.current.has(e.pointerId))return;const p=point(e);pointers.current.set(e.pointerId,p);const g=gesture.current;if(g&&pointers.current.size>=2){const [a,b]=[...pointers.current.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2},next=zoomAt(g.view,g.center,g.view.scale*Math.hypot(a.x-b.x,a.y-b.y)/g.distance);setView({...next,x:next.x+center.x-g.center.x,y:next.y+center.y-g.center.y});}else if(drag.current){const d=drag.current;setView({...d.view,x:d.view.x+p.x-d.point.x,y:d.view.y+p.y-d.point.y});}}}
  onPointerUp={e=>end(e.pointerId)} onPointerCancel={e=>end(e.pointerId)}>
- <img draggable={false} src={src} alt={alt} onLoad={e=>{setSize({width:e.currentTarget.naturalWidth,height:e.currentTarget.naturalHeight});setError(false);}} onError={()=>setError(true)} style={{width:size.width,height:size.height,transform:`translate3d(${view.x}px,${view.y}px,0) scale(${view.scale}) translate(-50%,-50%)`}}/>{error?<p role="alert">图片未能加载，请重新打开。</p>:null}</div></div>;
+ <div className="sv-zoom-stage" style={{width:size.width,height:size.height,transform:`translate3d(${view.x}px,${view.y}px,0) scale(${view.scale}) translate(-50%,-50%)`}}><img draggable={false} src={src} alt={alt} onLoad={e=>{setSize({width:e.currentTarget.naturalWidth,height:e.currentTarget.naturalHeight});setError(false);}} onError={()=>setError(true)}/>{regions.length?<RegionOverlay regions={regions} width={size.width} height={size.height}/>:null}</div>{error?<p role="alert">图片未能加载，请重新打开。</p>:null}</div></div>;
 }

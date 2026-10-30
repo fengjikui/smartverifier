@@ -11,6 +11,7 @@ class ReferenceEditTest(unittest.TestCase):
    folder=Path(folder);source=folder/'original.png';im=Image.new('RGB',(100,80),'white');im.paste('red',(0,0,50,80));im.save(source);raw=source.read_bytes()
    out=edit(dict(source=str(source),folder=str(folder),filename='正品.png',angle=90,crop=dict(x=0,y=0,width=1,height=.5)))
    self.assertEqual(source.read_bytes(),raw)
+   self.assertEqual(out['transform'],dict(angle=90,sourceWidth=100,sourceHeight=80,rotatedWidth=80,rotatedHeight=100,left=0,top=0,width=80,height=50))
    with Image.open(folder/out['id']) as image:
     self.assertEqual(image.size,(80,50));self.assertEqual(image.getpixel((40,25)),(255,0,0))
  def test_invalid_crop_and_nonfinite_rotation_rejected(self):
