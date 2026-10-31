@@ -13,6 +13,8 @@ import type { VisionPipeline } from './vision/local-pipeline.ts';
 import { TraceStore } from './vision/trace-store.ts';
 import { adminRoutes } from './admin/http.ts';
 import { DebugRuns } from './vision/debug-runs.ts';
+import { runStarter,starterAsset,starterOptionsSchema } from './vision/starter.ts';
+import { VisionContractError } from './vision/contracts.ts';
 import { directLoopback } from './network.ts';
 import { MARKING_BASE, MARKING_API, canonicalPage, apiRoute, publicLinkReplacer } from '../shared/paths.ts';
 import { acquireLease, assertLeaseFree, updateLeasePath, stateUpdateLeasePath, serviceLeasePath } from './local-lease.ts';
@@ -82,6 +84,13 @@ export function startServer(options: { state?: string; port?: number; host?: str
         if(pathname.startsWith('/debug/')){
           if(!debug)throw new ApiError(404,'本服务未启用模型调试窗口。');
           if(!directLoopback(req))throw new ApiError(403,'模型调试只允许在服务器本机直接查看。');
+          if(pathname==='/debug/vision-starter'&&req.method==='GET')return send(res,{mode:'mock',notice:'仅固定样图模拟，不调用模型，不写检测任务。'});
+          if(pathname==='/debug/vision-starter'&&req.method==='POST'){
+            try{return send(res,await runStarter(root,starterOptionsSchema.parse(await jsonBody(req))));}
+            catch(error){if(error instanceof VisionContractError)throw new ApiError(409,error.message);throw error;}
+          }
+          const starterImage=pathname.match(/^\/debug\/vision-starter\/assets\/(original|reference|crop-1|crop-2)$/);
+          if(starterImage&&req.method==='GET')return await file(res,starterAsset(root,starterImage[1]),true);
           if(pathname==='/debug/traces'&&req.method==='GET')return send(res,{traces:await traces.list(),running:debugRuns?.running??false});
           if(pathname==='/debug/samples'&&req.method==='POST'){
             if(!debugRuns)throw new ApiError(409,'此服务没有配置可调用的VLM。');

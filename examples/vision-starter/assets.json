@@ -1,0 +1,6 @@
+{
+  "starter-original": "../../fixtures/inspection/green-mat-v1/pair.png",
+  "starter-reference": "../../fixtures/inspection/green-mat-v1/reference-crop.png",
+  "starter-c1": "crop-1.png",
+  "starter-c2": "crop-2.png"
+}

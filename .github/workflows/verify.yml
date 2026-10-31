@@ -31,5 +31,6 @@ jobs:
       - run: npm run check
       # HTTP 路由回归实际读取 dist；全新 checkout 必须先构建，不能依赖本机旧产物。
       - run: npm run build
+      - run: npm run demo:vision -- --separate --backend auto
       - run: npm test
       - run: npm run test:python

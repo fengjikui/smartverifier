@@ -1,0 +1,174 @@
+[
+  {
+    "requestId": "starter-ocr-1",
+    "componentId": "starter-c1",
+    "photoId": "starter-photo",
+    "photoVersion": 1,
+    "sourceSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+    "inputSha256": "e97cb38d4557129936849fce2749807e0bfe78397f6306fae7046cda7d959808",
+    "state": "completed",
+    "lines": [
+      {
+        "text": "SV358",
+        "quadPx": [
+          [
+            0,
+            0.0
+          ],
+          [
+            460,
+            0.0
+          ],
+          [
+            460,
+            183.33333333333334
+          ],
+          [
+            0,
+            183.33333333333334
+          ]
+        ],
+        "score": null
+      },
+      {
+        "text": "A26",
+        "quadPx": [
+          [
+            0,
+            183.33333333333334
+          ],
+          [
+            460,
+            183.33333333333334
+          ],
+          [
+            460,
+            366.6666666666667
+          ],
+          [
+            0,
+            366.6666666666667
+          ]
+        ],
+        "score": null
+      },
+      {
+        "text": "0147",
+        "quadPx": [
+          [
+            0,
+            366.6666666666667
+          ],
+          [
+            460,
+            366.6666666666667
+          ],
+          [
+            460,
+            550.0
+          ],
+          [
+            0,
+            550.0
+          ]
+        ],
+        "score": null
+      }
+    ],
+    "engine": "mock-ocr",
+    "modelVersion": "fixture-v1",
+    "preprocessingVersion": "manual-crops-v1",
+    "scoreMeaning": "模拟读文无模型评分；文字框为示例行带，不是实测定位",
+    "elapsedMs": 0,
+    "warnings": [
+      "固定样例返回，不是OCR预测；文字行框为接口占位示例"
+    ],
+    "error": null
+  },
+  {
+    "requestId": "starter-ocr-2",
+    "componentId": "starter-c2",
+    "photoId": "starter-photo",
+    "photoVersion": 1,
+    "sourceSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+    "inputSha256": "a33ef01d4f893b8a7924e20e09588f6f029c855806bbac194e6754f1548367cf",
+    "state": "completed",
+    "lines": [
+      {
+        "text": "SV385",
+        "quadPx": [
+          [
+            0,
+            0.0
+          ],
+          [
+            510,
+            0.0
+          ],
+          [
+            510,
+            186.66666666666666
+          ],
+          [
+            0,
+            186.66666666666666
+          ]
+        ],
+        "score": null
+      },
+      {
+        "text": "A26",
+        "quadPx": [
+          [
+            0,
+            186.66666666666666
+          ],
+          [
+            510,
+            186.66666666666666
+          ],
+          [
+            510,
+            373.3333333333333
+          ],
+          [
+            0,
+            373.3333333333333
+          ]
+        ],
+        "score": null
+      },
+      {
+        "text": "0147",
+        "quadPx": [
+          [
+            0,
+            373.3333333333333
+          ],
+          [
+            510,
+            373.3333333333333
+          ],
+          [
+            510,
+            560.0
+          ],
+          [
+            0,
+            560.0
+          ]
+        ],
+        "score": null
+      }
+    ],
+    "engine": "mock-ocr",
+    "modelVersion": "fixture-v1",
+    "preprocessingVersion": "manual-crops-v1",
+    "scoreMeaning": "模拟读文无模型评分；文字框为示例行带，不是实测定位",
+    "elapsedMs": 0,
+    "warnings": [
+      "固定样例返回，不是OCR预测；文字行框为接口占位示例"
+    ],
+    "error": null
+  }
+]

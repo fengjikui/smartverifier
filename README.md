@@ -81,4 +81,6 @@ npm run test:python
 
 算法同事接入元件定位、分割或小 OCR 时，先看[接入初步方案](docs/定位分割与轻量OCR接入初步方案.md)，包含现有合同、实际接线工作及首轮交付要求。当前默认识别流程保持不变。
 
+最小示例：`npm run demo:vision -- --separate --backend lightweight`。不需要模型或 Python，导出样图和输入输出 JSON；电脑联调页在 `/inspections/marking/debug/vision-starter`。独立开关只改变模拟示例，默认真实检测不受影响。详见[示例与 Windows 步骤](examples/vision-starter/README.md)。
+
 完整资料从[文档索引](docs/README.md)开始。性能与准确度以现场实拍验收为准，生成样片不能代表真实业务准确率。

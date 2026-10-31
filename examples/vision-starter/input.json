@@ -1,0 +1,31 @@
+{
+  "photoId": "starter-photo",
+  "photoVersion": 1,
+  "original": {
+    "assetId": "starter-original",
+    "sha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+    "mime": "image/png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 3005938
+  },
+  "upright": {
+    "assetId": "starter-original",
+    "sha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+    "mime": "image/png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 3005938
+  },
+  "originalToUpright": [
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1
+  ]
+}

@@ -10,6 +10,8 @@ import './standalone.css';
 const root = createRoot(document.getElementById('root')!);
 if (location.pathname.startsWith(MARKING_BASE + '/admin/')) {
   void import('./admin/index').then(({Admin})=>root.render(<Admin/>));
+} else if (location.pathname === markingPaths.visionStarter) {
+  void import('./vision-starter').then(({VisionStarter})=>root.render(<VisionStarter/>));
 } else if (location.pathname === markingPaths.debug) {
   void import('./model-debug').then(({ModelDebug})=>root.render(<ModelDebug/>));
 } else if (location.pathname === markingPaths.preview) {

@@ -1,0 +1,14 @@
+{
+  "referenceImage": {
+    "assetId": "starter-reference",
+    "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+    "mime": "image/png",
+    "width": 431,
+    "height": 419,
+    "bytes": 335565
+  },
+  "standardDescription": "",
+  "onsiteInstruction": "",
+  "promptVersion": "starter-mock-v1",
+  "precedence": "onsite_over_standard"
+}

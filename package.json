@@ -22,6 +22,7 @@
     "update:windows": "node scripts/update-windows.ts",
     "probe:real": "node scripts/probe-real-vision.ts",
     "demo:prepare": "node scripts/prepare-twenty-demo.ts",
+    "demo:vision": "node scripts/vision-starter.ts",
     "test:unit": "node scripts/test.mjs unit",
     "test:admin": "node scripts/test.mjs admin",
     "test:camera": "node scripts/test.mjs camera",

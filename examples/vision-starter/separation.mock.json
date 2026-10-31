@@ -1,0 +1,112 @@
+{
+  "protocol": "sv.vision.v1",
+  "photoId": "starter-photo",
+  "photoVersion": 1,
+  "sourceSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+  "separatorId": "mock-manual-fixture",
+  "separatorVersion": "v1",
+  "preprocessingVersion": "manual-crops-v1",
+  "status": "completed",
+  "coverage": "complete",
+  "components": [
+    {
+      "componentId": "starter-c1",
+      "photoId": "starter-photo",
+      "photoVersion": 1,
+      "sourceSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+      "quadPx": [
+        [
+          140,
+          220
+        ],
+        [
+          600,
+          220
+        ],
+        [
+          600,
+          770
+        ],
+        [
+          140,
+          770
+        ]
+      ],
+      "modelView": {
+        "assetId": "starter-c1",
+        "sha256": "e97cb38d4557129936849fce2749807e0bfe78397f6306fae7046cda7d959808",
+        "mime": "image/png",
+        "width": 460,
+        "height": 550,
+        "bytes": 514964
+      },
+      "viewToUprightOriginal": [
+        1,
+        0,
+        140,
+        0,
+        1,
+        220,
+        0,
+        0,
+        1
+      ],
+      "rotationClockwiseDegrees": 0,
+      "quality": {
+        "state": "undetermined",
+        "reasons": []
+      },
+      "routeHint": "unclassified"
+    },
+    {
+      "componentId": "starter-c2",
+      "photoId": "starter-photo",
+      "photoVersion": 1,
+      "sourceSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+      "quadPx": [
+        [
+          930,
+          230
+        ],
+        [
+          1440,
+          230
+        ],
+        [
+          1440,
+          790
+        ],
+        [
+          930,
+          790
+        ]
+      ],
+      "modelView": {
+        "assetId": "starter-c2",
+        "sha256": "a33ef01d4f893b8a7924e20e09588f6f029c855806bbac194e6754f1548367cf",
+        "mime": "image/png",
+        "width": 510,
+        "height": 560,
+        "bytes": 511678
+      },
+      "viewToUprightOriginal": [
+        1,
+        0,
+        930,
+        0,
+        1,
+        230,
+        0,
+        0,
+        1
+      ],
+      "rotationClockwiseDegrees": 0,
+      "quality": {
+        "state": "undetermined",
+        "reasons": []
+      },
+      "routeHint": "unclassified"
+    }
+  ],
+  "issues": []
+}
