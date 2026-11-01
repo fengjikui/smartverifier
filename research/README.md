@@ -10,6 +10,7 @@
 
 | 日期 / 编号 | 问题 | 已完成的工作 | 证据 |
 | --- | --- | --- | --- |
+| 2026-11-01 / EXP-20261101-A | 小模型能否直接承接当前整图协议，默认模型究竟多大 | 实时核对 27B／4bit；采集 18 个公开权重条目；27B 与已有 4B 各做单／双／四件真实调用，保留 4B 越界框、错绑及质量语义反例 | [轻量选型与当前协议实测](../docs/research/轻量模型选型与当前协议实测-2026-11-01.md)、[实测 JSON](model-selection/current-protocol-smoke-2026-11-01.json)、[公开元数据](model-selection/small-model-metadata-2026-11-01.json)、[协议实验](model-selection/probe_whole_photo.ts)、[离线诊断](model-selection/summarize_whole_photo.ts) |
 | 2026-10-17 / EXP-001 | 原图会否缩小，批量布局是否影响识别 | 查本机配置及官方实现；27B 做 16 轮布局、尺寸探针和文字比对 | [机制调研](../docs/research/模型图片预处理与批量识别调研-2026-10-17.md)、[结果 JSON](vision-batching/results-2026-10-17.json)、[脚本](vision-batching/benchmark.py) |
 | 2026-10-17 / EXP-002 | 4B 能否完成基础丝印识别 | 相同图片、提示词、量化精度和调用方式，4B 做 8 轮对照 | [选型材料](../docs/research/模型选型与图像预处理-初步调研及汇报素材-2026-10-17.md)、[选型结果](model-selection/results-2026-10-17.json) |
 | 2026-10-17 / EXP-003 | 专用 OCR 在 CPU 上能否满足读字 | 现有 PP-OCRv6 small，在与 VLM 相同的四张裁片上运行 | 同上结果 JSON 的 `cpu_ocr` |

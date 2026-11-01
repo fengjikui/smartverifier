@@ -1,0 +1,81 @@
+{
+  "at": "2026-11-01T04:07:23.023Z",
+  "recognition": {
+    "mode": "vlm",
+    "model": "hr-qwen",
+    "provider": "lmstudio"
+  },
+  "visionConfiguration": {
+    "inputLayout": "prefix-first",
+    "outputFormat": "json-schema"
+  },
+  "models": [
+    {
+      "key": "qwen3.5-4b",
+      "displayName": "Qwen3.5 4B",
+      "publisher": "mlx-community",
+      "architecture": "qwen3_5",
+      "parameters": "4B",
+      "quantization": {
+        "name": "4bit",
+        "bits_per_weight": 4
+      },
+      "sizeBytes": 3061129077,
+      "format": "mlx",
+      "vision": true,
+      "loaded": []
+    },
+    {
+      "key": "qwen3.8-27b-mlx",
+      "displayName": "Qwen3.8 27B",
+      "publisher": "lmstudio-community",
+      "architecture": "qwen3_5",
+      "parameters": "27B",
+      "quantization": {
+        "name": "4bit",
+        "bits_per_weight": 4
+      },
+      "sizeBytes": 16081498220,
+      "format": "mlx",
+      "vision": true,
+      "loaded": [
+        {
+          "id": "hr-qwen",
+          "config": {
+            "context_length": 16384,
+            "parallel": 1
+          }
+        }
+      ]
+    }
+  ],
+  "configs": [
+    {
+      "package": "lmstudio-community/Qwen3.8-27B-MLX-4bit",
+      "configSha256": "14b65a0ee06517060a6bbd979bb1a8ff54e7b304b1a1f01d54344b88b8285e85",
+      "modelType": "qwen3_5",
+      "architectures": [
+        "Qwen3_5ForConditionalGeneration"
+      ],
+      "quantization": {
+        "group_size": 64,
+        "bits": 4,
+        "mode": "affine"
+      }
+    },
+    {
+      "package": "mlx-community/Qwen3.5-4B-4bit",
+      "configSha256": "f3efc81b2ea8d96a45301037d3ccccbcccdef44a961845c87f286aaddbc6eaaa",
+      "modelType": "qwen3_5",
+      "architectures": [
+        "Qwen3_5ForConditionalGeneration"
+      ],
+      "quantization": {
+        "group_size": 64,
+        "bits": 4,
+        "mode": "affine"
+      }
+    }
+  ],
+  "note": "Configuration and package size only; not peak runtime memory or original weights hash"
+}

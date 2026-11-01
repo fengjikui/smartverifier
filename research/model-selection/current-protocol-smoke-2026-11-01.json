@@ -1,0 +1,1162 @@
+{
+  "at": "2026-11-01T04:01:45.183Z",
+  "synthetic": true,
+  "repeats": 1,
+  "scope": "Current whole-photo protocol smoke; not production accuracy or stable speedup",
+  "environment": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v24.14.0",
+    "totalMemoryBytes": 68719476736,
+    "loaded": [
+      {
+        "key": "qwen3.5-4b",
+        "id": "sv-survey4b-20261101",
+        "config": {
+          "context_length": 16384,
+          "parallel": 1
+        },
+        "remaining_ttl_seconds": 579
+      },
+      {
+        "key": "qwen3.8-27b-mlx",
+        "id": "hr-qwen",
+        "config": {
+          "context_length": 16384,
+          "parallel": 1
+        }
+      }
+    ]
+  },
+  "codeHashes": {
+    "server/vision/local_worker.py": "d40440d823f8f0f3e4ec7c6c370a9b79ca89cbf84f574575d01cc570f7b6090f",
+    "server/vision/local-pipeline.ts": "bc1617e559e97f94deccd3c10eeba12cf491df279abacccf7798be7e77b2ba72",
+    "server/vision/photo-reply.ts": "f7243a3e3f9b3500b72f01882d312ff40d8acae72d4597a8b3fb0148f08f5840",
+    "server/vision/vlm_client/silkscreen_prompts.py": "a7fe754718617db3be984d494368c8b44e59ef40d09b011049db9f66f9faf9b3"
+  },
+  "resources": [
+    {
+      "model": "hr-qwen",
+      "case": "single",
+      "availableGiB": 14.34,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 6.8,
+      "load": [
+        3.33740234375,
+        2.34716796875,
+        1.98046875
+      ]
+    },
+    {
+      "model": "hr-qwen",
+      "case": "pair",
+      "availableGiB": 13.93,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 11.7,
+      "load": [
+        2.60107421875,
+        2.25390625,
+        1.95703125
+      ]
+    },
+    {
+      "model": "hr-qwen",
+      "case": "four",
+      "availableGiB": 14.6,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 0,
+      "load": [
+        3.15087890625,
+        2.39599609375,
+        2.015625
+      ]
+    },
+    {
+      "model": "sv-survey4b-20261101",
+      "case": "single",
+      "availableGiB": 14.83,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 6.4,
+      "load": [
+        3.47216796875,
+        2.5654296875,
+        2.09375
+      ]
+    },
+    {
+      "model": "sv-survey4b-20261101",
+      "case": "pair",
+      "availableGiB": 13.27,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 0,
+      "load": [
+        3.47265625,
+        2.59521484375,
+        2.109375
+      ]
+    },
+    {
+      "model": "sv-survey4b-20261101",
+      "case": "four",
+      "availableGiB": 13.6,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 10,
+      "load": [
+        3.3544921875,
+        2.5849609375,
+        2.1083984375
+      ]
+    },
+    {
+      "stage": "after",
+      "availableGiB": 14.51,
+      "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+      "cpuThreads": 2,
+      "cpuPercent": 25.8,
+      "load": [
+        2.97998046875,
+        2.53955078125,
+        2.099609375
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "model": "hr-qwen",
+      "case": "single",
+      "input": "fixtures/inspection/green-mat-v1/single.png",
+      "inputSha256": "8746e51737508b03bdb7e96d3e2a80870fd7ef2cdf83b83096d1daff8b9841da",
+      "expectedCount": 1,
+      "expectedVerdicts": [
+        "PASS"
+      ],
+      "clientElapsedMs": 20712,
+      "schemaValid": true,
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.35,
+            0.24,
+            0.28,
+            0.46
+          ],
+          "lines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "verdict": "PASS",
+          "confidence": 0.98,
+          "reason": "三行丝印字符、顺序及Pin 1圆点位置均与正品一致，封装引脚数量匹配。"
+        }
+      ],
+      "countExact": true,
+      "verdictsExact": true,
+      "linesExact": true,
+      "modelElapsedMs": 19683,
+      "usage": {
+        "prompt_tokens": 561,
+        "completion_tokens": 167,
+        "reasoning_tokens": 0
+      },
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+          "sentWidth": 431,
+          "sentHeight": 419,
+          "encodedBytes": 335565,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "375cbd59e52a749b382cafcf1bd5d69db63a6ae84fbbbec36f2f4d7426fbf5cf",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2533715,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "rawRecord": "7de23857-09c9-44c9-a8e6-b1094c168613.json",
+      "finishReason": "stop",
+      "rawReply": {
+        "coverage": "complete",
+        "instructionConflicts": [],
+        "items": [
+          {
+            "bbox": [
+              0.35,
+              0.24,
+              0.28,
+              0.46
+            ],
+            "componentId": "C01",
+            "confidence": 0.98,
+            "differences": [],
+            "features": [
+              "SOP-8封装，每侧4引脚",
+              "左下角有圆形Pin 1标记"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "三行丝印字符、顺序及Pin 1圆点位置均与正品一致，封装引脚数量匹配。",
+            "status": "decided",
+            "verdict": "PASS"
+          }
+        ],
+        "quality": {
+          "reason": "",
+          "state": "usable"
+        }
+      },
+      "rawReplySchemaIssues": [],
+      "firstOutputMs": 14379.62,
+      "itemComplete": [
+        {
+          "componentId": "C01",
+          "observedAtMs": 19328.46,
+          "provisional": true
+        }
+      ],
+      "generationStats": {
+        "stopReason": "eosFound",
+        "tokensPerSecond": 30.923268334433015,
+        "numGpuLayers": -1,
+        "timeToFirstTokenSec": 13.872,
+        "promptTokensCount": 561,
+        "predictedTokensCount": 167,
+        "totalTokensCount": 728
+      }
+    },
+    {
+      "model": "hr-qwen",
+      "case": "pair",
+      "input": "fixtures/inspection/green-mat-v1/pair.png",
+      "inputSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+      "expectedCount": 2,
+      "expectedVerdicts": [
+        "PASS",
+        "FAIL"
+      ],
+      "clientElapsedMs": 24909,
+      "schemaValid": true,
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.1,
+            0.26,
+            0.27,
+            0.48
+          ],
+          "lines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "verdict": "PASS",
+          "confidence": 0.95,
+          "reason": "丝印三行字符、顺序及方向标记与正品一致。"
+        },
+        {
+          "index": 1,
+          "bbox": [
+            0.62,
+            0.25,
+            0.28,
+            0.51
+          ],
+          "lines": [
+            "SV385",
+            "A26",
+            "0147"
+          ],
+          "verdict": "FAIL",
+          "confidence": 0.98,
+          "reason": "第一行型号与正品SV358不符，判定为FAIL。"
+        }
+      ],
+      "countExact": true,
+      "verdictsExact": true,
+      "linesExact": true,
+      "modelElapsedMs": 23847,
+      "usage": {
+        "prompt_tokens": 561,
+        "completion_tokens": 324,
+        "reasoning_tokens": 0
+      },
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+          "sentWidth": 431,
+          "sentHeight": 419,
+          "encodedBytes": 335565,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "52bcda082ad3d60c5192209b65acb820c8395b9b8d4c934c313b86f1b94e402f",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2742335,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "rawRecord": "231f6ba3-2608-4f81-b8ef-234c49a03157.json",
+      "finishReason": "stop",
+      "rawReply": {
+        "coverage": "complete",
+        "instructionConflicts": [],
+        "items": [
+          {
+            "bbox": [
+              0.1,
+              0.26,
+              0.27,
+              0.48
+            ],
+            "componentId": "C01",
+            "confidence": 0.95,
+            "differences": [],
+            "features": [
+              "8引脚SOIC封装",
+              "左下角有圆形方向标记"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "丝印三行字符、顺序及方向标记与正品一致。",
+            "status": "decided",
+            "verdict": "PASS"
+          },
+          {
+            "bbox": [
+              0.62,
+              0.25,
+              0.28,
+              0.51
+            ],
+            "componentId": "C02",
+            "confidence": 0.98,
+            "differences": [
+              {
+                "category": "text",
+                "lineIndex": 0,
+                "message": "第一行型号字符与正品不一致，待检为SV385。",
+                "referenceText": "SV358",
+                "sampleText": "SV385"
+              }
+            ],
+            "features": [
+              "8引脚SOIC封装",
+              "左下角有圆形方向标记"
+            ],
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "reason": "第一行型号与正品SV358不符，判定为FAIL。",
+            "status": "decided",
+            "verdict": "FAIL"
+          }
+        ],
+        "quality": {
+          "reason": "",
+          "state": "usable"
+        }
+      },
+      "rawReplySchemaIssues": [],
+      "firstOutputMs": 13383.23,
+      "itemComplete": [
+        {
+          "componentId": "C01",
+          "observedAtMs": 17796.31,
+          "provisional": true
+        },
+        {
+          "componentId": "C02",
+          "observedAtMs": 23493.58,
+          "provisional": true
+        }
+      ],
+      "generationStats": {
+        "stopReason": "eosFound",
+        "tokensPerSecond": 30.670666545293752,
+        "numGpuLayers": -1,
+        "timeToFirstTokenSec": 12.993,
+        "promptTokensCount": 561,
+        "predictedTokensCount": 324,
+        "totalTokensCount": 885
+      }
+    },
+    {
+      "model": "hr-qwen",
+      "case": "four",
+      "input": "fixtures/inspection/four-components.png",
+      "inputSha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b",
+      "expectedCount": 4,
+      "expectedVerdicts": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "clientElapsedMs": 43831,
+      "schemaValid": true,
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.18,
+            0.09,
+            0.23,
+            0.36
+          ],
+          "lines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "verdict": "PASS",
+          "confidence": 0.98,
+          "reason": "三行丝印与正品完全一致，封装特征匹配。"
+        },
+        {
+          "index": 1,
+          "bbox": [
+            0.61,
+            0.1,
+            0.23,
+            0.37
+          ],
+          "lines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "verdict": "PASS",
+          "confidence": 0.98,
+          "reason": "三行丝印与正品完全一致，封装特征匹配。"
+        },
+        {
+          "index": 2,
+          "bbox": [
+            0.2,
+            0.56,
+            0.21,
+            0.34
+          ],
+          "lines": [
+            "SV385",
+            "A26",
+            "0147"
+          ],
+          "verdict": "FAIL",
+          "confidence": 0.97,
+          "reason": "第一行型号与正品SV358不一致，读作SV385。"
+        },
+        {
+          "index": 3,
+          "bbox": [
+            0.59,
+            0.54,
+            0.26,
+            0.38
+          ],
+          "lines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "verdict": "PASS",
+          "confidence": 0.97,
+          "reason": "三行丝印与正品完全一致，封装特征匹配。"
+        }
+      ],
+      "countExact": true,
+      "verdictsExact": true,
+      "linesExact": true,
+      "modelElapsedMs": 42630,
+      "usage": {
+        "prompt_tokens": 561,
+        "completion_tokens": 592,
+        "reasoning_tokens": 0
+      },
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "79e177b687105bd7ae07ffe21a3b44191b00d2d86697881e293315cdc33c3b6d",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 1987377,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "942f062feb273e5ebb62ac6f13c49bda64eca269fc4ccb09f8b7764a9e94551a",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2108034,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "rawRecord": "53d74fe9-41fc-4e77-8e26-adda809fa01a.json",
+      "finishReason": "stop",
+      "rawReply": {
+        "coverage": "complete",
+        "instructionConflicts": [],
+        "items": [
+          {
+            "bbox": [
+              0.18,
+              0.09,
+              0.23,
+              0.36
+            ],
+            "componentId": "C01",
+            "confidence": 0.98,
+            "differences": [],
+            "features": [
+              "三行丝印清晰可读",
+              "封装与正品一致，带缺口和圆点标记"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "三行丝印与正品完全一致，封装特征匹配。",
+            "status": "decided",
+            "verdict": "PASS"
+          },
+          {
+            "bbox": [
+              0.61,
+              0.1,
+              0.23,
+              0.37
+            ],
+            "componentId": "C02",
+            "confidence": 0.98,
+            "differences": [],
+            "features": [
+              "三行丝印清晰可读",
+              "封装与正品一致，带缺口和圆点标记"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "三行丝印与正品完全一致，封装特征匹配。",
+            "status": "decided",
+            "verdict": "PASS"
+          },
+          {
+            "bbox": [
+              0.2,
+              0.56,
+              0.21,
+              0.34
+            ],
+            "componentId": "C03",
+            "confidence": 0.97,
+            "differences": [
+              {
+                "category": "text",
+                "lineIndex": 0,
+                "message": "第一行型号字符与正品不一致，末位由8变为5。",
+                "referenceText": "SV358",
+                "sampleText": "SV385"
+              }
+            ],
+            "features": [
+              "三行丝印清晰可读",
+              "封装与正品一致，带缺口和圆点标记"
+            ],
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "reason": "第一行型号与正品SV358不一致，读作SV385。",
+            "status": "decided",
+            "verdict": "FAIL"
+          },
+          {
+            "bbox": [
+              0.59,
+              0.54,
+              0.26,
+              0.38
+            ],
+            "componentId": "C04",
+            "confidence": 0.97,
+            "differences": [],
+            "features": [
+              "三行丝印清晰可读",
+              "封装与正品一致，带缺口和圆点标记"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "三行丝印与正品完全一致，封装特征匹配。",
+            "status": "decided",
+            "verdict": "PASS"
+          }
+        ],
+        "quality": {
+          "reason": "",
+          "state": "usable"
+        }
+      },
+      "rawReplySchemaIssues": [],
+      "firstOutputMs": 22969.29,
+      "itemComplete": [
+        {
+          "componentId": "C01",
+          "observedAtMs": 27677.38,
+          "provisional": true
+        },
+        {
+          "componentId": "C02",
+          "observedAtMs": 31885.57,
+          "provisional": true
+        },
+        {
+          "componentId": "C03",
+          "observedAtMs": 38047.33,
+          "provisional": true
+        },
+        {
+          "componentId": "C04",
+          "observedAtMs": 42268.38,
+          "provisional": true
+        }
+      ],
+      "generationStats": {
+        "stopReason": "eosFound",
+        "tokensPerSecond": 29.95583292107896,
+        "numGpuLayers": -1,
+        "timeToFirstTokenSec": 22.52,
+        "promptTokensCount": 561,
+        "predictedTokensCount": 592,
+        "totalTokensCount": 1153
+      }
+    },
+    {
+      "model": "sv-survey4b-20261101",
+      "case": "single",
+      "input": "fixtures/inspection/green-mat-v1/single.png",
+      "inputSha256": "8746e51737508b03bdb7e96d3e2a80870fd7ef2cdf83b83096d1daff8b9841da",
+      "expectedCount": 1,
+      "expectedVerdicts": [
+        "PASS"
+      ],
+      "clientElapsedMs": 7097,
+      "schemaValid": true,
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.35,
+            0.29,
+            0.64,
+            0.71
+          ],
+          "lines": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "verdict": "PASS",
+          "confidence": 0.95,
+          "reason": "元件丝印清晰，与正品参照图一致"
+        }
+      ],
+      "countExact": true,
+      "verdictsExact": true,
+      "linesExact": true,
+      "modelElapsedMs": 6091,
+      "usage": {
+        "prompt_tokens": 557,
+        "completion_tokens": 149,
+        "reasoning_tokens": 0
+      },
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+          "sentWidth": 431,
+          "sentHeight": 419,
+          "encodedBytes": 335565,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "375cbd59e52a749b382cafcf1bd5d69db63a6ae84fbbbec36f2f4d7426fbf5cf",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2533715,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "rawRecord": "55fd2b6c-e110-4a2b-9103-a4c471f69eb4.json",
+      "finishReason": "stop",
+      "rawReply": {
+        "coverage": "complete",
+        "instructionConflicts": [],
+        "items": [
+          {
+            "bbox": [
+              0.35,
+              0.29,
+              0.64,
+              0.71
+            ],
+            "componentId": "C01",
+            "confidence": 0.95,
+            "differences": [],
+            "features": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "元件丝印清晰，与正品参照图一致",
+            "status": "decided",
+            "verdict": "PASS"
+          }
+        ],
+        "quality": {
+          "reason": "",
+          "state": "usable"
+        }
+      },
+      "rawReplySchemaIssues": [],
+      "firstOutputMs": 4852.85,
+      "itemComplete": [
+        {
+          "componentId": "C01",
+          "observedAtMs": 6000.92,
+          "provisional": true
+        }
+      ],
+      "generationStats": {
+        "stopReason": "eosFound",
+        "tokensPerSecond": 117.56429272601514,
+        "numGpuLayers": -1,
+        "timeToFirstTokenSec": 4.538,
+        "promptTokensCount": 557,
+        "predictedTokensCount": 149,
+        "totalTokensCount": 706
+      }
+    },
+    {
+      "model": "sv-survey4b-20261101",
+      "case": "pair",
+      "input": "fixtures/inspection/green-mat-v1/pair.png",
+      "inputSha256": "56de4a273afdad0f4a44fb4ac92a7f8bd0cf5ecd50836abd0034e48746791e6e",
+      "expectedCount": 2,
+      "expectedVerdicts": [
+        "PASS",
+        "FAIL"
+      ],
+      "clientElapsedMs": 7078,
+      "schemaValid": false,
+      "error": "VLM未返回有效完整的整图结果，请重试；原照片已保留。",
+      "rawRecord": "4b124566-bc4e-48c3-8746-1c4aa661ea2f.json",
+      "modelElapsedMs": 6032,
+      "usage": {
+        "prompt_tokens": 557,
+        "completion_tokens": 340,
+        "reasoning_tokens": 0
+      },
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "aac3c79b83903cae73e904b542c264858ba643654eda8952b7f79111c4d46418",
+          "sentWidth": 431,
+          "sentHeight": 419,
+          "encodedBytes": 335565,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "52bcda082ad3d60c5192209b65acb820c8395b9b8d4c934c313b86f1b94e402f",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2742335,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "finishReason": "stop",
+      "rawReply": {
+        "coverage": "complete",
+        "instructionConflicts": [],
+        "items": [
+          {
+            "bbox": [
+              1,
+              0.35,
+              0.42,
+              0.78
+            ],
+            "componentId": "C01",
+            "confidence": 0.95,
+            "differences": [],
+            "features": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "元件丝印清晰，与正品一致。",
+            "status": "decided",
+            "verdict": "PASS"
+          },
+          {
+            "bbox": [
+              0.58,
+              0.36,
+              0.91,
+              0.78
+            ],
+            "componentId": "C02",
+            "confidence": 0.95,
+            "differences": [
+              {
+                "category": "text",
+                "lineIndex": 0,
+                "message": "型号丝印不一致，正品为SV358，待检为SV385",
+                "referenceText": "SV358",
+                "sampleText": "SV385"
+              }
+            ],
+            "features": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "reason": "型号丝印不一致，SV385与正品SV358不符。",
+            "status": "decided",
+            "verdict": "FAIL"
+          }
+        ],
+        "quality": {
+          "reason": "C02型号丝印不一致",
+          "state": "needs_recapture"
+        }
+      },
+      "rawReplySchemaIssues": [
+        {
+          "path": [
+            "items",
+            0,
+            "bbox"
+          ],
+          "message": "元件位置超出原图"
+        },
+        {
+          "path": [
+            "items",
+            1,
+            "bbox"
+          ],
+          "message": "元件位置超出原图"
+        }
+      ],
+      "firstOutputMs": 3175.9,
+      "itemComplete": [
+        {
+          "componentId": "C01",
+          "observedAtMs": 4307.33,
+          "provisional": true
+        },
+        {
+          "componentId": "C02",
+          "observedAtMs": 5860.67,
+          "provisional": true
+        }
+      ],
+      "generationStats": {
+        "stopReason": "eosFound",
+        "tokensPerSecond": 117.93168805443273,
+        "numGpuLayers": -1,
+        "timeToFirstTokenSec": 2.871,
+        "promptTokensCount": 557,
+        "predictedTokensCount": 340,
+        "totalTokensCount": 897
+      }
+    },
+    {
+      "model": "sv-survey4b-20261101",
+      "case": "four",
+      "input": "fixtures/inspection/four-components.png",
+      "inputSha256": "5225aa3abdf7f73a9a779da30f3ef312a0f8ff1143312b9d935ac80ee64d848b",
+      "expectedCount": 4,
+      "expectedVerdicts": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "clientElapsedMs": 11111,
+      "schemaValid": false,
+      "error": "VLM未返回有效完整的整图结果，请重试；原照片已保留。",
+      "rawRecord": "1e321112-8b71-4ee7-81ce-2f8dfd3a4202.json",
+      "modelElapsedMs": 9927,
+      "usage": {
+        "prompt_tokens": 557,
+        "completion_tokens": 561,
+        "reasoning_tokens": 0
+      },
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "79e177b687105bd7ae07ffe21a3b44191b00d2d86697881e293315cdc33c3b6d",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 1987377,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "942f062feb273e5ebb62ac6f13c49bda64eca269fc4ccb09f8b7764a9e94551a",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2108034,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "finishReason": "stop",
+      "rawReply": {
+        "coverage": "complete",
+        "instructionConflicts": [],
+        "items": [
+          {
+            "bbox": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "componentId": "C01",
+            "confidence": 0.98,
+            "differences": [
+              {
+                "category": "text",
+                "lineIndex": 0,
+                "message": "型号丝印不一致，待检为SV385，正品为SV358",
+                "referenceText": "SV358",
+                "sampleText": "SV385"
+              }
+            ],
+            "features": [
+              "型号丝印错误，SV385 vs SV358",
+              "批次号A26、0147一致"
+            ],
+            "lines": [
+              "SV385",
+              "A26",
+              "0147"
+            ],
+            "reason": "型号丝印错误，SV385 vs SV358",
+            "status": "decided",
+            "verdict": "FAIL"
+          },
+          {
+            "bbox": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "componentId": "C02",
+            "confidence": 0.98,
+            "differences": [],
+            "features": [
+              "型号丝印SV358正确",
+              "批次号A26、0147一致"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "丝印与正品一致，无差异",
+            "status": "decided",
+            "verdict": "PASS"
+          },
+          {
+            "bbox": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "componentId": "C03",
+            "confidence": 0.98,
+            "differences": [],
+            "features": [
+              "型号丝印SV358正确",
+              "批次号A26、0147一致"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "丝印与正品一致，无差异",
+            "status": "decided",
+            "verdict": "PASS"
+          },
+          {
+            "bbox": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "componentId": "C04",
+            "confidence": 0.98,
+            "differences": [],
+            "features": [
+              "型号丝印SV358正确",
+              "批次号A26、0147一致"
+            ],
+            "lines": [
+              "SV358",
+              "A26",
+              "0147"
+            ],
+            "reason": "丝印与正品一致，无差异",
+            "status": "decided",
+            "verdict": "PASS"
+          }
+        ],
+        "quality": {
+          "reason": "C01型号丝印错误，SV385 vs SV358",
+          "state": "usable"
+        }
+      },
+      "rawReplySchemaIssues": [
+        {
+          "path": [
+            "items",
+            0,
+            "bbox"
+          ],
+          "message": "元件位置超出原图"
+        },
+        {
+          "path": [
+            "items",
+            1,
+            "bbox"
+          ],
+          "message": "元件位置超出原图"
+        },
+        {
+          "path": [
+            "items",
+            2,
+            "bbox"
+          ],
+          "message": "元件位置超出原图"
+        },
+        {
+          "path": [
+            "items",
+            3,
+            "bbox"
+          ],
+          "message": "元件位置超出原图"
+        }
+      ],
+      "firstOutputMs": 5099.29,
+      "itemComplete": [
+        {
+          "componentId": "C01",
+          "observedAtMs": 6793.36,
+          "provisional": true
+        },
+        {
+          "componentId": "C02",
+          "observedAtMs": 7780.22,
+          "provisional": true
+        },
+        {
+          "componentId": "C03",
+          "observedAtMs": 8731.58,
+          "provisional": true
+        },
+        {
+          "componentId": "C04",
+          "observedAtMs": 9686.18,
+          "provisional": true
+        }
+      ],
+      "generationStats": {
+        "stopReason": "eosFound",
+        "tokensPerSecond": 115.4381992467134,
+        "numGpuLayers": -1,
+        "timeToFirstTokenSec": 4.755,
+        "promptTokensCount": 557,
+        "predictedTokensCount": 561,
+        "totalTokensCount": 1118
+      }
+    }
+  ]
+}

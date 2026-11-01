@@ -1,0 +1,702 @@
+{
+  "collected_at": "2026-11-01T03:59:40.076657+00:00",
+  "scope": "Public metadata only; not a benchmark or runtime memory measurement",
+  "models": [
+    {
+      "model": "Qwen/Qwen3.5-2B",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-2B",
+      "api_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-2B",
+      "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+      "last_modified": "2026-03-02T11:26:29.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "F32": 2592,
+          "BF16": 2274067232
+        },
+        "total": 2274069824
+      },
+      "metadata_sha256": "cb47be1634d1ac0a5b020296055de168a6b3523130561b20363c30303d185598",
+      "config_url": "https://huggingface.co/Qwen/Qwen3.5-2B/resolve/15852e8c16360a2fea060d615a32b45270f8a8fc/config.json",
+      "config": {
+        "model_type": "qwen3_5",
+        "architectures": [
+          "Qwen3_5ForConditionalGeneration"
+        ],
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 2048,
+          "num_hidden_layers": 24,
+          "vocab_size": 248320,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_5",
+          "hidden_size": 1024,
+          "depth": 24,
+          "patch_size": 16
+        }
+      },
+      "config_sha256": "ed1c1723241f23f7f4e23430759cbd7dcfb4103cbdfe052bfe7626b57c2615b4"
+    },
+    {
+      "model": "Qwen/Qwen3.5-4B",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-4B",
+      "api_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-4B",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "last_modified": "2026-03-02T00:52:52.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 4659861248,
+          "F32": 3840
+        },
+        "total": 4659865088
+      },
+      "metadata_sha256": "b78721b53354893635044d5d2ab31f19afb8d0879b7603bc997bcd433925ba12",
+      "config_url": "https://huggingface.co/Qwen/Qwen3.5-4B/resolve/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a/config.json",
+      "config": {
+        "model_type": "qwen3_5",
+        "architectures": [
+          "Qwen3_5ForConditionalGeneration"
+        ],
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 2560,
+          "num_hidden_layers": 32,
+          "vocab_size": 248320,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_5",
+          "hidden_size": 1024,
+          "depth": 24,
+          "patch_size": 16
+        }
+      },
+      "config_sha256": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670"
+    },
+    {
+      "model": "Qwen/Qwen3.5-9B",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-9B",
+      "api_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-9B",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "last_modified": "2026-03-02T00:51:43.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 9653100528,
+          "F32": 3840
+        },
+        "total": 9653104368
+      },
+      "metadata_sha256": "d7d75d94195ddb9b3a44a7fbb95f3cc1b19c88be616461a0d525038a152224d2",
+      "config_url": "https://huggingface.co/Qwen/Qwen3.5-9B/resolve/c202236235762e1c871ad0ccb60c8ee5ba337b9a/config.json",
+      "config": {
+        "model_type": "qwen3_5",
+        "architectures": [
+          "Qwen3_5ForConditionalGeneration"
+        ],
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 4096,
+          "num_hidden_layers": 32,
+          "vocab_size": 248320,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_5",
+          "hidden_size": 1152,
+          "depth": 27,
+          "patch_size": 16
+        }
+      },
+      "config_sha256": "d0883072e01861ed0b2d47be3c16c36a8e81c224c7ffaa310c6558fb3f932b05"
+    },
+    {
+      "model": "Qwen/Qwen3-VL-2B-Instruct",
+      "source": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct",
+      "api_url": "https://huggingface.co/api/models/Qwen/Qwen3-VL-2B-Instruct",
+      "revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+      "last_modified": "2025-10-23T11:30:44.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 2127532032
+        },
+        "total": 2127532032
+      },
+      "metadata_sha256": "f93e881f5ffd911ab3392e918c2333ae675920ef3c265bd3bf3e7de10fc6f2e5",
+      "config_url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct/resolve/89644892e4d85e24eaac8bacfd4f463576704203/config.json",
+      "config": {
+        "model_type": "qwen3_vl",
+        "architectures": [
+          "Qwen3VLForConditionalGeneration"
+        ],
+        "text_config": {
+          "model_type": "qwen3_vl_text",
+          "hidden_size": 2048,
+          "num_hidden_layers": 28,
+          "vocab_size": 151936,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_vl",
+          "hidden_size": 1024,
+          "depth": 24,
+          "patch_size": 16
+        }
+      },
+      "config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b"
+    },
+    {
+      "model": "openbmb/MiniCPM-V-4.7-1B",
+      "source": "https://huggingface.co/openbmb/MiniCPM-V-4.7-1B",
+      "api_url": "https://huggingface.co/api/models/openbmb/MiniCPM-V-4.7-1B",
+      "revision": "ad9bf379feb71204c888b22923d63322452407f9",
+      "last_modified": "2026-10-30T08:56:31.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 1554476272
+        },
+        "total": 1554476272
+      },
+      "metadata_sha256": "f2eadce603e8e76ff7b5e6e665e51ba3dd8fe8f6234864d7e2418fddbdc891c6",
+      "config_url": "https://huggingface.co/openbmb/MiniCPM-V-4.7-1B/resolve/ad9bf379feb71204c888b22923d63322452407f9/config.json",
+      "config": {
+        "model_type": "minicpmv4_7",
+        "architectures": [
+          "MiniCPMV4_7ForConditionalGeneration"
+        ],
+        "downsample_mode": "16x",
+        "dtype": "bfloat16",
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 1024,
+          "num_hidden_layers": 24,
+          "vocab_size": 248094
+        },
+        "vision_config": {
+          "model_type": "minicpmv4_7_vision",
+          "hidden_size": 1152,
+          "num_hidden_layers": 27,
+          "patch_size": 14,
+          "image_size": 980
+        }
+      },
+      "config_sha256": "20ed1fe71b174719b88ed1ce37c840ec45e3657f1120391d45f33505be7638a4"
+    },
+    {
+      "model": "OpenGVLab/InternVL3_5-2B",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3_5-2B",
+      "api_url": "https://huggingface.co/api/models/OpenGVLab/InternVL3_5-2B",
+      "revision": "7d7bd7bcc35b77b391883ebd7f9686cfa0e25cc0",
+      "last_modified": "2025-08-29T17:57:07.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 2348347392
+        },
+        "total": 2348347392
+      },
+      "metadata_sha256": "39cb73d2b64dbe11bfd3732dfb03a50f90f9d51d6cb156c2143e8a5c33e3599a",
+      "config_url": "https://huggingface.co/OpenGVLab/InternVL3_5-2B/resolve/7d7bd7bcc35b77b391883ebd7f9686cfa0e25cc0/config.json",
+      "config": {
+        "model_type": "internvl_chat",
+        "architectures": [
+          "InternVLChatModel"
+        ],
+        "torch_dtype": "bfloat16",
+        "llm_config": {
+          "model_type": "qwen3",
+          "architectures": [
+            "Qwen3ForCausalLM"
+          ],
+          "hidden_size": 2048,
+          "num_hidden_layers": 28,
+          "vocab_size": 151936,
+          "torch_dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "intern_vit_6b",
+          "architectures": [
+            "InternVisionModel"
+          ],
+          "hidden_size": 1024,
+          "num_hidden_layers": 24,
+          "patch_size": 14,
+          "image_size": 448,
+          "torch_dtype": "bfloat16"
+        }
+      },
+      "config_sha256": "a67c8ed51514a5ac992995800f070a683c14314798f30a999403686e944d57fa"
+    },
+    {
+      "model": "google/gemma-4-E2B-it",
+      "source": "https://huggingface.co/google/gemma-4-E2B-it",
+      "api_url": "https://huggingface.co/api/models/google/gemma-4-E2B-it",
+      "revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+      "last_modified": "2026-07-20T16:41:56.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "any-to-any",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 5123178051
+        },
+        "total": 5123178051
+      },
+      "metadata_sha256": "59c3a69d5226b55326db63bce946289f786703c187fed0976b3185210a64f9e0",
+      "config_url": "https://huggingface.co/google/gemma-4-E2B-it/resolve/3e22461f65e89153144f8adb70e3b8c2cc9845a7/config.json",
+      "config": {
+        "model_type": "gemma4",
+        "architectures": [
+          "Gemma4ForConditionalGeneration"
+        ],
+        "dtype": "bfloat16",
+        "text_config": {
+          "model_type": "gemma4_text",
+          "hidden_size": 1536,
+          "num_hidden_layers": 35,
+          "vocab_size": 262144,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "gemma4_vision",
+          "architectures": null,
+          "hidden_size": 768,
+          "num_hidden_layers": 16,
+          "patch_size": 16,
+          "dtype": "bfloat16"
+        }
+      },
+      "config_sha256": "1b28f3d2c3100f6c594754b81107428bd7b822a7f48272ca681dae9d2ec38330"
+    },
+    {
+      "model": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+      "source": "https://huggingface.co/HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+      "api_url": "https://huggingface.co/api/models/HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+      "revision": "482adb537c021c86670beed01cd58990d01e72e4",
+      "last_modified": "2025-04-08T07:25:13.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "F32": 2246784880
+        },
+        "total": 2246784880
+      },
+      "metadata_sha256": "1e49efe1480a81f550155e4aad9de1a72ff570688d09b226d055b03936230b8f",
+      "config_url": "https://huggingface.co/HuggingFaceTB/SmolVLM2-2.2B-Instruct/resolve/482adb537c021c86670beed01cd58990d01e72e4/config.json",
+      "config": {
+        "model_type": "smolvlm",
+        "architectures": [
+          "SmolVLMForConditionalGeneration"
+        ],
+        "vocab_size": 49280,
+        "torch_dtype": "float32",
+        "text_config": {
+          "model_type": "llama",
+          "architectures": [
+            "VLlama3ForCausalLM"
+          ],
+          "hidden_size": 2048,
+          "num_hidden_layers": 24,
+          "vocab_size": 49280,
+          "torch_dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "smolvlm_vision",
+          "num_hidden_layers": 27,
+          "patch_size": 14,
+          "image_size": 384
+        }
+      },
+      "config_sha256": "ec1f7e45deeafba7601f8dd0b6ca9ba75985dffc2f053e82341d12d06e2d9d46"
+    },
+    {
+      "model": "apple/FastVLM-0.5B",
+      "source": "https://huggingface.co/apple/FastVLM-0.5B",
+      "api_url": "https://huggingface.co/api/models/apple/FastVLM-0.5B",
+      "revision": "16375720c2d673fa583e57e9876afde27549c7d0",
+      "last_modified": "2025-09-03T14:17:07.000Z",
+      "license": "apple-amlr",
+      "pipeline_tag": "text-generation",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 758833760
+        },
+        "total": 758833760
+      },
+      "metadata_sha256": "aa7e19c1ef96c6ff8dd9f94e8741456e1fe842e5c8e9d8e947e286de92d1a9c9",
+      "config_url": "https://huggingface.co/apple/FastVLM-0.5B/resolve/16375720c2d673fa583e57e9876afde27549c7d0/config.json",
+      "config": {
+        "model_type": "llava_qwen2",
+        "architectures": [
+          "LlavaQwen2ForCausalLM"
+        ],
+        "hidden_size": 896,
+        "num_hidden_layers": 24,
+        "vocab_size": 151936,
+        "torch_dtype": "bfloat16"
+      },
+      "config_sha256": "67120725d74dc0aae329b4c8fae2d1310f5353f4a5ffbf2bbb87324cdc2be832"
+    },
+    {
+      "model": "microsoft/Phi-4-multimodal-instruct",
+      "source": "https://huggingface.co/microsoft/Phi-4-multimodal-instruct",
+      "api_url": "https://huggingface.co/api/models/microsoft/Phi-4-multimodal-instruct",
+      "revision": "93f923e1a7727d1c4f446756212d9d3e8fcc5d81",
+      "last_modified": "2025-12-10T20:18:10.000Z",
+      "license": "mit",
+      "pipeline_tag": "automatic-speech-recognition",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 5574460384
+        },
+        "total": 5574460384
+      },
+      "metadata_sha256": "86febd277c621a3d785d0a8ce96ec5c7579eedd75331fa741e1f7599dee94c3b",
+      "config_url": "https://huggingface.co/microsoft/Phi-4-multimodal-instruct/resolve/93f923e1a7727d1c4f446756212d9d3e8fcc5d81/config.json",
+      "config": {
+        "model_type": "phi4mm",
+        "architectures": [
+          "Phi4MMForCausalLM"
+        ],
+        "hidden_size": 3072,
+        "num_hidden_layers": 32,
+        "vocab_size": 200064,
+        "torch_dtype": "bfloat16"
+      },
+      "config_sha256": "49e1c05f93d43d7f17715b779a2576235b019f587285d7d914e5b05156253f62"
+    },
+    {
+      "model": "PaddlePaddle/PaddleOCR-VL-1.6",
+      "source": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+      "api_url": "https://huggingface.co/api/models/PaddlePaddle/PaddleOCR-VL-1.6",
+      "revision": "c5630abae1d940eafe0697512a0325494b02ab42",
+      "last_modified": "2026-08-08T14:32:21.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 958588736
+        },
+        "total": 958588736
+      },
+      "metadata_sha256": "0a1f9ff6c04645762f5b752ac78441dfeb8dee5b075e3d5034bc36a6df73e19d",
+      "config_url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6/resolve/c5630abae1d940eafe0697512a0325494b02ab42/config.json",
+      "config": {
+        "model_type": "paddleocr_vl",
+        "architectures": [
+          "PaddleOCRVLForConditionalGeneration"
+        ],
+        "hidden_size": 1024,
+        "num_hidden_layers": 18,
+        "vocab_size": 103424,
+        "torch_dtype": "bfloat16",
+        "vision_config": {
+          "model_type": "paddleocr_vl",
+          "architectures": [
+            "PaddleOCRVisionModel"
+          ],
+          "hidden_size": 1152,
+          "num_hidden_layers": 27,
+          "patch_size": 14,
+          "image_size": 384,
+          "torch_dtype": "bfloat16"
+        }
+      },
+      "config_sha256": "ce7f4565f8b1db78532ad5d1b9ebe55c2139d49bd4cb04778b580a08a598f171"
+    },
+    {
+      "model": "openbmb/MiniCPM-OCR-1.0",
+      "source": "https://huggingface.co/openbmb/MiniCPM-OCR-1.0",
+      "api_url": "https://huggingface.co/api/models/openbmb/MiniCPM-OCR-1.0",
+      "revision": "c5833cddb363aa62f1cb60ddde48c832e8f1a92c",
+      "last_modified": "2026-10-29T15:39:19.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 1300434160
+        },
+        "total": 1300434160
+      },
+      "metadata_sha256": "1bb52360597ca2fe3720647690a183f65c0aebe9504eef875e65a0fa80c6a7b8",
+      "config_url": "https://huggingface.co/openbmb/MiniCPM-OCR-1.0/resolve/c5833cddb363aa62f1cb60ddde48c832e8f1a92c/config.json",
+      "config": {
+        "model_type": "minicpm_ocr",
+        "architectures": [
+          "MiniCPMOcrForConditionalGeneration"
+        ],
+        "downsample_mode": "4x",
+        "dtype": "bfloat16",
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 1024,
+          "num_hidden_layers": 24,
+          "vocab_size": 248100
+        },
+        "vision_config": {
+          "model_type": "minicpm_ocr_vision",
+          "hidden_size": 1152,
+          "num_hidden_layers": 27,
+          "patch_size": 14,
+          "image_size": 980
+        }
+      },
+      "config_sha256": "762025491b206967a3c29c3e36ff2cccd8af6a8c750360b61dc91882b573f759"
+    },
+    {
+      "model": "baidu/Unlimited-OCR",
+      "source": "https://huggingface.co/baidu/Unlimited-OCR",
+      "api_url": "https://huggingface.co/api/models/baidu/Unlimited-OCR",
+      "revision": "8249d20b2822a7d8a4c22c8d8c9069b5ac36bda3",
+      "last_modified": "2026-10-14T06:17:59.000Z",
+      "license": "mit",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 3336106240
+        },
+        "total": 3336106240
+      },
+      "metadata_sha256": "f9beac6241e1f522ba633c991c202bd33d6dfed0e006ec7e7ef3c23f115d7dfe",
+      "config_url": "https://huggingface.co/baidu/Unlimited-OCR/resolve/8249d20b2822a7d8a4c22c8d8c9069b5ac36bda3/config.json",
+      "config": {
+        "model_type": "unlimited_ocr",
+        "architectures": [
+          "UnlimitedOCRForCausalLM"
+        ],
+        "hidden_size": 1280,
+        "num_hidden_layers": 12,
+        "vocab_size": 129280,
+        "torch_dtype": "bfloat16",
+        "vision_config": {
+          "model_type": "vision",
+          "image_size": 1024
+        }
+      },
+      "config_sha256": "55e6c5179eea054a3fca99e3e41424649d22f574fba4c5f0737ef9c9095526e4"
+    },
+    {
+      "model": "Qwen/Qwen3.8-27B",
+      "source": "https://huggingface.co/Qwen/Qwen3.8-27B",
+      "api_url": "https://huggingface.co/api/models/Qwen/Qwen3.8-27B",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "last_modified": "2026-08-14T15:00:01.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 27781427952
+        },
+        "total": 27781427952
+      },
+      "metadata_sha256": "cc920a652f6874abfe8cab397d9ade9f64c360b2fe9957e0e528fa2efadf7e4d",
+      "config_url": "https://huggingface.co/Qwen/Qwen3.8-27B/resolve/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0/config.json",
+      "config": {
+        "model_type": "qwen3_5",
+        "architectures": [
+          "Qwen3_5ForConditionalGeneration"
+        ],
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 5120,
+          "num_hidden_layers": 64,
+          "vocab_size": 248320,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_5",
+          "hidden_size": 1152,
+          "depth": 27,
+          "patch_size": 16
+        }
+      },
+      "config_sha256": "191e0af232104ed8b65258cf3fb2b842e288008baca7633c11b82a1ac7203aab"
+    },
+    {
+      "model": "Qwen/Qwen3.5-0.8B",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-0.8B",
+      "api_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-0.8B",
+      "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+      "last_modified": "2026-03-02T11:26:58.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "F32": 2592,
+          "BF16": 873436192
+        },
+        "total": 873438784
+      },
+      "metadata_sha256": "a2d09352380933293026607880379e5b24fd54049d760b1a9f11474472bd1d8f",
+      "config_url": "https://huggingface.co/Qwen/Qwen3.5-0.8B/resolve/2fc06364715b967f1860aea9cf38778875588b17/config.json",
+      "config": {
+        "model_type": "qwen3_5",
+        "architectures": [
+          "Qwen3_5ForConditionalGeneration"
+        ],
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 1024,
+          "num_hidden_layers": 24,
+          "vocab_size": 248320,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_5",
+          "hidden_size": 768,
+          "depth": 12,
+          "patch_size": 16
+        }
+      },
+      "config_sha256": "b90b86f35c8e6925ef74ee04d0e758f0a845c83a42089ad82bbaa948de9b4204"
+    },
+    {
+      "model": "openbmb/MiniCPM-OCR-Jev",
+      "source": "https://huggingface.co/openbmb/MiniCPM-OCR-Jev",
+      "api_url": "https://huggingface.co/api/models/openbmb/MiniCPM-OCR-Jev",
+      "revision": "bdb03f86182a2824d2632d129c719cdf780502e2",
+      "last_modified": "2026-10-30T02:16:51.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 2213245760
+        },
+        "total": 2213245760
+      },
+      "metadata_sha256": "2982367238ba353736bb8fa1e380add563375194a7ea6c45283a7c11752f4aff",
+      "config_url": "https://huggingface.co/openbmb/MiniCPM-OCR-Jev/resolve/bdb03f86182a2824d2632d129c719cdf780502e2/config.json",
+      "config": {
+        "model_type": "qwen3_5",
+        "architectures": [
+          "Qwen3_5ForConditionalGeneration"
+        ],
+        "hidden_size": 2048,
+        "dtype": "bfloat16",
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 2048,
+          "num_hidden_layers": 24,
+          "vocab_size": 248320,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_5_vision",
+          "hidden_size": 1024,
+          "depth": 24,
+          "patch_size": 16,
+          "dtype": "bfloat16"
+        }
+      },
+      "config_sha256": "fd3d48eacdf595b290afc504ac05aa4a4e44343a227406e60eb61516dc772b34"
+    },
+    {
+      "model": "zai-org/GLM-OCR",
+      "source": "https://huggingface.co/zai-org/GLM-OCR",
+      "api_url": "https://huggingface.co/api/models/zai-org/GLM-OCR",
+      "revision": "2e85a62840ccac27daa451df36c736c4636b8628",
+      "last_modified": "2026-09-11T11:59:14.000Z",
+      "license": "mit",
+      "pipeline_tag": "image-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 1325258240
+        },
+        "total": 1325258240
+      },
+      "metadata_sha256": "7548182913b6cd6596e1826181ef28a9b7efb881ed1f33b11aeabad86adb600c",
+      "config_url": "https://huggingface.co/zai-org/GLM-OCR/resolve/2e85a62840ccac27daa451df36c736c4636b8628/config.json",
+      "config": {
+        "model_type": "glm_ocr",
+        "architectures": [
+          "GlmOcrForConditionalGeneration"
+        ],
+        "text_config": {
+          "model_type": "glm_ocr_text",
+          "hidden_size": 1536,
+          "num_hidden_layers": 16,
+          "vocab_size": 59392,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "glm_ocr_vision",
+          "hidden_size": 1024,
+          "depth": 24,
+          "patch_size": 14,
+          "image_size": 336
+        }
+      },
+      "config_sha256": "ad537817b2becde827cbb23569a1dd83a352ee64cc34ce751a4ef000ecce4b5f"
+    },
+    {
+      "model": "xiaomi-research/Xiaomi-OCR-0",
+      "source": "https://huggingface.co/xiaomi-research/Xiaomi-OCR-0",
+      "api_url": "https://huggingface.co/api/models/xiaomi-research/Xiaomi-OCR-0",
+      "revision": "bbd8cf8d21f256b3644b44cb860f3a7cecb93c30",
+      "last_modified": "2026-10-29T02:17:14.000Z",
+      "license": "apache-2.0",
+      "pipeline_tag": "image-text-to-text",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 873438784
+        },
+        "total": 873438784
+      },
+      "metadata_sha256": "bf6a0cb9167c566492ff92798b9ecfdc3f5e31d76fea8f28c710112518e84f8e",
+      "config_url": "https://huggingface.co/xiaomi-research/Xiaomi-OCR-0/resolve/bbd8cf8d21f256b3644b44cb860f3a7cecb93c30/config.json",
+      "config": {
+        "model_type": "qwen3_5",
+        "architectures": [
+          "Qwen3_5ForConditionalGeneration"
+        ],
+        "hidden_size": 1024,
+        "dtype": "bfloat16",
+        "text_config": {
+          "model_type": "qwen3_5_text",
+          "hidden_size": 1024,
+          "num_hidden_layers": 24,
+          "vocab_size": 248320,
+          "dtype": "bfloat16"
+        },
+        "vision_config": {
+          "model_type": "qwen3_5_vision",
+          "hidden_size": 768,
+          "depth": 12,
+          "patch_size": 16,
+          "dtype": "bfloat16"
+        }
+      },
+      "config_sha256": "2eb95982069a24336fe66b3a0869ea5a711aba7566787d4a599654907ecc070c"
+    }
+  ],
+  "additional_collected_at": "2026-11-01T04:02:52.778742+00:00"
+}
