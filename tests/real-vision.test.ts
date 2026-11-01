@@ -25,10 +25,18 @@ test('正常识别默认发送固定前缀与实际Schema，兼容显式旧配�
   t.after(async()=>{service.closing=true;service.store.close();await rm(directory,{recursive:true,force:true});});
   let view=service.open('REALVISION1');view=await service.addRealTrial(view.round!.id,view.round!.revision,person);
   const photo=view.round!.photos[0],component:ComponentResult={id:'c1',label:'P001-01',index:0,bbox:[0,0,1,1],ai:null,aiHistory:[],review:null,reviewHistory:[],crop:{assetId:photo.file,url:photo.url,width:photo.width,height:photo.height,rotation:0,qualityReasons:[]}};
+  view.round!.standard.lines=['O0I1Z2','6G8B5S'];
   let request:Record<string,unknown>={};
   pipeline.worker=async input=>{request=input;return {model:'fixture',elapsedMs:1,promptVersion:'test',response:{choices:[{finish_reason:'stop',message:{content:JSON.stringify({items:[item],instructionConflicts:[]})}}]}};};
   await pipeline.recognize(view.round!,photo,component);
   assert.equal(request.inputLayout,'prefix-first');assert.deepEqual((request.responseSchema as {properties:{items:{items:{properties:{componentId:{enum:string[]}}}}}}).properties.items.items.properties.componentId.enum,['c1']);
+  assert.match(String(request.description),/\["O0I1Z2","6G8B5S"\]/,'人工确认的形近字必须送入单件模型请求');
+  assert.match(String(request.description),/不得据此猜补/);
+  pipeline.worker=async input=>{request=input;return {model:'fixture',elapsedMs:1,promptVersion:'test',response:{choices:[{finish_reason:'stop',message:{content:JSON.stringify({quality:{state:'usable',reason:''},coverage:'complete',items:[{...item,componentId:'C01',bbox:[.1,.1,.8,.8]}],instructionConflicts:[]})}}]}};};
+  await pipeline.recognizePhoto(view.round!,photo);
+  assert.match(String(request.description),/\["O0I1Z2","6G8B5S"\]/,'人工文字也必须送入正常整图请求');
+  assert.match(String(request.description),/空间范围为限/);
+  pipeline.worker=async input=>{request=input;return {model:'fixture',elapsedMs:1,promptVersion:'test',response:{choices:[{finish_reason:'stop',message:{content:JSON.stringify({items:[item],instructionConflicts:[]})}}]}};};
   pipeline.inputLayout='legacy';pipeline.structured=false;await pipeline.recognize(view.round!,photo,component);
   assert.equal(request.inputLayout,'legacy');assert.equal('responseSchema' in request,false);
   pipeline.worker=async()=>{throw new RecognitionProblem('error','Schema请求失败');};

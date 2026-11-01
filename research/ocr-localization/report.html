@@ -1,0 +1,201 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>鉴微 · OCR 与定位实验</title><style>
+body{font:15px/1.65 system-ui,sans-serif;margin:0;background:#f4f5f4;color:#252b29}main{max-width:1150px;margin:40px auto;padding:0 24px}h1{font-size:30px;margin-bottom:8px}h2{font-size:22px;margin-top:0}p{max-width:90ch}.muted{color:#65716c}.notice{background:#fff2de;border-left:4px solid #ab710f;padding:16px 20px;border-radius:8px}section{margin:24px 0;background:white;border:1px solid #dfe5e0;border-radius:12px;padding:22px}img,svg{display:block;max-width:100%;max-height:650px;margin:auto;border-radius:6px}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{text-align:left;border-bottom:1px solid #e5e9e6;padding:8px 12px}th{color:#65716c;font-size:13px}code{font:14px ui-monospace,monospace}.bad{color:#b42318}.good{color:#177245}.scroll{overflow-x:auto}summary{cursor:pointer;color:#4d6559;padding:10px 0}a{color:#177245}.codes{display:flex;flex-wrap:wrap;gap:6px}.codes span{font:12px ui-monospace,monospace;background:#eef2ef;padding:5px 8px;border-radius:4px}</style>
+<main><div class="muted">2026-11-01 · 本机研究 · 正常检验仍使用 VLM</div><h1>小模型读字，定位与方向分开验证</h1>
+<p>9 张图片，63 次元件出现。60 次可按像素核验主码；另 3 次形近字按录入人员声明单列观察。合成图和公开实拍用于探索，不能代表公司现场准确率。</p>
+<p class="notice"><b>需要保留的反例：</b>18 件样片中的 C08、C17 有预设字符差异。原有 VLM 配置延长到 180 秒后仍将两件判为合格；三套 OCR 开启方向分类后在这一张图上都读对了 18 件主码。不能把任一模型的高分当作正确答案。</p>
+<p><a href="../../docs/research/轻量OCR与定位方向探索-2026-11-01.md">研究说明与来源</a> · <a href="../../fixtures/inspection/ocr-exploration-v1/public/ATTRIBUTION.md">公开图片署名与许可</a></p>
+<section id="scattered-six"><h2>scattered-six</h2>
+<img src="../../fixtures/inspection/ocr-exploration-v1/scattered-six.png" alt="scattered-six"><div class="codes">
+<span class="">C01 SV358</span>
+<span class="">C02 SV358</span>
+<span class="">C03 SV358</span>
+<span class="">C04 SV358</span>
+<span class="">C05 SV358</span>
+<span class="bad">C06 SV385</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>3 → 4 / 6</td><td>0.265 秒</td><td>4 / 6</td><td>0.712 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>SV358 (0.9273) | sv358 (0.8195) | A26 (0.9968) | A26 (0.9993) | 0147 (0.9971) | SV358 (0.9781) | N (0.5425) | 8148 (0.9884) | SV385 (0.976) | L (0.5989) | A26 (0.9997) | 0.147 (0.9877)</code></details></td></tr>
+<tr><td>v6-small</td><td>5 → 6 / 6</td><td>1.030 秒</td><td>5 / 6</td><td>2.535 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>SV358 (0.9998) | SV358 (0.9993) | 0147 (1.0) | A26 (1.0) | A26 (1.0) | 0147 (1.0) | A26 (1.0) | 0147 (1.0) | SV358 (1.0) | SV358 (0.9989) | HU (0.6746) | 8148 (0.9999) | 0147 (0.8968) | A26 (1.0) | SV358 (0.9989) | 3.233 (0.6198) | SV385 (0.9999) | A26 (1.0) | 建区 (0.551) | B (0.5443) | 0.147 (0.9792)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>2 → 3 / 6</td><td>1.011 秒</td><td>6 / 6</td><td>3.978 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>SV358 (0.9972) | V358 (0.9959) | 0147 (0.9965) | A26 (0.9929) | 0147 (0.9981) | A2 (0.9834) | 6 (0.9451) | A26 (0.9909) | 0147 (0.9985) | SV358 (0.9989) | S (0.8383) | 8148 (0.9815) | 828 (0.9542) | SV385 (0.9986) | N (0.9441) | A26 (0.9932) | 9 (0.8205) | 8 (0.9447) | 0147 (0.998)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+<details><summary>SAM 2.1 Tiny 自动网格：12 个候选，3.00 秒，查看多余框和漏件</summary><svg viewBox="0 0 1536 1024"><image href="../../fixtures/inspection/ocr-exploration-v1/scattered-six.png" width="1536" height="1024"/>
+<rect x="0.0" y="0.0" width="1535.0" height="1023.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="2.0" y="18.0" fill="#a10c0c" font-size="18">1</text>
+<rect x="603.0" y="158.0" width="272.0" height="280.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="605.0" y="176.0" fill="#a10c0c" font-size="18">2</text>
+<rect x="618.0" y="575.0" width="275.0" height="295.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="620.0" y="593.0" fill="#a10c0c" font-size="18">3</text>
+<rect x="212.0" y="149.0" width="248.0" height="277.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="214.0" y="167.0" fill="#a10c0c" font-size="18">4</text>
+<rect x="68.0" y="790.0" width="54.0" height="63.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="70.0" y="808.0" fill="#a10c0c" font-size="18">5</text>
+<rect x="278.0" y="159.0" width="26.0" height="43.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="280.0" y="177.0" fill="#a10c0c" font-size="18">6</text>
+<rect x="1234.0" y="819.0" width="30.0" height="54.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="1236.0" y="837.0" fill="#a10c0c" font-size="18">7</text>
+<rect x="223.0" y="588.0" width="176.0" height="234.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="225.0" y="606.0" fill="#a10c0c" font-size="18">8</text>
+<rect x="1237.0" y="155.0" width="22.0" height="46.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="1239.0" y="173.0" fill="#a10c0c" font-size="18">9</text>
+<rect x="1247.0" y="29.0" width="29.0" height="58.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="1249.0" y="47.0" fill="#a10c0c" font-size="18">10</text>
+<rect x="1049.0" y="166.0" width="16.0" height="24.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="1051.0" y="184.0" fill="#a10c0c" font-size="18">11</text>
+<rect x="272.0" y="830.0" width="25.0" height="44.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="274.0" y="848.0" fill="#a10c0c" font-size="18">12</text>
+</svg><p>8×8 点网格，不按元件类别过滤；框可能属于背景、托盘或引脚。这不是逐元件真值。</p></details>
+</section>
+<section id="tray-thirty"><h2>tray-thirty</h2>
+<img src="../../fixtures/inspection/ocr-exploration-v1/tray-thirty.png" alt="tray-thirty"><div class="codes">
+<span class="">C01 J3</span>
+<span class="">C02 J3</span>
+<span class="">C03 J3</span>
+<span class="">C04 J3</span>
+<span class="">C05 J3</span>
+<span class="">C06 J3</span>
+<span class="">C07 J3</span>
+<span class="">C08 J3</span>
+<span class="">C09 J3</span>
+<span class="">C10 J3</span>
+<span class="">C11 J3</span>
+<span class="">C12 J3</span>
+<span class="">C13 J3</span>
+<span class="">C14 J3</span>
+<span class="">C15 J3</span>
+<span class="">C16 J3</span>
+<span class="">C17 J3</span>
+<span class="">C18 J3</span>
+<span class="">C19 J3</span>
+<span class="">C20 J3</span>
+<span class="">C21 J3</span>
+<span class="">C22 J3</span>
+<span class="">C23 J3</span>
+<span class="bad">C24 J8</span>
+<span class="">C25 J3</span>
+<span class="">C26 J3</span>
+<span class="">C27 J3</span>
+<span class="">C28 J3</span>
+<span class="">C29 J3</span>
+<span class="">C30 J3</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>14 → 15 / 30</td><td>0.348 秒</td><td>26 / 30</td><td>1.404 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>J3 (0.9998) | J3 (0.9994) | J3 (0.9996) | J3 (0.9999) | J3 (0.9999) | Er (0.5479) | er (0.6213) | er (0.8534) | J3 (0.9999) | J3 (0.9997) | J3 (0.9999) | J3 (0.9999) | J3 (0.9999) | E (0.6876) | er (0.5472) | er (0.6927) | er (0.5039) | er (0.8005) | 2 (0.6186) | J3 (0.9999) | J3 (0.9999) | J3 (0.9998) | J8 (0.9992) | J3 (0.9998) | er (0.7339) | er (0.7363) | Er (0.5105) | er (0.5676)</code></details></td></tr>
+<tr><td>v6-small</td><td>21 → 23 / 30</td><td>1.086 秒</td><td>30 / 30</td><td>3.378 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>J3 (0.9997) | J3 (0.9993) | J3 (0.9997) | J3 (0.9999) | J3 (0.9996) | 日 (0.573) | J3 (0.9998) | 13 (0.766) | 13 (0.7449) | 13 (0.6977) | 13 (0.6731) | J3 (0.9998) | J3 (0.9997) | J3 (0.9996) | J3 (0.9995) | J3 (0.9998) | J3 (0.661) | J3 (0.5901) | J3 (0.6597) | J3 (0.6806) | J3 (0.9998) | D (0.5361) | I0 (0.5748) | J3 (0.9997) | J3 (0.9998) | J3 (0.9996) | J8 (0.9997) | J3 (0.9996) | J3 (0.9997) | J3 (0.6802) | J13 (0.6584) | J13 (0.6185) | 13 (0.7331)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>14 → 19 / 30</td><td>1.375 秒</td><td>7 / 30</td><td>1.561 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>J3 (0.9973) | J3 (0.9893) | J3 (0.9963) | J3 (0.996) | J3 (0.8665) | 二 (0.6201) | 00 (0.863) | J3 (0.9948) | Er (0.6532) | J3 (0.9982) | J3 (0.9972) | J3 (0.9987) | J3 (0.9959) | J3 (0.992) | J3 (0.9965) | Er (0.7296) | Er (0.5557) | εr (0.6417) | J3 (0.998) | εr (0.5457) | J3 (0.9952) | J3 (0.9953) | J3 (0.9955) | J8 (0.9968) | J3 (0.9873) | 小 (0.6885) | J3 (0.9954) | Er (0.6391) | εr (0.7918) | εr (0.5918) | 二 (0.6784)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+<details><summary>SAM 2.1 Tiny 自动网格：9 个候选，2.76 秒，查看多余框和漏件</summary><svg viewBox="0 0 1536 1024"><image href="../../fixtures/inspection/ocr-exploration-v1/tray-thirty.png" width="1536" height="1024"/>
+<rect x="1239.0" y="548.0" width="84.0" height="62.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="1241.0" y="566.0" fill="#a10c0c" font-size="18">1</text>
+<rect x="976.0" y="549.0" width="80.0" height="61.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="978.0" y="567.0" fill="#a10c0c" font-size="18">2</text>
+<rect x="460.0" y="552.0" width="79.0" height="44.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="462.0" y="570.0" fill="#a10c0c" font-size="18">3</text>
+<rect x="31.0" y="17.0" width="1465.0" height="995.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="33.0" y="35.0" fill="#a10c0c" font-size="18">4</text>
+<rect x="642.0" y="206.0" width="226.0" height="126.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="644.0" y="224.0" fill="#a10c0c" font-size="18">5</text>
+<rect x="1246.0" y="432.0" width="14.0" height="19.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="1248.0" y="450.0" fill="#a10c0c" font-size="18">6</text>
+<rect x="898.0" y="202.0" width="230.0" height="126.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="900.0" y="220.0" fill="#a10c0c" font-size="18">7</text>
+<rect x="1225.0" y="188.0" width="59.0" height="11.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="1227.0" y="206.0" fill="#a10c0c" font-size="18">8</text>
+<rect x="477.0" y="443.0" width="12.0" height="18.0" stroke="#ffb000" stroke-width="3" fill="none"/><text x="479.0" y="461.0" fill="#a10c0c" font-size="18">9</text>
+</svg><p>8×8 点网格，不按元件类别过滤；框可能属于背景、托盘或引脚。这不是逐元件真值。</p></details>
+</section>
+<section id="long-code-pair"><h2>long-code-pair</h2>
+<img src="../../fixtures/inspection/ocr-exploration-v1/long-code-pair.png" alt="long-code-pair"><div class="codes">
+<span class="">C01 STM32F103C8T6</span>
+<span class="bad">C02 STM32F103C8I6</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>1 → 1 / 2</td><td>0.250 秒</td><td>1 / 2</td><td>0.563 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>2a8888 (0.5026) | STM32F103C8T6 (0.9294) | GH27B5 (0.9457) | 92h2 NMI (0.6498) | 92h2 NML (0.8115) | 918DE0±2EWIS (0.6922) | GH27B5 (0.9793)</code></details></td></tr>
+<tr><td>v6-small</td><td>1 → 1 / 2</td><td>0.514 秒</td><td>2 / 2</td><td>1.185 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>STM32F103C8T6 (0.9988) | GH27B5 (0.9998) | TWN 2426 (0.9957) | 92h2 NM1 (0.8906) | STMMEEIS (0.6882) | GH27B5 (0.9996)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>1 → 1 / 2</td><td>0.523 秒</td><td>0 / 2</td><td>1.442 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>8738888888888888 (0.5331) | STM32F103C8T6 (0.9531) | GH27B5 (0.9836) | 92h2 NML (0.702) | 92h2 NML (0.7636) | GH27B5 (0.9872)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+</section>
+<section id="public-ne555"><h2>public-ne555</h2>
+<img src="../../fixtures/inspection/ocr-exploration-v1/public/ne555-dip-soic.jpg" alt="public-ne555"><div class="codes">
+<span class="">C01 NE555P</span>
+<span class="">C02 NE555</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>2 → 2 / 2</td><td>0.274 秒</td><td>2 / 2</td><td>0.465 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>Q09AHS2M (0.9) | NE555P (0.9993) | NE555 (0.9986) | 05K (0.9642) | A41994 (0.9641)</code></details></td></tr>
+<tr><td>v6-small</td><td>2 → 2 / 2</td><td>0.542 秒</td><td>2 / 2</td><td>0.974 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>09AHS2M (0.9924) | NE555P (0.9999) | NE555 (1.0) | 05K (0.9914) | A419G4 (0.9994)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>2 → 2 / 2</td><td>0.442 秒</td><td>1 / 2</td><td>0.939 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>A909AHS2M (0.7451) | NE555P (0.9965) | NE555 (0.9965) | 419G4 (0.9699)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+</section>
+<section id="public-lm358"><h2>public-lm358</h2>
+<img src="../../fixtures/inspection/ocr-exploration-v1/public/lm358n.jpg" alt="public-lm358"><div class="codes">
+<span class="">C01 358N</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>1 → 1 / 1</td><td>0.192 秒</td><td>1 / 1</td><td>0.441 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>多M8706 (0.9169) | LM (0.9976) | 358N (0.9996)</code></details></td></tr>
+<tr><td>v6-small</td><td>1 → 1 / 1</td><td>0.417 秒</td><td>1 / 1</td><td>1.013 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>≈M8706 (0.9367) | LM (1.0) | 358N (1.0)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>1 → 1 / 1</td><td>0.289 秒</td><td>1 / 1</td><td>0.781 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>WM8706 (0.9367) | LM (0.9869) | 358N (0.9996)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+</section>
+<section id="eighteen-two-differences"><h2>eighteen-two-differences</h2>
+<img src="../../fixtures/inspection/ocr-exploration-v1/eighteen-two-differences.png" alt="eighteen-two-differences"><div class="codes">
+<span class="">C01 QG5S208B</span>
+<span class="">C02 QG5S208B</span>
+<span class="">C03 QG5S208B</span>
+<span class="">C04 QG5S208B</span>
+<span class="">C05 QG5S208B</span>
+<span class="">C06 QG5S208B</span>
+<span class="">C07 QG5S208B</span>
+<span class="bad">C08 Q65S208B</span>
+<span class="">C09 QG5S208B</span>
+<span class="">C10 QG5S208B</span>
+<span class="">C11 QG5S208B</span>
+<span class="">C12 QG5S208B</span>
+<span class="">C13 QG5S208B</span>
+<span class="">C14 QG5S208B</span>
+<span class="">C15 QG5S208B</span>
+<span class="">C16 QG5S208B</span>
+<span class="bad">C17 QG5S20BB</span>
+<span class="">C18 QG5S208B</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>10 → 18 / 18</td><td>0.294 秒</td><td>18 / 18</td><td>1.352 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>QG5S208B (0.9993) | QG5S208B (0.9977) | QG5S208B (0.9994) | QG5S208B (0.9981) | QG5S208B (0.9994) | QG5S208B (0.9992) | QG5S208B (0.9585) | Q65S208B (0.9996) | QG5S208B (0.9956) | QG5S208B (0.9969) | QG5S208B (0.9982) | QG5S208B (0.9996) | QG5S208B (0.9989) | QG5S208B (0.9863) | QG5S208B (0.997) | QG5S208B (0.9991) | QG5S20BB (0.9994) | QG5S208B (0.9925)</code></details></td></tr>
+<tr><td>v6-small</td><td>10 → 18 / 18</td><td>0.683 秒</td><td>18 / 18</td><td>2.932 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>QG5S208B (0.9999) | QG5S208B (0.9997) | QG5S208B (0.9999) | QG5S208B (0.9998) | QG5S208B (0.9999) | QG5S208B (0.9998) | QG5S208B (0.9998) | Q65S208B (0.9999) | QG5S208B (0.9996) | QG5S208B (0.9999) | QG5S208B (0.9979) | QG5S208B (0.9998) | QG5S208B (0.9998) | QG5S208B (0.9998) | QG5S208B (0.9602) | QG5S208B (0.9999) | QG5S20BB (0.9998) | QG5S208B (0.9991)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>10 → 18 / 18</td><td>0.576 秒</td><td>18 / 18</td><td>4.312 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>QG5S208B (0.9987) | QG5S208B (0.9984) | QG5S208B (0.9984) | QG5S208B (0.9986) | QG5S208B (0.9984) | QG5S208B (0.9986) | QG5S208B (0.9984) | Q65S208B (0.9987) | QG5S208B (0.9985) | QG5S208B (0.9984) | QG5S208B (0.9985) | QG5S208B (0.9982) | QG5S208B (0.9987) | QG5S208B (0.9986) | QG5S208B (0.9974) | QG5S208B (0.9982) | QG5S20BB (0.9974) | QG5S208B (0.9978)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+<p class="notice"><b>VLM 对照：</b>整图未提供人工文字时 94.18 秒，提供后 91.58 秒，两次均将 18 件判合格，漏掉 C08/C17。按人工位置分别裁出后，两件都被正确判为不合格（22.27 / 21.85 秒）。以下只放大原像素，不重绘文字。</p><div style="display:flex;gap:20px;flex-wrap:wrap">
+<div style="flex:1;min-width:200px"><svg viewBox="285 365 245 285" style="max-height:280px"><image href="../../fixtures/inspection/ocr-exploration-v1/eighteen-two-differences.png" width="1536" height="1024"/></svg><p class="bad">C08 · Q65S208B · 逐件 VLM：FAIL</p></div>
+<div style="flex:1;min-width:200px"><svg viewBox="1030 650 250 295" style="max-height:280px"><image href="../../fixtures/inspection/ocr-exploration-v1/eighteen-two-differences.png" width="1536" height="1024"/></svg><p class="bad">C17 · QG5S20BB · 逐件 VLM：FAIL</p></div>
+</div>
+</section>
+<section id="reference-qg"><h2>reference-qg</h2>
+<img src="../../fixtures/inspection/ocr-exploration-v1/reference-qg.png" alt="reference-qg"><div class="codes">
+<span class="">C01 QG5S208B</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>1 → 1 / 1</td><td>0.219 秒</td><td>1 / 1</td><td>0.342 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>QG5S208B (0.9988)</code></details></td></tr>
+<tr><td>v6-small</td><td>1 → 1 / 1</td><td>0.416 秒</td><td>1 / 1</td><td>0.697 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>QG5S208B (0.9993)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>1 → 1 / 1</td><td>0.327 秒</td><td>1 / 1</td><td>0.484 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>QG5S208B (0.999)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+</section>
+<section id="confusable-pair"><h2>confusable-pair</h2>
+<p class="notice">形近字单列探索：O/0、I/1 的像素本身难以明确区分。期望文字由录入人员声明，不作为独立 OCR 正确率证明。</p>
+<img src="../../fixtures/inspection/ocr-exploration-v1/confusable-pair.png" alt="confusable-pair"><div class="codes">
+<span class="">C01 O0I1Z2</span>
+<span class="">C02 O0I1Z2</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>0 → 0 / 2</td><td>0.269 秒</td><td>0 / 2</td><td>0.431 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>SSSEEEESEESS (0.5723) | BERBBBBBE (0.572) | 0011Z2 (0.9312) | 6G8B5S (0.9775) | 6G8B5S (0.9976) | 0011Z2 (0.8679)</code></details></td></tr>
+<tr><td>v6-small</td><td>0 → 0 / 2</td><td>0.541 秒</td><td>0 / 2</td><td>0.851 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>00I1Z2 (0.9384) | 6G8B5S (0.996) | 6G8B5S (0.9995) | 00I1Z2 (0.9409)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>0 → 0 / 2</td><td>0.598 秒</td><td>0 / 2</td><td>1.014 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>0011Z2 (0.9673) | 6G8B5S (0.987) | 6G8B5S (0.9977) | 0011Z2 (0.9493) | L (0.5423)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+</section>
+<section id="reference-confusables"><h2>reference-confusables</h2>
+<p class="notice">形近字单列探索：O/0、I/1 的像素本身难以明确区分。期望文字由录入人员声明，不作为独立 OCR 正确率证明。</p>
+<img src="../../fixtures/inspection/ocr-exploration-v1/reference-confusables.png" alt="reference-confusables"><div class="codes">
+<span class="">C01 O0I1Z2</span>
+</div><div class="scroll"><table><tr><th>模型</th><th>整图主码，方向关→开</th><th>开启方向耗时</th><th>人工 ROI＋四方向主码</th><th>ROI 全部调用耗时</th></tr>
+<tr><td>v6-tiny</td><td>0 → 0 / 1</td><td>0.252 秒</td><td>0 / 1</td><td>0.619 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-tiny · 实际整图 OCR 原文和分数</summary><code>00I1Z2 (0.9538) | 6G8B5S (0.9994)</code></details></td></tr>
+<tr><td>v6-small</td><td>0 → 0 / 1</td><td>0.612 秒</td><td>0 / 1</td><td>1.611 秒</td></tr>
+<tr><td colspan="5"><details><summary>v6-small · 实际整图 OCR 原文和分数</summary><code>网 (0.9016) | 00I1Z2 (0.9539) | 6G8B5S (1.0)</code></details></td></tr>
+<tr><td>v5-mobile</td><td>0 → 0 / 1</td><td>0.640 秒</td><td>0 / 1</td><td>1.186 秒</td></tr>
+<tr><td colspan="5"><details><summary>v5-mobile · 实际整图 OCR 原文和分数</summary><code>00I1Z2 (0.9494) | 6G8B5S (0.9986) | KI (0.6378)</code></details></td></tr>
+</table></div><p class="muted">耗时为单次已加载 CPU 推理，2 线程；不同模式处理次数不同。人工框只用于评估归属及方向实验，不是自动定位结果。</p>
+</section>
+<p class="muted">结果来自保存 JSON，生成此页不调用模型。没有修改或重绘原始丝印。正品录入中的人工文本不能成为给样品自动纠错的字典。</p></main></html>

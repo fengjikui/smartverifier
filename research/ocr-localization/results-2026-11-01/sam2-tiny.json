@@ -1,0 +1,598 @@
+{
+  "torch": "2.15.0",
+  "device": "cpu",
+  "threads": 2,
+  "source_commit": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+  "weights_sha256": "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69",
+  "weights_bytes": 156008466,
+  "load_seconds": 0.36575125018134713,
+  "resources": [
+    {
+      "process_rss_bytes": 385171456,
+      "available_bytes": 19404898304,
+      "load_average": [
+        3.279296875,
+        3.31396484375,
+        2.73681640625
+      ],
+      "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    {
+      "process_rss_bytes": 899153920,
+      "available_bytes": 19102187520,
+      "load_average": [
+        3.279296875,
+        3.31396484375,
+        2.73681640625
+      ],
+      "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    {
+      "process_rss_bytes": 1831976960,
+      "available_bytes": 18670731264,
+      "load_average": [
+        3.8173828125,
+        3.4248046875,
+        2.779296875
+      ],
+      "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    },
+    {
+      "process_rss_bytes": 3125346304,
+      "available_bytes": 17999364096,
+      "load_average": [
+        3.67138671875,
+        3.40087890625,
+        2.7744140625
+      ],
+      "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scattered-six",
+      "file": "fixtures/inspection/ocr-exploration-v1/scattered-six.png",
+      "input_sha256": "d2ad0544d211efe555cb250e7d424633cb13ab0feb93ab99e9f4f33a492961b3",
+      "encode_seconds": 0.7119476250372827,
+      "oracle_box_decode_seconds": 0.16393566690385342,
+      "oracle_box_scores": [
+        [
+          0.9421109557151794
+        ],
+        [
+          0.9716488718986511
+        ],
+        [
+          0.9723829030990601
+        ],
+        [
+          0.9656791090965271
+        ],
+        [
+          0.9735466837882996
+        ],
+        [
+          0.960084080696106
+        ]
+      ],
+      "oracle_box_mask_pixels": [
+        48033,
+        43838,
+        44791,
+        48868,
+        46604,
+        48341
+      ],
+      "automatic_seconds_including_encoding": 3.0046722502447665,
+      "automatic_parameters": {
+        "points_per_side": 8,
+        "points_per_batch": 8,
+        "pred_iou_thresh": 0.8,
+        "stability_score_thresh": 0.9,
+        "crop_n_layers": 0
+      },
+      "automatic_masks": [
+        {
+          "bbox": [
+            0.0,
+            0.0,
+            1535.0,
+            1023.0
+          ],
+          "area": 1256248,
+          "predicted_iou": 0.994852602481842,
+          "stability_score": 0.9585430026054382,
+          "point_coords": [
+            [
+              480.0,
+              576.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            603.0,
+            158.0,
+            272.0,
+            280.0
+          ],
+          "area": 38230,
+          "predicted_iou": 0.9703280329704285,
+          "stability_score": 0.9162492752075195,
+          "point_coords": [
+            [
+              672.0,
+              192.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            618.0,
+            575.0,
+            275.0,
+            295.0
+          ],
+          "area": 39669,
+          "predicted_iou": 0.9702908992767334,
+          "stability_score": 0.9314090609550476,
+          "point_coords": [
+            [
+              672.0,
+              704.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            212.0,
+            149.0,
+            248.0,
+            277.0
+          ],
+          "area": 39979,
+          "predicted_iou": 0.9566189646720886,
+          "stability_score": 0.9182618856430054,
+          "point_coords": [
+            [
+              288.0,
+              320.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            68.0,
+            790.0,
+            54.0,
+            63.0
+          ],
+          "area": 2242,
+          "predicted_iou": 0.9527215957641602,
+          "stability_score": 0.9722589254379272,
+          "point_coords": [
+            [
+              96.0,
+              832.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            278.0,
+            159.0,
+            26.0,
+            43.0
+          ],
+          "area": 884,
+          "predicted_iou": 0.9512031078338623,
+          "stability_score": 0.9710144996643066,
+          "point_coords": [
+            [
+              288.0,
+              192.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            1234.0,
+            819.0,
+            30.0,
+            54.0
+          ],
+          "area": 1060,
+          "predicted_iou": 0.9504134058952332,
+          "stability_score": 0.9712163209915161,
+          "point_coords": [
+            [
+              1248.0,
+              832.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            223.0,
+            588.0,
+            176.0,
+            234.0
+          ],
+          "area": 39365,
+          "predicted_iou": 0.944004476070404,
+          "stability_score": 0.9594507217407227,
+          "point_coords": [
+            [
+              288.0,
+              704.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            1237.0,
+            155.0,
+            22.0,
+            46.0
+          ],
+          "area": 874,
+          "predicted_iou": 0.9350840449333191,
+          "stability_score": 0.9618834257125854,
+          "point_coords": [
+            [
+              1248.0,
+              192.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            1247.0,
+            29.0,
+            29.0,
+            58.0
+          ],
+          "area": 1256,
+          "predicted_iou": 0.9096311926841736,
+          "stability_score": 0.9593750238418579,
+          "point_coords": [
+            [
+              1248.0,
+              64.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            1049.0,
+            166.0,
+            16.0,
+            24.0
+          ],
+          "area": 290,
+          "predicted_iou": 0.8363752365112305,
+          "stability_score": 0.911475419998169,
+          "point_coords": [
+            [
+              1056.0,
+              192.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            272.0,
+            830.0,
+            25.0,
+            44.0
+          ],
+          "area": 647,
+          "predicted_iou": 0.814275860786438,
+          "stability_score": 0.922848641872406,
+          "point_coords": [
+            [
+              288.0,
+              832.0
+            ]
+          ]
+        }
+      ],
+      "preview": "outputs/ocr-localization-20261101/scattered-six-sam2-automatic.png"
+    },
+    {
+      "id": "tray-thirty",
+      "file": "fixtures/inspection/ocr-exploration-v1/tray-thirty.png",
+      "input_sha256": "0f8f844d748fedbea12fded24e3fb9ec819c67fdb646103775dea7dfb2f8fe0d",
+      "encode_seconds": 0.6805792911909521,
+      "oracle_box_decode_seconds": 0.8663491662591696,
+      "oracle_box_scores": [
+        [
+          0.9187628626823425
+        ],
+        [
+          0.9288558959960938
+        ],
+        [
+          0.9492473602294922
+        ],
+        [
+          0.9177643060684204
+        ],
+        [
+          0.9258413910865784
+        ],
+        [
+          0.9292152523994446
+        ],
+        [
+          0.9371590614318848
+        ],
+        [
+          0.9417674541473389
+        ],
+        [
+          0.9357245564460754
+        ],
+        [
+          0.9423078298568726
+        ],
+        [
+          0.9075356721878052
+        ],
+        [
+          0.9255700707435608
+        ],
+        [
+          0.9358794689178467
+        ],
+        [
+          0.9221429228782654
+        ],
+        [
+          0.9306899309158325
+        ],
+        [
+          0.9544488787651062
+        ],
+        [
+          0.9572979807853699
+        ],
+        [
+          0.9616983532905579
+        ],
+        [
+          0.9545847177505493
+        ],
+        [
+          0.961972713470459
+        ],
+        [
+          0.9486957788467407
+        ],
+        [
+          0.9298219084739685
+        ],
+        [
+          0.9366975426673889
+        ],
+        [
+          0.9265981316566467
+        ],
+        [
+          0.9294964671134949
+        ],
+        [
+          0.8972522020339966
+        ],
+        [
+          0.9056840538978577
+        ],
+        [
+          0.91561359167099
+        ],
+        [
+          0.8808265328407288
+        ],
+        [
+          0.9088085889816284
+        ]
+      ],
+      "oracle_box_mask_pixels": [
+        23449,
+        24965,
+        26351,
+        25062,
+        28633,
+        26930,
+        27451,
+        27874,
+        27724,
+        29626,
+        27211,
+        27292,
+        28057,
+        29001,
+        31120,
+        29193,
+        30206,
+        30195,
+        30918,
+        32986,
+        30289,
+        30168,
+        31637,
+        32246,
+        34755,
+        31128,
+        30624,
+        31854,
+        29245,
+        34089
+      ],
+      "automatic_seconds_including_encoding": 2.7582121659070253,
+      "automatic_parameters": {
+        "points_per_side": 8,
+        "points_per_batch": 8,
+        "pred_iou_thresh": 0.8,
+        "stability_score_thresh": 0.9,
+        "crop_n_layers": 0
+      },
+      "automatic_masks": [
+        {
+          "bbox": [
+            1239.0,
+            548.0,
+            84.0,
+            62.0
+          ],
+          "area": 3667,
+          "predicted_iou": 0.9548066854476929,
+          "stability_score": 0.9512779712677002,
+          "point_coords": [
+            [
+              1248.0,
+              576.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            976.0,
+            549.0,
+            80.0,
+            61.0
+          ],
+          "area": 3558,
+          "predicted_iou": 0.9362239837646484,
+          "stability_score": 0.952589750289917,
+          "point_coords": [
+            [
+              1056.0,
+              576.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            460.0,
+            552.0,
+            79.0,
+            44.0
+          ],
+          "area": 3435,
+          "predicted_iou": 0.9219424724578857,
+          "stability_score": 0.9620108604431152,
+          "point_coords": [
+            [
+              480.0,
+              576.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            31.0,
+            17.0,
+            1465.0,
+            995.0
+          ],
+          "area": 1345878,
+          "predicted_iou": 0.8953956365585327,
+          "stability_score": 0.9127554297447205,
+          "point_coords": [
+            [
+              96.0,
+              192.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            642.0,
+            206.0,
+            226.0,
+            126.0
+          ],
+          "area": 26555,
+          "predicted_iou": 0.888426661491394,
+          "stability_score": 0.9116584658622742,
+          "point_coords": [
+            [
+              672.0,
+              320.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            1246.0,
+            432.0,
+            14.0,
+            19.0
+          ],
+          "area": 245,
+          "predicted_iou": 0.8710942268371582,
+          "stability_score": 0.9448819160461426,
+          "point_coords": [
+            [
+              1248.0,
+              448.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            898.0,
+            202.0,
+            230.0,
+            126.0
+          ],
+          "area": 26344,
+          "predicted_iou": 0.8692131042480469,
+          "stability_score": 0.901340901851654,
+          "point_coords": [
+            [
+              1056.0,
+              320.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            1225.0,
+            188.0,
+            59.0,
+            11.0
+          ],
+          "area": 591,
+          "predicted_iou": 0.8252991437911987,
+          "stability_score": 0.9440789222717285,
+          "point_coords": [
+            [
+              1248.0,
+              192.0
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            477.0,
+            443.0,
+            12.0,
+            18.0
+          ],
+          "area": 196,
+          "predicted_iou": 0.8222026228904724,
+          "stability_score": 0.9365853667259216,
+          "point_coords": [
+            [
+              480.0,
+              448.0
+            ]
+          ]
+        }
+      ],
+      "preview": "outputs/ocr-localization-20261101/tray-thirty-sam2-automatic.png"
+    }
+  ]
+}

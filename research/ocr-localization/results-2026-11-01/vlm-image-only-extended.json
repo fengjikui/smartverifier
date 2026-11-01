@@ -1,0 +1,860 @@
+[
+  {
+    "id": "eighteen-two-differences",
+    "model": "hr-qwen",
+    "timeoutSeconds": 180,
+    "inputSha256": "69b9200ac57147e2400b99cfc95ccf89aee30a36c75c7e5d03b841ded492f47e",
+    "referenceSha256": "75d2dbc34f8c9e3bd7be2372622172cea90446ccf6d245c0a32597f4c496675a",
+    "result": {
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.048,
+            0.125,
+            0.113,
+            0.198
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 1,
+          "bbox": [
+            0.208,
+            0.131,
+            0.115,
+            0.204
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 2,
+          "bbox": [
+            0.361,
+            0.129,
+            0.115,
+            0.204
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 3,
+          "bbox": [
+            0.528,
+            0.136,
+            0.117,
+            0.208
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 4,
+          "bbox": [
+            0.685,
+            0.132,
+            0.117,
+            0.204
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 5,
+          "bbox": [
+            0.846,
+            0.129,
+            0.117,
+            0.204
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 6,
+          "bbox": [
+            0.048,
+            0.397,
+            0.125,
+            0.204
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 7,
+          "bbox": [
+            0.213,
+            0.405,
+            0.127,
+            0.208
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 8,
+          "bbox": [
+            0.368,
+            0.412,
+            0.125,
+            0.208
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 9,
+          "bbox": [
+            0.528,
+            0.401,
+            0.127,
+            0.208
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 10,
+          "bbox": [
+            0.685,
+            0.397,
+            0.127,
+            0.208
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 11,
+          "bbox": [
+            0.846,
+            0.397,
+            0.125,
+            0.208
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 12,
+          "bbox": [
+            0.048,
+            0.671,
+            0.125,
+            0.208
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 13,
+          "bbox": [
+            0.208,
+            0.675,
+            0.131,
+            0.208
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 14,
+          "bbox": [
+            0.368,
+            0.679,
+            0.125,
+            0.208
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 15,
+          "bbox": [
+            0.528,
+            0.679,
+            0.131,
+            0.208
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 16,
+          "bbox": [
+            0.685,
+            0.679,
+            0.131,
+            0.208
+          ],
+          "reason": "丝印与正品一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印与正品一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [
+              {
+                "category": "text",
+                "message": "末位字符为B，与正品一致；倒数第二位为8，与正品一致。",
+                "lineIndex": 0,
+                "referenceText": "QG5S208B",
+                "sampleText": "QG5S208B"
+              }
+            ],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 17,
+          "bbox": [
+            0.846,
+            0.679,
+            0.125,
+            0.208
+          ],
+          "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按引脚1方向校正后丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 92960,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0b965448-8e41-4554-9f8c-4d1bc93dd75b.json",
+            "features": [
+              "丝印清晰",
+              "8引脚SOP封装"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        }
+      ]
+    },
+    "raw": {
+      "taskId": "RESEARCH20261101",
+      "roundId": "e34579bb-18fd-4dc8-a96d-4cf44c2c39ae",
+      "photoId": "a82bbe91-04b3-43d4-add4-3e9a0afeeaa7",
+      "sourceHash": "69b9200ac57147e2400b99cfc95ccf89aee30a36c75c7e5d03b841ded492f47e",
+      "standardId": "RESEARCH",
+      "standardVersion": 1,
+      "referenceRegions": [],
+      "instructionVersion": 1,
+      "onsiteInstruction": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "role": "assistant",
+              "content": "{\"coverage\": \"complete\", \"instructionConflicts\": [], \"items\": [{\"bbox\": [0.048, 0.125, 0.113, 0.198], \"componentId\": \"C01\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.208, 0.131, 0.115, 0.204], \"componentId\": \"C02\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.361, 0.129, 0.115, 0.204], \"componentId\": \"C03\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.528, 0.136, 0.117, 0.208], \"componentId\": \"C04\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.685, 0.132, 0.117, 0.204], \"componentId\": \"C05\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.846, 0.129, 0.117, 0.204], \"componentId\": \"C06\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.048, 0.397, 0.125, 0.204], \"componentId\": \"C07\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.213, 0.405, 0.127, 0.208], \"componentId\": \"C08\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.368, 0.412, 0.125, 0.208], \"componentId\": \"C09\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.528, 0.401, 0.127, 0.208], \"componentId\": \"C10\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.685, 0.397, 0.127, 0.208], \"componentId\": \"C11\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.846, 0.397, 0.125, 0.208], \"componentId\": \"C12\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.048, 0.671, 0.125, 0.208], \"componentId\": \"C13\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.208, 0.675, 0.131, 0.208], \"componentId\": \"C14\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.368, 0.679, 0.125, 0.208], \"componentId\": \"C15\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.528, 0.679, 0.131, 0.208], \"componentId\": \"C16\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.685, 0.679, 0.131, 0.208], \"componentId\": \"C17\", \"confidence\": 0.95, \"differences\": [{\"category\": \"text\", \"lineIndex\": 0, \"message\": \"末位字符为B，与正品一致；倒数第二位为8，与正品一致。\", \"referenceText\": \"QG5S208B\", \"sampleText\": \"QG5S208B\"}], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.846, 0.679, 0.125, 0.208], \"componentId\": \"C18\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"丝印清晰\", \"8引脚SOP封装\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按引脚1方向校正后丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}], \"quality\": {\"reason\": \"\", \"state\": \"usable\"}}"
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 575,
+          "completion_tokens": 2111,
+          "reasoning_tokens": 0
+        },
+        "lmstudio": {
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 29.44072469201529,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 20.927,
+            "promptTokensCount": 575,
+            "predictedTokensCount": 2111,
+            "totalTokensCount": 2686
+          },
+          "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "enable_thinking": false,
+          "stream_fragment_count": 2038
+        }
+      },
+      "elapsedMs": 92960,
+      "model": "hr-qwen",
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "inputLayout": "prefix-first",
+      "provider": "lmstudio",
+      "outputFormat": "json-schema",
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "114fce1e657ea78f621b3147bd1e9153e3d36a1580d9cdbd4ff83f0f1862fe50",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2088158,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "b749f44b0c0d49d51c64bb4255d4894e3691ea72519538781a78787521a4a669",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2664531,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "traceId": "f5ad0964-0e58-4328-81da-c06d2551de4c",
+      "resourcesBefore": {
+        "availableGiB": 17.67,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 4.6,
+        "load": [
+          2.8896484375,
+          3.31103515625,
+          2.89453125
+        ]
+      },
+      "resourcesAfter": {
+        "availableGiB": 15.93,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 4.1,
+        "load": [
+          2.93212890625,
+          3.23291015625,
+          2.90625
+        ]
+      },
+      "workerPeakRssMiB": 113.33
+    },
+    "elapsedMs": 94178
+  },
+  {
+    "id": "confusable-pair",
+    "model": "hr-qwen",
+    "timeoutSeconds": 180,
+    "inputSha256": "763aade2c04f1e51f69c0fae3bda19bf055dda35543accbbb2dc219777bc54e9",
+    "referenceSha256": "ed071d2b36ffd045fdafbb1d29fc701a32cd6eea03e3af62c29f2ebb229e5827",
+    "result": {
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.08,
+            0.24,
+            0.31,
+            0.47
+          ],
+          "reason": "两行丝印与正品逐字符一致，方向正常。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "00I1Z2",
+              "6G8B5S"
+            ],
+            "confidence": 0.98,
+            "reason": "两行丝印与正品逐字符一致，方向正常。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 29977,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "70b6924e-20ed-4d54-9724-518fc66864c2.json",
+            "features": [
+              "两行丝印清晰",
+              "第一脚圆点位于左下角"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 1,
+          "bbox": [
+            0.58,
+            0.23,
+            0.31,
+            0.49
+          ],
+          "reason": "元件倒置，按第一脚方向校正后两行丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "00I1Z2",
+              "6G8B5S"
+            ],
+            "confidence": 0.95,
+            "reason": "元件倒置，按第一脚方向校正后两行丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 29977,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "70b6924e-20ed-4d54-9724-518fc66864c2.json",
+            "features": [
+              "两行丝印清晰",
+              "元件整体倒置摆放"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        }
+      ]
+    },
+    "raw": {
+      "taskId": "RESEARCH20261101",
+      "roundId": "3c933544-c1ef-431a-9525-4fd6c0f46244",
+      "photoId": "e602e539-2219-40be-929a-42fcb86289d8",
+      "sourceHash": "763aade2c04f1e51f69c0fae3bda19bf055dda35543accbbb2dc219777bc54e9",
+      "standardId": "RESEARCH",
+      "standardVersion": 1,
+      "referenceRegions": [],
+      "instructionVersion": 1,
+      "onsiteInstruction": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "role": "assistant",
+              "content": "{\"coverage\": \"complete\", \"instructionConflicts\": [], \"items\": [{\"bbox\": [0.08, 0.24, 0.31, 0.47], \"componentId\": \"C01\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"两行丝印清晰\", \"第一脚圆点位于左下角\"], \"lines\": [\"00I1Z2\", \"6G8B5S\"], \"reason\": \"两行丝印与正品逐字符一致，方向正常。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.58, 0.23, 0.31, 0.49], \"componentId\": \"C02\", \"confidence\": 0.95, \"differences\": [], \"features\": [\"两行丝印清晰\", \"元件整体倒置摆放\"], \"lines\": [\"00I1Z2\", \"6G8B5S\"], \"reason\": \"元件倒置，按第一脚方向校正后两行丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}], \"quality\": {\"reason\": \"\", \"state\": \"usable\"}}"
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 575,
+          "completion_tokens": 272,
+          "reasoning_tokens": 0
+        },
+        "lmstudio": {
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 30.22280554923404,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 20.646,
+            "promptTokensCount": 575,
+            "predictedTokensCount": 272,
+            "totalTokensCount": 847
+          },
+          "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "enable_thinking": false,
+          "stream_fragment_count": 264
+        }
+      },
+      "elapsedMs": 29977,
+      "model": "hr-qwen",
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "inputLayout": "prefix-first",
+      "provider": "lmstudio",
+      "outputFormat": "json-schema",
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "3afef01ebadcccc8214a4e47e89cf543d5b92b5635ffa3480cbb893a58add153",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2289869,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "217f18364b91d0fee0e2e33503d71d3aa2483a513d060ab3d528101e66e3ed84",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2780722,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "traceId": "44b318fd-6d98-4c93-b5d6-7de410a9c417",
+      "resourcesBefore": {
+        "availableGiB": 15.97,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 5.7,
+        "load": [
+          2.93212890625,
+          3.23291015625,
+          2.90625
+        ]
+      },
+      "resourcesAfter": {
+        "availableGiB": 15.7,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 5.4,
+        "load": [
+          2.8115234375,
+          3.1640625,
+          2.8916015625
+        ]
+      },
+      "workerPeakRssMiB": 147.7
+    },
+    "elapsedMs": 31181
+  }
+]

@@ -1,0 +1,862 @@
+[
+  {
+    "id": "eighteen-two-differences",
+    "variant": "confirmed",
+    "model": "hr-qwen",
+    "timeoutSeconds": 180,
+    "inputSha256": "69b9200ac57147e2400b99cfc95ccf89aee30a36c75c7e5d03b841ded492f47e",
+    "referenceSha256": "75d2dbc34f8c9e3bd7be2372622172cea90446ccf6d245c0a32597f4c496675a",
+    "result": {
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.048,
+            0.125,
+            0.113,
+            0.196
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 1,
+          "bbox": [
+            0.21,
+            0.134,
+            0.115,
+            0.196
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 2,
+          "bbox": [
+            0.361,
+            0.129,
+            0.115,
+            0.196
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 3,
+          "bbox": [
+            0.528,
+            0.134,
+            0.116,
+            0.196
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 4,
+          "bbox": [
+            0.685,
+            0.132,
+            0.114,
+            0.196
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 5,
+          "bbox": [
+            0.846,
+            0.129,
+            0.115,
+            0.196
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 6,
+          "bbox": [
+            0.048,
+            0.412,
+            0.115,
+            0.196
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 7,
+          "bbox": [
+            0.213,
+            0.415,
+            0.116,
+            0.196
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 8,
+          "bbox": [
+            0.368,
+            0.415,
+            0.117,
+            0.203
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 9,
+          "bbox": [
+            0.528,
+            0.412,
+            0.116,
+            0.196
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 10,
+          "bbox": [
+            0.687,
+            0.412,
+            0.115,
+            0.196
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 11,
+          "bbox": [
+            0.846,
+            0.415,
+            0.115,
+            0.196
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 12,
+          "bbox": [
+            0.048,
+            0.691,
+            0.115,
+            0.203
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 13,
+          "bbox": [
+            0.206,
+            0.691,
+            0.117,
+            0.203
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 14,
+          "bbox": [
+            0.368,
+            0.691,
+            0.117,
+            0.203
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 15,
+          "bbox": [
+            0.528,
+            0.691,
+            0.117,
+            0.203
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 16,
+          "bbox": [
+            0.687,
+            0.691,
+            0.115,
+            0.203
+          ],
+          "reason": "丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "丝印清晰",
+              "字符顺序与正品一致"
+            ],
+            "differences": [
+              {
+                "category": "text",
+                "message": "末位字符为B，与正品一致；倒数第二位为8，与正品一致。",
+                "lineIndex": 0,
+                "referenceText": "QG5S208B",
+                "sampleText": "QG5S208B"
+              }
+            ],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 17,
+          "bbox": [
+            0.846,
+            0.691,
+            0.115,
+            0.203
+          ],
+          "reason": "元件倒置，按正立方向读取后与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "QG5S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 90397,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "b4168147-91d3-45eb-a838-b8e057b81f52.json",
+            "features": [
+              "元件倒置",
+              "丝印清晰"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        }
+      ]
+    },
+    "raw": {
+      "taskId": "RESEARCH20261101",
+      "roundId": "9c80fba3-461c-4961-baf9-c9a72c0bdc28",
+      "photoId": "ea37ad32-b8ef-4bca-b1a3-971bd47a97a1",
+      "sourceHash": "69b9200ac57147e2400b99cfc95ccf89aee30a36c75c7e5d03b841ded492f47e",
+      "standardId": "RESEARCH",
+      "standardVersion": 1,
+      "referenceRegions": [],
+      "instructionVersion": 1,
+      "onsiteInstruction": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "role": "assistant",
+              "content": "{\"coverage\": \"complete\", \"instructionConflicts\": [], \"items\": [{\"bbox\": [0.048, 0.125, 0.113, 0.196], \"componentId\": \"C01\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.21, 0.134, 0.115, 0.196], \"componentId\": \"C02\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.361, 0.129, 0.115, 0.196], \"componentId\": \"C03\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.528, 0.134, 0.116, 0.196], \"componentId\": \"C04\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.685, 0.132, 0.114, 0.196], \"componentId\": \"C05\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.846, 0.129, 0.115, 0.196], \"componentId\": \"C06\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.048, 0.412, 0.115, 0.196], \"componentId\": \"C07\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.213, 0.415, 0.116, 0.196], \"componentId\": \"C08\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.368, 0.415, 0.117, 0.203], \"componentId\": \"C09\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.528, 0.412, 0.116, 0.196], \"componentId\": \"C10\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.687, 0.412, 0.115, 0.196], \"componentId\": \"C11\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.846, 0.415, 0.115, 0.196], \"componentId\": \"C12\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.048, 0.691, 0.115, 0.203], \"componentId\": \"C13\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.206, 0.691, 0.117, 0.203], \"componentId\": \"C14\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.368, 0.691, 0.117, 0.203], \"componentId\": \"C15\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.528, 0.691, 0.117, 0.203], \"componentId\": \"C16\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.687, 0.691, 0.115, 0.203], \"componentId\": \"C17\", \"confidence\": 0.98, \"differences\": [{\"category\": \"text\", \"lineIndex\": 0, \"message\": \"末位字符为B，与正品一致；倒数第二位为8，与正品一致。\", \"referenceText\": \"QG5S208B\", \"sampleText\": \"QG5S208B\"}], \"features\": [\"丝印清晰\", \"字符顺序与正品一致\"], \"lines\": [\"QG5S208B\"], \"reason\": \"丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.846, 0.691, 0.115, 0.203], \"componentId\": \"C18\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置\", \"丝印清晰\"], \"lines\": [\"QG5S208B\"], \"reason\": \"元件倒置，按正立方向读取后与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}], \"quality\": {\"reason\": \"\", \"state\": \"usable\"}}"
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 701,
+          "completion_tokens": 2048,
+          "reasoning_tokens": 0
+        },
+        "lmstudio": {
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 29.811259736069072,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 21.38,
+            "promptTokensCount": 701,
+            "predictedTokensCount": 2048,
+            "totalTokensCount": 2749
+          },
+          "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "enable_thinking": false,
+          "stream_fragment_count": 1975
+        }
+      },
+      "elapsedMs": 90397,
+      "model": "hr-qwen",
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "inputLayout": "prefix-first",
+      "provider": "lmstudio",
+      "outputFormat": "json-schema",
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "114fce1e657ea78f621b3147bd1e9153e3d36a1580d9cdbd4ff83f0f1862fe50",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2088158,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "b749f44b0c0d49d51c64bb4255d4894e3691ea72519538781a78787521a4a669",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2664531,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "traceId": "b6ba1d8d-2146-4cd5-89bc-7c326bcc8118",
+      "resourcesBefore": {
+        "availableGiB": 16.42,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 7,
+        "load": [
+          2.6923828125,
+          3.12548828125,
+          2.880859375
+        ]
+      },
+      "resourcesAfter": {
+        "availableGiB": 15.51,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 5.3,
+        "load": [
+          3.33837890625,
+          3.20751953125,
+          2.93505859375
+        ]
+      },
+      "workerPeakRssMiB": 127
+    },
+    "elapsedMs": 91582
+  },
+  {
+    "id": "confusable-pair",
+    "variant": "confirmed",
+    "model": "hr-qwen",
+    "timeoutSeconds": 180,
+    "inputSha256": "763aade2c04f1e51f69c0fae3bda19bf055dda35543accbbb2dc219777bc54e9",
+    "referenceSha256": "ed071d2b36ffd045fdafbb1d29fc701a32cd6eea03e3af62c29f2ebb229e5827",
+    "result": {
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.08,
+            0.25,
+            0.31,
+            0.46
+          ],
+          "reason": "两行丝印与正品逐字符一致，未见差异。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "00I1Z2",
+              "6G8B5S"
+            ],
+            "confidence": 0.98,
+            "reason": "两行丝印与正品逐字符一致，未见差异。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 31410,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0201d756-d280-4d3b-a4f8-6a44dd1a827c.json",
+            "features": [
+              "两行丝印清晰可读",
+              "第一行与第二行字符顺序和字形均与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        },
+        {
+          "index": 1,
+          "bbox": [
+            0.58,
+            0.24,
+            0.31,
+            0.47
+          ],
+          "reason": "元件倒置，按正立方向读取后两行丝印与正品一致。",
+          "ai": {
+            "verdict": "PASS",
+            "lines": [
+              "00I1Z2",
+              "6G8B5S"
+            ],
+            "confidence": 0.98,
+            "reason": "元件倒置，按正立方向读取后两行丝印与正品一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 31410,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0201d756-d280-4d3b-a4f8-6a44dd1a827c.json",
+            "features": [
+              "元件倒置摆放",
+              "按正立方向读取后两行丝印与正品一致"
+            ],
+            "differences": [],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        }
+      ]
+    },
+    "raw": {
+      "taskId": "RESEARCH20261101",
+      "roundId": "24724272-bfb7-469c-ac25-eeb16dc371b2",
+      "photoId": "485cd654-a385-4b7f-8114-380627859504",
+      "sourceHash": "763aade2c04f1e51f69c0fae3bda19bf055dda35543accbbb2dc219777bc54e9",
+      "standardId": "RESEARCH",
+      "standardVersion": 1,
+      "referenceRegions": [],
+      "instructionVersion": 1,
+      "onsiteInstruction": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "role": "assistant",
+              "content": "{\"coverage\": \"complete\", \"instructionConflicts\": [], \"items\": [{\"bbox\": [0.08, 0.25, 0.31, 0.46], \"componentId\": \"C01\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"两行丝印清晰可读\", \"第一行与第二行字符顺序和字形均与正品一致\"], \"lines\": [\"00I1Z2\", \"6G8B5S\"], \"reason\": \"两行丝印与正品逐字符一致，未见差异。\", \"status\": \"decided\", \"verdict\": \"PASS\"}, {\"bbox\": [0.58, 0.24, 0.31, 0.47], \"componentId\": \"C02\", \"confidence\": 0.98, \"differences\": [], \"features\": [\"元件倒置摆放\", \"按正立方向读取后两行丝印与正品一致\"], \"lines\": [\"00I1Z2\", \"6G8B5S\"], \"reason\": \"元件倒置，按正立方向读取后两行丝印与正品一致。\", \"status\": \"decided\", \"verdict\": \"PASS\"}], \"quality\": {\"reason\": \"\", \"state\": \"usable\"}}"
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 707,
+          "completion_tokens": 287,
+          "reasoning_tokens": 0
+        },
+        "lmstudio": {
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 30.127999778081563,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 21.557,
+            "promptTokensCount": 707,
+            "predictedTokensCount": 287,
+            "totalTokensCount": 994
+          },
+          "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "enable_thinking": false,
+          "stream_fragment_count": 279
+        }
+      },
+      "elapsedMs": 31410,
+      "model": "hr-qwen",
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "inputLayout": "prefix-first",
+      "provider": "lmstudio",
+      "outputFormat": "json-schema",
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "3afef01ebadcccc8214a4e47e89cf543d5b92b5635ffa3480cbb893a58add153",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2289869,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "217f18364b91d0fee0e2e33503d71d3aa2483a513d060ab3d528101e66e3ed84",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2780722,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "traceId": "e097a1a3-f269-4e2d-8152-6e8f567e7a29",
+      "resourcesBefore": {
+        "availableGiB": 15.66,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 0,
+        "load": [
+          3.33837890625,
+          3.20751953125,
+          2.93505859375
+        ]
+      },
+      "resourcesAfter": {
+        "availableGiB": 16.27,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 7.5,
+        "load": [
+          3.92724609375,
+          3.37109375,
+          3.00537109375
+        ]
+      },
+      "workerPeakRssMiB": 126.83
+    },
+    "elapsedMs": 32619
+  }
+]

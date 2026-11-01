@@ -1,0 +1,308 @@
+[
+  {
+    "id": "eighteen-two-differences-C08",
+    "variant": "oracle-roi",
+    "model": "hr-qwen",
+    "timeoutSeconds": 180,
+    "inputSha256": "cdfac901ac5dd9f69540862dca73debb044492a8f521b83b2c07712179bd892a",
+    "referenceSha256": "75d2dbc34f8c9e3bd7be2372622172cea90446ccf6d245c0a32597f4c496675a",
+    "oracleSource": "fixtures/inspection/ocr-exploration-v1/eighteen-two-differences.png",
+    "oracleSourceSha256": "69b9200ac57147e2400b99cfc95ccf89aee30a36c75c7e5d03b841ded492f47e",
+    "oracleRoi": [
+      285,
+      365,
+      530,
+      650
+    ],
+    "result": {
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.24,
+            0.18,
+            0.53,
+            0.67
+          ],
+          "reason": "待检元件丝印首字符为数字6，与正品字母Q不一致，其余可见字符一致。",
+          "ai": {
+            "verdict": "FAIL",
+            "lines": [
+              "Q65S208B"
+            ],
+            "confidence": 0.98,
+            "reason": "待检元件丝印首字符为数字6，与正品字母Q不一致，其余可见字符一致。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 21235,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "87a7370b-5629-41d7-a9e8-c9a435f89f00.json",
+            "features": [
+              "丝印为单行字符",
+              "首字符由Q变为6"
+            ],
+            "differences": [
+              {
+                "category": "text",
+                "message": "第1个字符与正品不一致：样品为数字6，正品为字母Q。",
+                "lineIndex": 0,
+                "referenceText": "QG5S208B",
+                "sampleText": "Q65S208B"
+              }
+            ],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        }
+      ]
+    },
+    "raw": {
+      "taskId": "RESEARCH20261101",
+      "roundId": "90a6f1ee-b24a-4193-aad2-53ffc75223da",
+      "photoId": "a98c9435-f5a0-4d07-b26a-dce7ec439ba2",
+      "sourceHash": "cdfac901ac5dd9f69540862dca73debb044492a8f521b83b2c07712179bd892a",
+      "standardId": "RESEARCH",
+      "standardVersion": 1,
+      "referenceRegions": [],
+      "instructionVersion": 1,
+      "onsiteInstruction": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "role": "assistant",
+              "content": "{\"coverage\": \"complete\", \"instructionConflicts\": [], \"items\": [{\"bbox\": [0.24, 0.18, 0.53, 0.67], \"componentId\": \"C01\", \"confidence\": 0.98, \"differences\": [{\"category\": \"text\", \"lineIndex\": 0, \"message\": \"第1个字符与正品不一致：样品为数字6，正品为字母Q。\", \"referenceText\": \"QG5S208B\", \"sampleText\": \"Q65S208B\"}], \"features\": [\"丝印为单行字符\", \"首字符由Q变为6\"], \"lines\": [\"Q65S208B\"], \"reason\": \"待检元件丝印首字符为数字6，与正品字母Q不一致，其余可见字符一致。\", \"status\": \"decided\", \"verdict\": \"FAIL\"}], \"quality\": {\"reason\": \"\", \"state\": \"usable\"}}"
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 701,
+          "completion_tokens": 216,
+          "reasoning_tokens": 0
+        },
+        "lmstudio": {
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 30.710996354828666,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 13.941,
+            "promptTokensCount": 701,
+            "predictedTokensCount": 216,
+            "totalTokensCount": 917
+          },
+          "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "enable_thinking": false,
+          "stream_fragment_count": 211
+        }
+      },
+      "elapsedMs": 21235,
+      "model": "hr-qwen",
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "inputLayout": "prefix-first",
+      "provider": "lmstudio",
+      "outputFormat": "json-schema",
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "114fce1e657ea78f621b3147bd1e9153e3d36a1580d9cdbd4ff83f0f1862fe50",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2088158,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "cdfac901ac5dd9f69540862dca73debb044492a8f521b83b2c07712179bd892a",
+          "sentWidth": 245,
+          "sentHeight": 285,
+          "encodedBytes": 122629,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "traceId": "794417a2-bbac-4ea6-998b-33c49b80bee6",
+      "resourcesBefore": {
+        "availableGiB": 17.94,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 0,
+        "load": [
+          3.16015625,
+          3.24365234375,
+          2.986328125
+        ]
+      },
+      "resourcesAfter": {
+        "availableGiB": 16.43,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 5.4,
+        "load": [
+          3.2294921875,
+          3.25439453125,
+          2.99755859375
+        ]
+      },
+      "workerPeakRssMiB": 94.19
+    },
+    "elapsedMs": 22268
+  },
+  {
+    "id": "eighteen-two-differences-C17",
+    "variant": "oracle-roi",
+    "model": "hr-qwen",
+    "timeoutSeconds": 180,
+    "inputSha256": "ab5bbe089a4ad544b319f606e4a111a96ed892474e904eec1a136ff5f0112200",
+    "referenceSha256": "75d2dbc34f8c9e3bd7be2372622172cea90446ccf6d245c0a32597f4c496675a",
+    "oracleSource": "fixtures/inspection/ocr-exploration-v1/eighteen-two-differences.png",
+    "oracleSourceSha256": "69b9200ac57147e2400b99cfc95ccf89aee30a36c75c7e5d03b841ded492f47e",
+    "oracleRoi": [
+      1030,
+      650,
+      1280,
+      945
+    ],
+    "result": {
+      "qualityReasons": [],
+      "components": [
+        {
+          "index": 0,
+          "bbox": [
+            0.24,
+            0.18,
+            0.53,
+            0.64
+          ],
+          "reason": "丝印清晰可读，前7位与正品一致，末位由8变为B。",
+          "ai": {
+            "verdict": "FAIL",
+            "lines": [
+              "QG5S20BB"
+            ],
+            "confidence": 0.95,
+            "reason": "丝印清晰可读，前7位与正品一致，末位由8变为B。",
+            "instructionVersion": 1,
+            "source": "vlm",
+            "provider": "lmstudio",
+            "model": "hr-qwen",
+            "elapsedMs": 20803,
+            "promptVersion": "silkscreen-whole-photo-v2",
+            "rawRecord": "0508e9b5-f878-4ef4-b131-10dde95a1e36.json",
+            "features": [
+              "单行丝印",
+              "8引脚封装"
+            ],
+            "differences": [
+              {
+                "category": "text",
+                "message": "末位字符与正品不一致：样品为B，正品为8。",
+                "lineIndex": 0,
+                "referenceText": "QG5S208B",
+                "sampleText": "QG5S20BB"
+              }
+            ],
+            "instructionConflicts": [],
+            "instructionWarnings": []
+          }
+        }
+      ]
+    },
+    "raw": {
+      "taskId": "RESEARCH20261101",
+      "roundId": "29a38e77-bdff-4db2-a76c-dcf663de6105",
+      "photoId": "5fad106e-4ffb-4698-bfd0-f1404729adbb",
+      "sourceHash": "ab5bbe089a4ad544b319f606e4a111a96ed892474e904eec1a136ff5f0112200",
+      "standardId": "RESEARCH",
+      "standardVersion": 1,
+      "referenceRegions": [],
+      "instructionVersion": 1,
+      "onsiteInstruction": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "role": "assistant",
+              "content": "{\"coverage\": \"complete\", \"instructionConflicts\": [], \"items\": [{\"bbox\": [0.24, 0.18, 0.53, 0.64], \"componentId\": \"C01\", \"confidence\": 0.95, \"differences\": [{\"category\": \"text\", \"lineIndex\": 0, \"message\": \"末位字符与正品不一致：样品为B，正品为8。\", \"referenceText\": \"QG5S208B\", \"sampleText\": \"QG5S20BB\"}], \"features\": [\"单行丝印\", \"8引脚封装\"], \"lines\": [\"QG5S20BB\"], \"reason\": \"丝印清晰可读，前7位与正品一致，末位由8变为B。\", \"status\": \"decided\", \"verdict\": \"FAIL\"}], \"quality\": {\"reason\": \"\", \"state\": \"usable\"}}"
+            }
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 701,
+          "completion_tokens": 201,
+          "reasoning_tokens": 0
+        },
+        "lmstudio": {
+          "stats": {
+            "stopReason": "eosFound",
+            "tokensPerSecond": 30.816321481385035,
+            "numGpuLayers": -1,
+            "timeToFirstTokenSec": 14.035,
+            "promptTokensCount": 701,
+            "predictedTokensCount": 201,
+            "totalTokensCount": 902
+          },
+          "template_source_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+          "enable_thinking": false,
+          "stream_fragment_count": 196
+        }
+      },
+      "elapsedMs": 20803,
+      "model": "hr-qwen",
+      "promptVersion": "silkscreen-whole-photo-v2",
+      "inputLayout": "prefix-first",
+      "provider": "lmstudio",
+      "outputFormat": "json-schema",
+      "inputMetrics": [
+        {
+          "inputIndex": 0,
+          "sha256": "114fce1e657ea78f621b3147bd1e9153e3d36a1580d9cdbd4ff83f0f1862fe50",
+          "sentWidth": 1536,
+          "sentHeight": 1024,
+          "encodedBytes": 2088158,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        },
+        {
+          "inputIndex": 1,
+          "sha256": "ab5bbe089a4ad544b319f606e4a111a96ed892474e904eec1a136ff5f0112200",
+          "sentWidth": 250,
+          "sentHeight": 295,
+          "encodedBytes": 126072,
+          "effectiveWidth": null,
+          "effectiveHeight": null
+        }
+      ],
+      "traceId": "84be6b57-d5c7-4e42-aff1-3bdda7a59db2",
+      "resourcesBefore": {
+        "availableGiB": 16.52,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 0,
+        "load": [
+          3.2294921875,
+          3.25439453125,
+          2.99755859375
+        ]
+      },
+      "resourcesAfter": {
+        "availableGiB": 16.95,
+        "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+        "cpuThreads": 2,
+        "cpuPercent": 3.2,
+        "load": [
+          3.341796875,
+          3.27099609375,
+          3.00927734375
+        ]
+      },
+      "workerPeakRssMiB": 88.53
+    },
+    "elapsedMs": 21853
+  }
+]

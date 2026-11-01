@@ -1,0 +1,1038 @@
+{
+  "created": "2026-11-01",
+  "purpose": "独立 OCR、方向与定位探索，不是业务验收",
+  "truth_method": "查看实际像素并旋转核对；提示词不当作答案。只评估人工可确定的文字；不确认正品真实性。",
+  "roi_notice": "人工粗框仅用于评估文字归属，以及 oracle ROI 方向实验；不是自动定位结果，不能据此报告定位召回率。",
+  "scenes": [
+    {
+      "id": "scattered-six",
+      "file": "fixtures/inspection/ocr-exploration-v1/scattered-six.png",
+      "sha256": "d2ad0544d211efe555cb250e7d424633cb13ab0feb93ab99e9f4f33a492961b3",
+      "size": [
+        1536,
+        1024
+      ],
+      "source": "synthetic-imagegen",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            130,
+            95,
+            525,
+            465
+          ],
+          "primary": "SV358",
+          "required": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "reference": "SV358"
+        },
+        {
+          "id": "C02",
+          "roi": [
+            545,
+            100,
+            925,
+            470
+          ],
+          "primary": "SV358",
+          "required": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "reference": "SV358"
+        },
+        {
+          "id": "C03",
+          "roi": [
+            1060,
+            120,
+            1380,
+            470
+          ],
+          "primary": "SV358",
+          "required": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "reference": "SV358"
+        },
+        {
+          "id": "C04",
+          "roi": [
+            125,
+            550,
+            475,
+            880
+          ],
+          "primary": "SV358",
+          "required": [
+            "SV358",
+            "A26",
+            "0147"
+          ],
+          "reference": "SV358"
+        },
+        {
+          "id": "C05",
+          "roi": [
+            570,
+            525,
+            945,
+            915
+          ],
+          "primary": "SV358",
+          "required": [
+            "SV358"
+          ],
+          "reference": "SV358",
+          "notes": "生成图片此处没有遵循 A26/0147 提示；实际副行近似 B2287/8148，副行未纳入评分。主行像素已旋转核对为 SV358。"
+        },
+        {
+          "id": "C06",
+          "roi": [
+            1080,
+            535,
+            1410,
+            925
+          ],
+          "primary": "SV385",
+          "required": [
+            "SV385",
+            "A26",
+            "0147"
+          ],
+          "reference": "SV358"
+        }
+      ]
+    },
+    {
+      "id": "tray-thirty",
+      "file": "fixtures/inspection/ocr-exploration-v1/tray-thirty.png",
+      "sha256": "0f8f844d748fedbea12fded24e3fb9ec819c67fdb646103775dea7dfb2f8fe0d",
+      "size": [
+        1536,
+        1024
+      ],
+      "source": "synthetic-imagegen",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            120,
+            70,
+            380,
+            200
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C02",
+          "roi": [
+            380,
+            70,
+            630,
+            200
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C03",
+          "roi": [
+            630,
+            70,
+            880,
+            200
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C04",
+          "roi": [
+            880,
+            70,
+            1120,
+            200
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C05",
+          "roi": [
+            1120,
+            70,
+            1410,
+            200
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C06",
+          "roi": [
+            120,
+            200,
+            380,
+            350
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C07",
+          "roi": [
+            380,
+            200,
+            630,
+            350
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C08",
+          "roi": [
+            630,
+            200,
+            880,
+            350
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C09",
+          "roi": [
+            880,
+            200,
+            1120,
+            350
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C10",
+          "roi": [
+            1120,
+            200,
+            1410,
+            350
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C11",
+          "roi": [
+            120,
+            350,
+            380,
+            500
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C12",
+          "roi": [
+            380,
+            350,
+            630,
+            500
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C13",
+          "roi": [
+            630,
+            350,
+            880,
+            500
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C14",
+          "roi": [
+            880,
+            350,
+            1120,
+            500
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C15",
+          "roi": [
+            1120,
+            350,
+            1410,
+            500
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C16",
+          "roi": [
+            120,
+            500,
+            380,
+            650
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C17",
+          "roi": [
+            380,
+            500,
+            630,
+            650
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C18",
+          "roi": [
+            630,
+            500,
+            880,
+            650
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C19",
+          "roi": [
+            880,
+            500,
+            1120,
+            650
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C20",
+          "roi": [
+            1120,
+            500,
+            1410,
+            650
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C21",
+          "roi": [
+            120,
+            650,
+            380,
+            810
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C22",
+          "roi": [
+            380,
+            650,
+            630,
+            810
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C23",
+          "roi": [
+            630,
+            650,
+            880,
+            810
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C24",
+          "roi": [
+            880,
+            650,
+            1120,
+            810
+          ],
+          "primary": "J8",
+          "required": [
+            "J8"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C25",
+          "roi": [
+            1120,
+            650,
+            1410,
+            810
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C26",
+          "roi": [
+            120,
+            810,
+            380,
+            965
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C27",
+          "roi": [
+            380,
+            810,
+            630,
+            965
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C28",
+          "roi": [
+            630,
+            810,
+            880,
+            965
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C29",
+          "roi": [
+            880,
+            810,
+            1120,
+            965
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        },
+        {
+          "id": "C30",
+          "roi": [
+            1120,
+            810,
+            1410,
+            965
+          ],
+          "primary": "J3",
+          "required": [
+            "J3"
+          ],
+          "reference": "J3"
+        }
+      ]
+    },
+    {
+      "id": "long-code-pair",
+      "file": "fixtures/inspection/ocr-exploration-v1/long-code-pair.png",
+      "sha256": "755463d21ae7402628384a1806b9170f6a4f77e5ad071d70721fbc68866f8054",
+      "size": [
+        1536,
+        1024
+      ],
+      "source": "synthetic-imagegen",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            220,
+            90,
+            770,
+            600
+          ],
+          "primary": "STM32F103C8T6",
+          "required": [
+            "STM32F103C8T6",
+            "GH27B5",
+            "TWN2426"
+          ],
+          "reference": "STM32F103C8T6"
+        },
+        {
+          "id": "C02",
+          "roi": [
+            770,
+            405,
+            1320,
+            960
+          ],
+          "primary": "STM32F103C8I6",
+          "required": [
+            "STM32F103C8I6",
+            "GH27B5",
+            "TWN2426"
+          ],
+          "reference": "STM32F103C8T6"
+        }
+      ]
+    },
+    {
+      "id": "public-ne555",
+      "file": "fixtures/inspection/ocr-exploration-v1/public/ne555-dip-soic.jpg",
+      "sha256": "f261a13c37d08870f4d495d15bcf83cb40a277dd9f88b773ca6b0b8eb410fd7b",
+      "size": [
+        1624,
+        1296
+      ],
+      "source": "public-photo",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            230,
+            120,
+            1000,
+            710
+          ],
+          "primary": "NE555P",
+          "required": [
+            "NE555P"
+          ],
+          "reference": "NE555P"
+        },
+        {
+          "id": "C02",
+          "roi": [
+            840,
+            710,
+            1320,
+            1130
+          ],
+          "primary": "NE555",
+          "required": [
+            "NE555",
+            "05K",
+            "A419G4"
+          ],
+          "reference": "NE555"
+        }
+      ]
+    },
+    {
+      "id": "public-lm358",
+      "file": "fixtures/inspection/ocr-exploration-v1/public/lm358n.jpg",
+      "sha256": "05183b408b76cb0e6265509ed6081ca9791f818dd9fd7c874735a75610e4ee41",
+      "size": [
+        1250,
+        1000
+      ],
+      "source": "public-photo",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            80,
+            140,
+            1160,
+            840
+          ],
+          "primary": "358N",
+          "required": [
+            "M8706",
+            "LM",
+            "358N"
+          ],
+          "reference": "358N"
+        }
+      ]
+    },
+    {
+      "id": "eighteen-two-differences",
+      "file": "fixtures/inspection/ocr-exploration-v1/eighteen-two-differences.png",
+      "sha256": "69b9200ac57147e2400b99cfc95ccf89aee30a36c75c7e5d03b841ded492f47e",
+      "size": [
+        1536,
+        1024
+      ],
+      "source": "synthetic-imagegen",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            40,
+            90,
+            285,
+            365
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C02",
+          "roi": [
+            285,
+            90,
+            530,
+            365
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C03",
+          "roi": [
+            530,
+            90,
+            780,
+            365
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C04",
+          "roi": [
+            780,
+            90,
+            1030,
+            365
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C05",
+          "roi": [
+            1030,
+            90,
+            1280,
+            365
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C06",
+          "roi": [
+            1280,
+            90,
+            1510,
+            365
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C07",
+          "roi": [
+            40,
+            365,
+            285,
+            650
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C08",
+          "roi": [
+            285,
+            365,
+            530,
+            650
+          ],
+          "primary": "Q65S208B",
+          "required": [
+            "Q65S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C09",
+          "roi": [
+            530,
+            365,
+            780,
+            650
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C10",
+          "roi": [
+            780,
+            365,
+            1030,
+            650
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C11",
+          "roi": [
+            1030,
+            365,
+            1280,
+            650
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C12",
+          "roi": [
+            1280,
+            365,
+            1510,
+            650
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C13",
+          "roi": [
+            40,
+            650,
+            285,
+            945
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C14",
+          "roi": [
+            285,
+            650,
+            530,
+            945
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C15",
+          "roi": [
+            530,
+            650,
+            780,
+            945
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C16",
+          "roi": [
+            780,
+            650,
+            1030,
+            945
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C17",
+          "roi": [
+            1030,
+            650,
+            1280,
+            945
+          ],
+          "primary": "QG5S20BB",
+          "required": [
+            "QG5S20BB"
+          ],
+          "reference": "QG5S208B"
+        },
+        {
+          "id": "C18",
+          "roi": [
+            1280,
+            650,
+            1510,
+            945
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        }
+      ],
+      "reference_file": "fixtures/inspection/ocr-exploration-v1/reference-qg.png",
+      "reference_lines": [
+        "QG5S208B"
+      ]
+    },
+    {
+      "id": "reference-qg",
+      "file": "fixtures/inspection/ocr-exploration-v1/reference-qg.png",
+      "sha256": "75d2dbc34f8c9e3bd7be2372622172cea90446ccf6d245c0a32597f4c496675a",
+      "size": [
+        1536,
+        1024
+      ],
+      "source": "synthetic-imagegen",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            350,
+            200,
+            1140,
+            840
+          ],
+          "primary": "QG5S208B",
+          "required": [
+            "QG5S208B"
+          ],
+          "reference": "QG5S208B"
+        }
+      ]
+    },
+    {
+      "id": "confusable-pair",
+      "file": "fixtures/inspection/ocr-exploration-v1/confusable-pair.png",
+      "sha256": "763aade2c04f1e51f69c0fae3bda19bf055dda35543accbbb2dc219777bc54e9",
+      "size": [
+        1536,
+        1024
+      ],
+      "source": "synthetic-imagegen",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            120,
+            240,
+            610,
+            740
+          ],
+          "primary": "O0I1Z2",
+          "required": [
+            "O0I1Z2",
+            "6G8B5S"
+          ],
+          "reference": "O0I1Z2"
+        },
+        {
+          "id": "C02",
+          "roi": [
+            900,
+            240,
+            1400,
+            780
+          ],
+          "primary": "O0I1Z2",
+          "required": [
+            "O0I1Z2",
+            "6G8B5S"
+          ],
+          "reference": "O0I1Z2"
+        }
+      ],
+      "reference_file": "fixtures/inspection/ocr-exploration-v1/reference-confusables.png",
+      "reference_lines": [
+        "O0I1Z2",
+        "6G8B5S"
+      ],
+      "truth_assurance": "manual-declared-confusable",
+      "notes": "O/0 和 I/1 的形状非常接近；按设计及录入人员声明填写标准。单凭像素无法证明所有字形，单列探索，不纳入像素核验主码正确率。"
+    },
+    {
+      "id": "reference-confusables",
+      "file": "fixtures/inspection/ocr-exploration-v1/reference-confusables.png",
+      "sha256": "ed071d2b36ffd045fdafbb1d29fc701a32cd6eea03e3af62c29f2ebb229e5827",
+      "size": [
+        1536,
+        1024
+      ],
+      "source": "synthetic-imagegen",
+      "parts": [
+        {
+          "id": "C01",
+          "roi": [
+            310,
+            80,
+            1240,
+            920
+          ],
+          "primary": "O0I1Z2",
+          "required": [
+            "O0I1Z2",
+            "6G8B5S"
+          ],
+          "reference": "O0I1Z2"
+        }
+      ],
+      "reference_file": "fixtures/inspection/ocr-exploration-v1/reference-confusables.png",
+      "reference_lines": [
+        "O0I1Z2",
+        "6G8B5S"
+      ],
+      "truth_assurance": "manual-declared-confusable",
+      "notes": "O/0 和 I/1 的形状非常接近；按设计及录入人员声明填写标准。单凭像素无法证明所有字形，单列探索，不纳入像素核验主码正确率。"
+    }
+  ]
+}

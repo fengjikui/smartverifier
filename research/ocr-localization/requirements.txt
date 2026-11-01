@@ -1,0 +1,5 @@
+# 独立研究环境；不添加到生产 requirements.txt。
+rapidocr==3.10.0
+onnxruntime==1.31.1
+Pillow==13.0.0
+psutil==7.2.2
