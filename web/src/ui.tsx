@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { alignText, finalVerdict } from '../../shared/domain';
 import type { ComponentResult, Photo, Verdict } from '../../shared/types';
+import { FocusedComponent } from './component-image';
 
 export function Btn({tone='secondary',className='',...props}:ComponentProps<typeof Button>&{tone?:'primary'|'secondary'|'quiet'|'danger'}){
   return <Button {...props} variant="outline" className={'sv-btn sv-btn-'+tone+' '+className}/>;
@@ -31,10 +32,8 @@ export function Modal({title,description,children,onClose,actions,imageView=fals
   </DialogContent></Dialog>;
 }
 export function PhotoCrop({photo,component}:{photo:Photo;component:ComponentResult}){
-  if(component.viewMode==='original')return <img className="sv-reference" src={photo.preparation?.uprightUrl??photo.url} alt={'待检原始照片，元件 '+component.label+' 由VLM在整图中识别'}/>;
-  if(component.crop)return <div className="sv-crop sv-rectified-crop"><img src={component.crop.url} alt={'元件 '+component.label+' 的转正裁片'}/></div>;
-  const [x,y,w,h]=component.bbox;
-  return <div className="sv-crop" style={{aspectRatio:`${photo.width*w}/${photo.height*h}`}}><img src={photo.url} alt={'元件 '+component.label+' 的图像'} style={{width:100/w+'%',height:100/h+'%',left:-100*x/w+'%',top:-100*y/h+'%'}}/></div>;
+  if(component.viewMode!=='original'&&component.crop)return <div className="sv-crop sv-rectified-crop"><img src={component.crop.url} alt={'元件 '+component.label+' 的转正裁片'}/></div>;
+  return <FocusedComponent photo={photo} component={component}/>;
 }
 export function DiffTable({expected,actual,title='丝印逐行对照',reason}:{expected:string[];actual:string[];title?:string;reason?:string}){
   if(!expected.length)return <section className="sv-panel sv-diff"><h2>实拍丝印识别</h2>{actual.map((line,i)=><p key={i}><code>{line}</code></p>)}<p className="sv-description">正品未录入文字转写，本次依据正品图片比对。</p>{reason?<p>{reason}</p>:null}</section>;

@@ -8,11 +8,13 @@ import { useImageWheel } from './use-image-wheel';
 import { zoomAt } from '../../shared/image-editor';
 import type { Point, View } from '../../shared/image-editor';
 import './image-viewer.css';
+import { ComponentOverlay } from './component-image';
+import type { ComponentAnnotations } from './component-image';
 
 /** 可查看原始像素的公共组件；浏览变换不写回文件或区域坐标。 */
-interface ZoomImageProps {src:string;alt:string;regions?:ReferenceRegion[];width?:number;height?:number}
+interface ZoomImageProps {src:string;alt:string;regions?:ReferenceRegion[];width?:number;height?:number;annotations?:ComponentAnnotations}
 export function ZoomImage(props:ZoomImageProps){return <ZoomImageContent key={props.src} {...props}/>;}
-function ZoomImageContent({src,alt,regions=[],width,height}:ZoomImageProps){
+function ZoomImageContent({src,alt,regions=[],width,height,annotations}:ZoomImageProps){
  const [element,setElement]=useState<HTMLDivElement|null>(null),area=useRef<HTMLDivElement>(null),bindArea=useCallback((node:HTMLDivElement|null)=>{area.current=node;setElement(node);},[]),[size,setSize]=useState<{width:number;height:number}|null>(null),[view,setView]=useState<View>({x:0,y:0,scale:1}),[fitScale,setFitScale]=useState(1),[error,setError]=useState(false);
  // 缓存命中时 load 可能早于普通 effect；挂载时也读取 naturalSize，不再用 effect 重置成 1×1。
  const readImage=useCallback((image:HTMLImageElement|null)=>{if(!image?.complete||!image.naturalWidth||!image.naturalHeight)return;const next={width:image.naturalWidth,height:image.naturalHeight};setSize(old=>old?.width===next.width&&old.height===next.height?old:next);setError(false);},[]);
@@ -30,5 +32,5 @@ function ZoomImageContent({src,alt,regions=[],width,height}:ZoomImageProps){
  onPointerDown={e=>{if(e.button!==0)return;e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);const p=point(e);pointers.current.set(e.pointerId,p);if(pointers.current.size>1)startGesture();else drag.current={view:{...view},point:p};}}
  onPointerMove={e=>{if(!pointers.current.has(e.pointerId))return;const p=point(e);pointers.current.set(e.pointerId,p);const g=gesture.current;if(g&&pointers.current.size>=2){const [a,b]=[...pointers.current.values()];setView(pinchView(g,a,b));}else if(drag.current){const d=drag.current;setView({...d.view,x:d.view.x+p.x-d.point.x,y:d.view.y+p.y-d.point.y});}}}
  onPointerUp={e=>end(e.pointerId)} onPointerCancel={e=>end(e.pointerId)}>
- <div className="sv-zoom-stage" style={{width:size?.width??1,height:size?.height??1,visibility:size?'visible':'hidden',transform:`translate3d(${view.x}px,${view.y}px,0) scale(${view.scale}) translate(-50%,-50%)`}}><img ref={readImage} draggable={false} src={src} alt={alt} onLoad={e=>readImage(e.currentTarget)} onError={()=>setError(true)}/>{regions.length&&size?<RegionOverlay regions={regions} width={size.width} height={size.height}/>:null}</div>{error?<p role="alert">图片未能加载，请重新打开。</p>:!size?<p role="status">正在加载图片…</p>:null}</div></div>;
+ <div className="sv-zoom-stage" style={{width:size?.width??1,height:size?.height??1,visibility:size?'visible':'hidden',transform:`translate3d(${view.x}px,${view.y}px,0) scale(${view.scale}) translate(-50%,-50%)`}}><img ref={readImage} draggable={false} src={src} alt={alt} onLoad={e=>readImage(e.currentTarget)} onError={()=>setError(true)}/>{regions.length&&size?<RegionOverlay regions={regions} width={size.width} height={size.height}/>:null}{annotations&&size?<ComponentOverlay {...annotations} width={size.width} height={size.height} scale={view.scale}/>:null}</div>{error?<p role="alert">图片未能加载，请重新打开。</p>:!size?<p role="status">正在加载图片…</p>:null}</div></div>;
 }

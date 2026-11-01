@@ -1,10 +1,11 @@
-import { apiPath, assetPath } from '../../shared/paths';
+import { apiPath } from '../../shared/paths';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { finalVerdict, isVlmJudgement } from '../../shared/domain';
-import { sampleMarker } from '../../shared/sample-presets';
+import { componentNumbers } from '../../shared/component-view';
 import type { ComponentResult, Person, Photo, Round, Summary, Task } from '../../shared/types';
 import { ComponentNavigator } from './component-navigator';
+import { AnnotatedPhoto } from './component-image';
 import { Btn, DiffTable, PhotoPill, Pill, VerdictPill } from './ui';
 
 const photoName=(p:Photo)=>'P'+String(p.sequence).padStart(3,'0');
@@ -17,6 +18,7 @@ export function InspectionReport({round,summary,task,person,onOriginal}: {
   const main=useRef<HTMLElement>(null),navigation=useRef<HTMLDivElement>(null);
   const sections=useRef(new Map<string,HTMLElement>()),pendingJump=useRef<string|null>(null);
   const entries=round.photos.flatMap(photo=>photo.components.map(component=>({photo,component})));
+  const numbers=componentNumbers(round.photos);
   const instructionNotices=[...new Set(entries.flatMap(({component:c})=>[...(c.ai?.instructionConflicts??[]),...(c.ai?.instructionWarnings??[])]))];
   const active=entries.find(entry=>entry.component.id===selected&&entry.component.ai)??entries.find(entry=>entry.component.ai);
 
@@ -48,9 +50,9 @@ export function InspectionReport({round,summary,task,person,onOriginal}: {
     </div>
     {round.photos.map(photo=><section key={photo.id} className="sv-report-photo">
       <div className="sv-report-photo-heading"><h2>照片 {photoName(photo)} · {photo.components.length}个元件</h2><PhotoPill photo={photo}/></div>
-      <ReportOriginal photo={photo} onOpen={()=>onOriginal(photo)}/>
+      <ReportOriginal photo={photo} numbers={numbers} onOpen={()=>onOriginal(photo)}/>
       {photo.components.filter(component=>component.ai).map(component=><section key={component.id} tabIndex={-1} data-report-component={component.id} ref={node=>{if(node)sections.current.set(component.id,node);else sections.current.delete(component.id);}} className={'sv-report-component sv-report-entry'+(component.id===active?.component.id?' is-selected':'')} aria-label={component.label+'的检查结果'}>
-        <div className="sv-report-component-heading"><h3>{component.label}</h3><VerdictPill verdict={finalVerdict(component)}/>{component.review?<Pill>人工已修正</Pill>:component.ai!.confidence<.8?<Pill tone="warning">建议按需复核</Pill>:null}</div>
+        <div className="sv-report-component-heading"><h3>元件 {numbers.get(component.id)} · 照片 {photoName(photo)}</h3><VerdictPill verdict={finalVerdict(component)}/>{component.review?<Pill>人工已修正</Pill>:component.ai!.confidence<.8?<Pill tone="warning">建议按需复核</Pill>:null}</div>
         <ReportEvidence component={component} expected={round.standard.lines}/>
       </section>)}{photo.message?<p className="sv-description">{photo.message}</p>:null}
     </section>)}
@@ -62,8 +64,6 @@ function ReportEvidence({component,expected}:{component:ComponentResult;expected
   return <><DiffTable expected={expected} actual={component.ai!.lines} title="丝印文字对照" reason={component.review?'AI原识别差异保留；最终以人工核对结果为准。':component.ai!.reason}/><p className="sv-description">AI判断把握 {Math.round(component.ai!.confidence*100)}%{isVlmJudgement(component.ai)?'（模型自评，非校准概率）':'（样例预设）'}</p>{isVlmJudgement(component.ai)?<details className="sv-report-model-detail"><summary>模型与外观特征</summary><p>{component.ai!.model} · {((component.ai!.elapsedMs??0)/1000).toFixed(1)}秒</p><p>{component.ai!.features?.join('；')}</p></details>:null}{component.review?<p className="sv-review-record">{component.review.person.name} · {component.review.reason} · AI原判{component.ai!.verdict==='PASS'?'合格':'不合格'}保留</p>:null}</>;
 }
 
-function ReportOriginal({photo,onOpen}:{photo:Photo;onOpen:()=>void}) {
-  return <div className="sv-report-original"><button className="sv-report-original-button" onClick={onOpen} aria-label={'查看照片 '+photoName(photo)+' 原图'}><img src={photo.preparation?.annotatedUrl??photo.url} alt={(photo.preparation&&photo.preparation.mode!=='original'?'元件定位与编号 ':'原始照片 ')+photoName(photo)} loading="lazy"/></button>
-    {photo.sample==='four'?<div className="sv-sample-annotations">{[0,1,2,3].map(i=><img key={i} src={assetPath('report-frame'+(i?i:'')+'.svg')} width="626" height="310" alt=""/>)}{photo.components.map(c=><span key={c.id} className={'sv-sample-label label-'+c.index}>{String(c.index+1).padStart(2,'0')}</span>)}</div>:photo.sample==='twenty'?<svg className="sv-many-annotations" viewBox={`0 0 ${photo.width} ${photo.height}`} aria-label="20个元件的编号标记">{photo.components.map(c=>{const marker=sampleMarker(photo,c.index);return <g key={c.id} className={!c.ai?'is-pending':finalVerdict(c)==='FAIL'?'is-fail':'is-pass'}><rect x={marker.x} y={marker.y} width="152" height="100" rx="12"/><text x={marker.x+76} y={marker.y+74} textAnchor="middle">{String(c.index+1).padStart(2,'0')}</text></g>;})}</svg>:null}
-  </div>;
+function ReportOriginal({photo,numbers,onOpen}:{photo:Photo;numbers:Map<string,string>;onOpen:()=>void}) {
+  return <div className="sv-report-original"><button className="sv-report-original-button" onClick={onOpen} aria-label={'查看照片 '+photoName(photo)+' 原图'}><AnnotatedPhoto photo={photo} numbers={numbers}/></button></div>;
 }

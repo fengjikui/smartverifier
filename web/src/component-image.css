@@ -1,0 +1,8 @@
+.sv-focused-component,.sv-annotated-photo{display:block;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}
+.sv-component-overlay{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.sv-component-mark{color:var(--success);pointer-events:none}.sv-component-mark.is-fail{color:var(--brand)}.sv-component-mark.is-pending{color:var(--muted)}
+.sv-component-outline{fill:none;stroke:currentColor}.sv-component-halo{fill:none;stroke:var(--paper)}.sv-component-leader{fill:none;stroke:currentColor}
+.sv-component-number-bg{fill:currentColor;stroke:var(--paper)}.sv-component-badge text{fill:var(--paper);font-family:inherit;font-weight:600;font-variant-numeric:tabular-nums}
+.sv-component-hit{fill:transparent;stroke:none}.sv-component-badge.is-actionable{cursor:pointer;pointer-events:auto;touch-action:manipulation;outline:none}
+.sv-component-badge.is-actionable:hover .sv-component-number-bg,.sv-component-badge.is-actionable:focus-visible .sv-component-number-bg{stroke:var(--ink);paint-order:stroke fill}
+.sv-original-key{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:12px;line-height:1.6}.sv-original-key span{display:inline-flex;align-items:center;gap:6px}.sv-original-key i{width:8px;height:8px;border-radius:50%;background:var(--success)}.sv-original-key .is-fail i{background:var(--brand)}.sv-original-key .is-pending i{background:var(--muted)}
