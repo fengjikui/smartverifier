@@ -1,0 +1,8 @@
+# 本轮实际版本；仅 Apple Silicon 独立研究环境。
+mlx==0.32.4
+mlx-vlm==0.7.11
+transformers==5.22.1
+huggingface-hub==2.4.0
+Pillow==13.0.0
+psutil==7.2.2
+socksio==1.0.0

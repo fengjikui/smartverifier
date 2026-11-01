@@ -1,0 +1,17 @@
+{
+  "purpose": "程序排字阳性对照，非元件照片，不纳入元件准确度",
+  "lines": [
+    "SV358",
+    "SV385",
+    "QG5S208B",
+    "Q65S208B",
+    "O0I1Z2",
+    "6G8B5S"
+  ],
+  "font": "macOS Menlo regular, 62px",
+  "size": [
+    1200,
+    800
+  ],
+  "sha256": "d88db02f004ad509c244cf5fad1107d53f7e714330644a7e2fe35873c134f81c"
+}

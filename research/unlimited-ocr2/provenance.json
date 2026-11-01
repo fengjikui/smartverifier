@@ -1,0 +1,33 @@
+{
+  "official_model": "baidu/Unlimited-OCR-2",
+  "official_revision": "c14071b549f4fcab10909f3c4acc6a2edb366947",
+  "mlx_model": "mlx-community/Unlimited-OCR-2-bf16",
+  "mlx_revision": "850d1e483f5a82a0597f0a45aac31b07ba840df2",
+  "precision": "BF16, no quantization",
+  "runtime": {
+    "mlx-vlm": "0.7.11",
+    "mlx": "0.32.4",
+    "transformers": "5.22.1"
+  },
+  "runtime_source_hashes": {
+    "config.py": "813d056f5e18ead38b32ffa09b6592d89a03996a9b2ea5b0afa83d2694948a21",
+    "processing_unlimitedocr.py": "3f6c8b78c7c269e410f79c89fdd384e6f90c8a8d8a0843f27b5e663de2c82222",
+    "__init__.py": "8361c871b9521be7adde7aebd4e98b63fa695fe74b27df32d45e9015923a13d7",
+    "dash.py": "aa26c89bac3e57be0247b8deb287a54b089548ee88f21c833cbf4f104cf43820",
+    "language.py": "df4370d3e077607bca75f132107bd4ebe173cffce52e19e78adfa3af8fa05faf",
+    "unlimitedocr.py": "e9a90c39a11eaf35223b4909e9133dd846739950679ca1cf31bdc64cc4d50b1b"
+  },
+  "paper": "https://arxiv.org/abs/2610.39308",
+  "official_code": "https://github.com/baidu/Unlimited-OCR",
+  "license": "MIT",
+  "fixture_manifest_sha256": "95f5d7b74569ad9b2c3cf7d7bd4b071da869bc0873ac843a3fd54b6898a64529",
+  "model_card_url": "https://huggingface.co/mlx-community/Unlimited-OCR-2-bf16/blob/850d1e483f5a82a0597f0a45aac31b07ba840df2/README.md",
+  "model_card_sha256": "f0dabd2dc621bafe5e85ae7790071b0e7d10696976615c24230aeea5614f5ad9",
+  "model_card_checked_facts": [
+    "基座为 baidu/Unlimited-OCR-2",
+    "BF16 转换、未量化",
+    "单页默认全局 1024、局部 640、最多 16 块",
+    "原生 DASH 注意力，当前依赖实现文件哈希见上"
+  ],
+  "official_parameter_count": 3343978497
+}

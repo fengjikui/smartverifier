@@ -1,0 +1,968 @@
+{
+  "smoke": {
+    "file": "smoke.json",
+    "cases": 2,
+    "completed_cases": 2,
+    "pixel_verified_appearances": 1,
+    "complete_primary_count_matches": 1,
+    "anomaly_codes_total": 0,
+    "complete_anomaly_code_matches": 0,
+    "roi_all_required_exact": null,
+    "metric": "整图全文完整主码计数，不证明元件归属",
+    "completed_wall_seconds_median": 5.595698042074218,
+    "mlx_peak_gib_max": 7.5676608150824904,
+    "cases_detail": [
+      {
+        "id": "text-positive-control",
+        "state": "complete",
+        "wall_seconds": 10.07479662494734,
+        "first_text_seconds": 8.835571417119354,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 1,
+            "SV385": 1,
+            "QG5S208B": 1,
+            "Q65S208B": 1,
+            "O0I1Z2": 1,
+            "6G8B5S": 1
+          },
+          "observed_code_counts": {
+            "SV358": 1,
+            "SV385": 1,
+            "QG5S208B": 1,
+            "Q65S208B": 1,
+            "00I1Z2": 1,
+            "G8B5S": 1
+          },
+          "primary_count_matches": 4,
+          "primary_count_total": 6,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "reference-qg",
+        "state": "complete",
+        "wall_seconds": 1.1165994592010975,
+        "first_text_seconds": 0.7235155422240496,
+        "score": {
+          "expected_primary_counts": {
+            "QG5S208B": 1
+          },
+          "observed_code_counts": {
+            "QG5S208B": 1
+          },
+          "primary_count_matches": 1,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": true,
+          "all_required_exact": true,
+          "false_reference_transcription": false
+        },
+        "error": null
+      }
+    ]
+  },
+  "whole": {
+    "file": "whole.json",
+    "cases": 9,
+    "completed_cases": 9,
+    "pixel_verified_appearances": 60,
+    "complete_primary_count_matches": 1,
+    "anomaly_codes_total": 5,
+    "complete_anomaly_code_matches": 0,
+    "roi_all_required_exact": null,
+    "metric": "整图全文完整主码计数，不证明元件归属",
+    "completed_wall_seconds_median": 1.0847995416261256,
+    "mlx_peak_gib_max": 7.936419145204127,
+    "cases_detail": [
+      {
+        "id": "scattered-six",
+        "state": "complete",
+        "wall_seconds": 1.2439660001546144,
+        "first_text_seconds": 1.073150749783963,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 5,
+            "SV385": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 6,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "tray-thirty",
+        "state": "complete",
+        "wall_seconds": 0.9238539580255747,
+        "first_text_seconds": 0.7443596660159528,
+        "score": {
+          "expected_primary_counts": {
+            "J3": 29,
+            "J8": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 30,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "long-code-pair",
+        "state": "complete",
+        "wall_seconds": 0.8173153339885175,
+        "first_text_seconds": 0.650607249699533,
+        "score": {
+          "expected_primary_counts": {
+            "STM32F103C8T6": 1,
+            "STM32F103C8I6": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 2,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "public-ne555",
+        "state": "complete",
+        "wall_seconds": 1.3548292079940438,
+        "first_text_seconds": 1.1863025831989944,
+        "score": {
+          "expected_primary_counts": {
+            "NE555P": 1,
+            "NE555": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 2,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "public-lm358",
+        "state": "complete",
+        "wall_seconds": 1.2472794582135975,
+        "first_text_seconds": 1.0922074997797608,
+        "score": {
+          "expected_primary_counts": {
+            "358N": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "eighteen-two-differences",
+        "state": "complete",
+        "wall_seconds": 3.728204208891839,
+        "first_text_seconds": 0.7121232920326293,
+        "score": {
+          "expected_primary_counts": {
+            "QG5S208B": 16,
+            "Q65S208B": 1,
+            "QG5S20BB": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 18,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 2,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "reference-qg",
+        "state": "complete",
+        "wall_seconds": 1.0847995416261256,
+        "first_text_seconds": 0.695469249971211,
+        "score": {
+          "expected_primary_counts": {
+            "QG5S208B": 1
+          },
+          "observed_code_counts": {
+            "QG5S208B": 1
+          },
+          "primary_count_matches": 1,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": true,
+          "all_required_exact": true,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "confusable-pair",
+        "state": "complete",
+        "wall_seconds": 1.0255016246810555,
+        "first_text_seconds": 0.6967761656269431,
+        "score": {
+          "expected_primary_counts": {
+            "O0I1Z2": 2
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 2,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "reference-confusables",
+        "state": "complete",
+        "wall_seconds": 0.9479749999009073,
+        "first_text_seconds": 0.6842146250419319,
+        "score": {
+          "expected_primary_counts": {
+            "O0I1Z2": 1
+          },
+          "observed_code_counts": {
+            "001172": 1,
+            "6G8B5S": 1
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      }
+    ]
+  },
+  "roi": {
+    "file": "roi.json",
+    "cases": 16,
+    "completed_cases": 16,
+    "pixel_verified_appearances": 14,
+    "complete_primary_count_matches": 4,
+    "anomaly_codes_total": 5,
+    "complete_anomaly_code_matches": 2,
+    "roi_all_required_exact": 3,
+    "metric": "人工 ROI 完整主码",
+    "completed_wall_seconds_median": 0.5386756670195609,
+    "mlx_peak_gib_max": 7.5676608150824904,
+    "cases_detail": [
+      {
+        "id": "scattered-six-C01",
+        "state": "complete",
+        "wall_seconds": 1.1513921660371125,
+        "first_text_seconds": 0.5790351247414947,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 1
+          },
+          "observed_code_counts": {
+            "SV358": 1,
+            "A26": 1,
+            "0147": 1
+          },
+          "primary_count_matches": 1,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": true,
+          "all_required_exact": true,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "scattered-six-C03",
+        "state": "complete",
+        "wall_seconds": 1.0136041659861803,
+        "first_text_seconds": 0.33258666563779116,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 1
+          },
+          "observed_code_counts": {
+            "SY358": 1,
+            "A26": 1,
+            "0147": 1
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "scattered-six-C04",
+        "state": "complete",
+        "wall_seconds": 0.5370030421763659,
+        "first_text_seconds": 0.36223962530493736,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "scattered-six-C05",
+        "state": "complete",
+        "wall_seconds": 0.49299150006845593,
+        "first_text_seconds": 0.3063058750703931,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "scattered-six-C06",
+        "state": "complete",
+        "wall_seconds": 0.4831037921831012,
+        "first_text_seconds": 0.30275545781478286,
+        "score": {
+          "expected_primary_counts": {
+            "SV385": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "tray-thirty-C01",
+        "state": "complete",
+        "wall_seconds": 0.540348291862756,
+        "first_text_seconds": 0.3765991246327758,
+        "score": {
+          "expected_primary_counts": {
+            "J3": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "tray-thirty-C06",
+        "state": "complete",
+        "wall_seconds": 0.5107577913440764,
+        "first_text_seconds": 0.32190170837566257,
+        "score": {
+          "expected_primary_counts": {
+            "J3": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "tray-thirty-C24",
+        "state": "complete",
+        "wall_seconds": 0.49505637492984533,
+        "first_text_seconds": 0.31510954117402434,
+        "score": {
+          "expected_primary_counts": {
+            "J8": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "long-code-pair-C01",
+        "state": "complete",
+        "wall_seconds": 0.5262519167736173,
+        "first_text_seconds": 0.35514195868745446,
+        "score": {
+          "expected_primary_counts": {
+            "STM32F103C8T6": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "long-code-pair-C02",
+        "state": "complete",
+        "wall_seconds": 0.9420868749730289,
+        "first_text_seconds": 0.3029264588840306,
+        "score": {
+          "expected_primary_counts": {
+            "STM32F103C8I6": 1
+          },
+          "observed_code_counts": {
+            "STM32F101CBCE1": 2,
+            "5H2C7B5": 1,
+            "2H2": 1
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "public-ne555-C02",
+        "state": "complete",
+        "wall_seconds": 0.4654279579408467,
+        "first_text_seconds": 0.3106248746626079,
+        "score": {
+          "expected_primary_counts": {
+            "NE555": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "public-lm358-C01",
+        "state": "complete",
+        "wall_seconds": 1.3809962500818074,
+        "first_text_seconds": 0.6907792082056403,
+        "score": {
+          "expected_primary_counts": {
+            "358N": 1
+          },
+          "observed_code_counts": {
+            "MB706": 1,
+            "LM": 1,
+            "358N": 1
+          },
+          "primary_count_matches": 1,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": true,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "eighteen-two-differences-C08",
+        "state": "complete",
+        "wall_seconds": 0.52064587501809,
+        "first_text_seconds": 0.31542591704055667,
+        "score": {
+          "expected_primary_counts": {
+            "Q65S208B": 1
+          },
+          "observed_code_counts": {
+            "Q65S208B": 1
+          },
+          "primary_count_matches": 1,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 1,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": true,
+          "all_required_exact": true,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "eighteen-two-differences-C17",
+        "state": "complete",
+        "wall_seconds": 0.5620350004173815,
+        "first_text_seconds": 0.3479949999600649,
+        "score": {
+          "expected_primary_counts": {
+            "QG5S20BB": 1
+          },
+          "observed_code_counts": {
+            "QG5S20BB": 1
+          },
+          "primary_count_matches": 1,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 1,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": true,
+          "all_required_exact": true,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "confusable-pair-C01",
+        "state": "complete",
+        "wall_seconds": 0.5694771660491824,
+        "first_text_seconds": 0.31533804116770625,
+        "score": {
+          "expected_primary_counts": {
+            "O0I1Z2": 1
+          },
+          "observed_code_counts": {
+            "001172": 1,
+            "668B55": 1
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "confusable-pair-C02",
+        "state": "complete",
+        "wall_seconds": 0.7510761669836938,
+        "first_text_seconds": 0.3507010000757873,
+        "score": {
+          "expected_primary_counts": {
+            "O0I1Z2": 1
+          },
+          "observed_code_counts": {
+            "0011272": 1
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      }
+    ]
+  },
+  "upright": {
+    "file": "upright.json",
+    "cases": 3,
+    "completed_cases": 3,
+    "pixel_verified_appearances": 3,
+    "complete_primary_count_matches": 0,
+    "anomaly_codes_total": 1,
+    "complete_anomaly_code_matches": 0,
+    "roi_all_required_exact": 0,
+    "metric": "人工 ROI 完整主码",
+    "completed_wall_seconds_median": 0.5986801250837743,
+    "mlx_peak_gib_max": 7.085920850746334,
+    "cases_detail": [
+      {
+        "id": "scattered-six-C03",
+        "state": "complete",
+        "wall_seconds": 0.7017884170636535,
+        "first_text_seconds": 0.5243192501366138,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "scattered-six-C04",
+        "state": "complete",
+        "wall_seconds": 0.5986801250837743,
+        "first_text_seconds": 0.4395669582299888,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 0,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      },
+      {
+        "id": "long-code-pair-C02",
+        "state": "complete",
+        "wall_seconds": 0.5186807499267161,
+        "first_text_seconds": 0.3540305416099727,
+        "score": {
+          "expected_primary_counts": {
+            "STM32F103C8I6": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 1,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。",
+          "primary_exact": false,
+          "all_required_exact": false,
+          "false_reference_transcription": false
+        },
+        "error": null
+      }
+    ]
+  },
+  "plain-prompt": {
+    "file": "plain-prompt.json",
+    "cases": 3,
+    "completed_cases": 1,
+    "pixel_verified_appearances": 54,
+    "complete_primary_count_matches": 0,
+    "anomaly_codes_total": 4,
+    "complete_anomaly_code_matches": 0,
+    "roi_all_required_exact": null,
+    "metric": "整图全文完整主码计数，不证明元件归属",
+    "completed_wall_seconds_median": 0.7485449998639524,
+    "mlx_peak_gib_max": 7.567661420442164,
+    "cases_detail": [
+      {
+        "id": "scattered-six",
+        "state": "truncated",
+        "wall_seconds": 22.35598154179752,
+        "first_text_seconds": 0.7817892916500568,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 5,
+            "SV385": 1
+          },
+          "observed_code_counts": {
+            "DO": 342,
+            "NOT": 342,
+            "USE": 341,
+            "ANY": 341,
+            "CHARACTERS": 341
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 6,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": false,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "tray-thirty",
+        "state": "complete",
+        "wall_seconds": 0.7485449998639524,
+        "first_text_seconds": null,
+        "score": {
+          "expected_primary_counts": {
+            "J3": 29,
+            "J8": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 30,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "eighteen-two-differences",
+        "state": "truncated",
+        "wall_seconds": 22.043536541983485,
+        "first_text_seconds": 0.6792305000126362,
+        "score": {
+          "expected_primary_counts": {
+            "QG5S208B": 16,
+            "Q65S208B": 1,
+            "QG5S20BB": 1
+          },
+          "observed_code_counts": {
+            "DO": 342,
+            "NOT": 342,
+            "GUESS": 341,
+            "MISSING": 341,
+            "CHARACTERS": 341
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 18,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 2,
+          "complete_output": false,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      }
+    ]
+  },
+  "free-ocr": {
+    "file": "free-ocr.json",
+    "cases": 2,
+    "completed_cases": 2,
+    "pixel_verified_appearances": 24,
+    "complete_primary_count_matches": 0,
+    "anomaly_codes_total": 3,
+    "complete_anomaly_code_matches": 0,
+    "roi_all_required_exact": null,
+    "metric": "整图全文完整主码计数，不证明元件归属",
+    "completed_wall_seconds_median": 2.4986012915614992,
+    "mlx_peak_gib_max": 7.469271767884493,
+    "cases_detail": [
+      {
+        "id": "scattered-six",
+        "state": "complete",
+        "wall_seconds": 1.0804085000418127,
+        "first_text_seconds": 0.9201061669737101,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 5,
+            "SV385": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 6,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "eighteen-two-differences",
+        "state": "complete",
+        "wall_seconds": 3.916794083081186,
+        "first_text_seconds": 0.7779202503152192,
+        "score": {
+          "expected_primary_counts": {
+            "QG5S208B": 16,
+            "Q65S208B": 1,
+            "QG5S20BB": 1
+          },
+          "observed_code_counts": {},
+          "primary_count_matches": 0,
+          "primary_count_total": 18,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 2,
+          "complete_output": true,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      }
+    ]
+  },
+  "grounding-ocr": {
+    "file": "grounding-ocr.json",
+    "cases": 2,
+    "completed_cases": 0,
+    "pixel_verified_appearances": 24,
+    "complete_primary_count_matches": 0,
+    "anomaly_codes_total": 3,
+    "complete_anomaly_code_matches": 0,
+    "roi_all_required_exact": null,
+    "metric": "整图全文完整主码计数，不证明元件归属",
+    "completed_wall_seconds_median": null,
+    "mlx_peak_gib_max": 7.5676608979702,
+    "cases_detail": [
+      {
+        "id": "scattered-six",
+        "state": "truncated",
+        "wall_seconds": 21.66511504072696,
+        "first_text_seconds": 0.7746324157342315,
+        "score": {
+          "expected_primary_counts": {
+            "SV358": 5,
+            "SV385": 1
+          },
+          "observed_code_counts": {
+            "IMAGE": 28,
+            "375": 16,
+            "128": 16,
+            "582": 15,
+            "430": 15,
+            "ANGLE": 7,
+            "725": 12,
+            "149": 12,
+            "868": 12,
+            "420": 12,
+            "1": 22
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 6,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 1,
+          "complete_output": false,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      },
+      {
+        "id": "eighteen-two-differences",
+        "state": "truncated",
+        "wall_seconds": 21.333812250290066,
+        "first_text_seconds": 0.748735792003572,
+        "score": {
+          "expected_primary_counts": {
+            "QG5S208B": 16,
+            "Q65S208B": 1,
+            "QG5S20BB": 1
+          },
+          "observed_code_counts": {
+            "IMAGE": 1,
+            "686": 1,
+            "121": 1,
+            "800": 1
+          },
+          "primary_count_matches": 0,
+          "primary_count_total": 18,
+          "anomaly_code_matches": 0,
+          "anomaly_code_total": 2,
+          "complete_output": false,
+          "metric_notice": "全文完整主码计数；不证明文字属于正确元件，也不生成检验结论。"
+        },
+        "error": null
+      }
+    ]
+  }
+}
