@@ -15,6 +15,8 @@ export { ApiError } from './errors.ts';
 import { mockTask, mockReferenceId } from './mes/mock.ts';
 import type { TaskPage } from '../shared/catalog.ts';
 import { Registry } from './admin/registry.ts';
+import { photoPolicy, admitPhotoTime } from './photo-policy.ts';
+import type { PhotoPolicy } from '../shared/types.ts';
 export const person: Person = { id: 'QA018', name: '王敏' };
 const now = () => new Date().toISOString();
 const sampleFiles: Record<SampleKind, string> = { pass: 'reference.png', fail: 'mismatch.png', four: 'four-components.png', twenty: 'twenty-components.png', quality: 'reference.png' };
@@ -23,7 +25,9 @@ function escapeMarkdown(s: string) { return s.replace(/[\\`*_{}\[\]<>#!|]/g, '\\
 
 export class InspectionService {
   store: Store; registry: Registry; directory: string; root: string; interval: number; queue: string[] = []; worker = false; closing = false; vision?:VisionPipeline;
-  constructor(directory: string, root: string, interval = 1200, vision?:VisionPipeline) {
+  photoPolicy:PhotoPolicy;
+  constructor(directory: string, root: string, interval = 1200, vision?:VisionPipeline, policy:PhotoPolicy=photoPolicy()) {
+    this.photoPolicy=policy;
     this.directory = directory; this.root = root; this.interval = interval; this.store = new Store(directory); this.registry = new Registry(this.store);
     this.vision=vision;
     if (!this.store.tasks().length) for (const [id, material, supplier] of [['IQCF26090500016', 'MAT-358-08', '华信电子'], ['IQCF26090500017', 'MAT-358-08', '华信电子'], ['IQCF26090500018', 'MAT-725-16', '远成电子']]) this.store.saveTask({ id, number: id, material, supplier, modelNumber:material==='MAT-358-08'?'SV358':'', standard: material === 'MAT-358-08' ? standard : null, roundId: null, effectiveRoundId: null });
@@ -107,21 +111,32 @@ export class InspectionService {
     return r;
   }
   saveMutation(r: Round) { r.revision++; r.transfer = null; r.status = r.photos.length && r.photos.every(p => p.status === 'ready') ? 'ready' : 'draft'; this.store.saveRound(r); return this.view(r.taskId); }
-  async addPhoto(id: string, revision: number, input: { bytes: Buffer; filename: string; width: number; height: number; sample?: SampleKind; replaceId?: string; clientId?: string }, actor: Person): Promise<TaskView> {
-    if (input.clientId && this.round(id).photos.some(p => p.uploadKey === input.clientId)) return this.view(this.round(id).taskId);
+  async addPhoto(id: string, revision: number, input: { bytes: Buffer; filename: string; width: number; height: number; sample?: SampleKind; replaceId?: string; clientId?: string; source?:'camera'|'album' }, actor: Person): Promise<TaskView> {
+    const hash = createHash('sha256').update(input.bytes).digest('hex');
+    const repeated=input.clientId?this.round(id).photos.find(p=>p.uploadKey===input.clientId):undefined;
+    if(repeated){if(repeated.hash!==hash)throw new ApiError(409,'同一上传请求不能更换照片内容，请重新添加。');return this.view(this.round(id).taskId);}
     this.mutable(id, revision);
     const ext = input.bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10])) ? '.png' : input.bytes[0] === 255 && input.bytes[1] === 216 && input.bytes[2] === 255 ? '.jpg' : input.bytes.subarray(0,4).toString() === 'RIFF' && input.bytes.subarray(8,12).toString() === 'WEBP' ? '.webp' : null;
     if (!ext) throw new ApiError(415, '仅支持有效的 JPG、PNG 或 WebP 图片。');
     if (!input.bytes.length || input.bytes.length > 20 * 1024 * 1024) throw new ApiError(413, '单张照片请控制在20MB以内，原图不会压缩后替代保存。');
     if (!Number.isInteger(input.width) || !Number.isInteger(input.height) || input.width < 1 || input.height < 1 || input.width > 30000 || input.height > 30000) throw new ApiError(400, '照片尺寸无法读取，请换一张照片。');
-    const file = randomUUID() + ext, hash = createHash('sha256').update(input.bytes).digest('hex');
+    const source=input.source??'camera';
+    const capturedAt=input.sample?undefined:await admitPhotoTime(input.bytes,source,this.photoPolicy);
+    const check=(r:Round)=>{
+      if(input.replaceId&&!r.photos.some(p=>p.id===input.replaceId))throw new ApiError(404,'要替换的照片已不存在，请刷新后重试。');
+      const duplicate=!input.sample?r.photos.find(p=>!p.sample&&p.id!==input.replaceId&&p.hash===hash):undefined;
+      if(duplicate)throw new ApiError(422,`这张照片已添加为 P${String(duplicate.sequence).padStart(3,'0')}，本次检测不能重复使用同一张照片。`,'PHOTO_DUPLICATE');
+    };
+    check(this.mutable(id,revision));
+    const file = randomUUID() + ext;
     await mkdir(path.join(this.directory, 'files'), { recursive: true, mode: 0o700 });
     await writeFile(path.join(this.directory, 'files', file), input.bytes, { mode: 0o600 });
-    const r = this.mutable(id, revision), old = input.replaceId ? r.photos.find(p => p.id === input.replaceId) : null;
-    if (input.replaceId && !old) throw new ApiError(404, '要替换的照片已不存在，请刷新后重试。');
-    const photo: Photo = { id: randomUUID(), uploadKey: input.clientId, sequence: old?.sequence ?? r.nextPhotoSequence++, filename: path.basename(input.filename).slice(0,160), file, url: apiPath('/files/' + file), hash, width: input.width, height: input.height, sample: input.sample ?? null, status: 'pending', message: '', components: [] };
+    let r:Round;
+    try{r=this.mutable(id,revision);check(r);}catch(e){await rm(path.join(this.directory,'files',file),{force:true});throw e;}
+    const old=input.replaceId?r.photos.find(p=>p.id===input.replaceId):undefined;
+    const photo: Photo = { id: randomUUID(), uploadKey: input.clientId, sequence: old?.sequence ?? r.nextPhotoSequence++, filename: path.basename(input.filename).slice(0,160), file, url: apiPath('/files/' + file), hash, width: input.width, height: input.height, sample: input.sample ?? null, status: 'pending', message: '', components: [],...(!input.sample?{source,capturedAt}:{}) };
     if (old) r.photos[r.photos.indexOf(old)] = photo; else r.photos.push(photo);
-    this.store.audit(r, actor, old ? 'photo.replace' : 'photo.add', { oldId: old?.id, photoId: photo.id, hash });
+    this.store.audit(r, actor, old ? 'photo.replace' : 'photo.add', { oldId: old?.id, photoId: photo.id, hash,source:photo.source,capturedAt });
     return this.saveMutation(r);
   }
   async addSample(id: string, revision: number, sample: SampleKind, replaceId: string | undefined, actor: Person) {

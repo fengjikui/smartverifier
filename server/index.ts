@@ -75,7 +75,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         service.store.db.prepare('DELETE FROM sessions WHERE expires<?').run(Date.now());
         service.store.db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(key,JSON.stringify(person),Date.now()+24*60*60*1000);
         res.setHeader('Set-Cookie',`sv_next_session=${key}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400`);
-        return send(res,{person,mode:'mock',recognition,tasks:service.list()});
+        return send(res,{person,mode:'mock',recognition,tasks:service.list(),photoPolicy:service.photoPolicy});
       }
       if(api!==null){
         if(!session||Number(session.expires)<Date.now())throw new ApiError(401,'本地试用会话已过期，请重新进入，草稿已保留。');
@@ -111,7 +111,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
         if(pathname==='/session'&&req.method==='DELETE'){
           service.store.db.prepare('DELETE FROM sessions WHERE token=?').run(token!);res.setHeader('Set-Cookie','sv_next_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');return send(res,{ok:true});
         }
-        if(pathname==='/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',recognition,tasks:service.list()});
+        if(pathname==='/bootstrap'&&req.method==='GET')return send(res,{person:actor,mode:'mock',recognition,tasks:service.list(),photoPolicy:service.photoPolicy});
         if(pathname==='/tasks'&&req.method==='GET')return send(res,service.taskPage(z.string().max(200).parse(url.searchParams.get('q')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1),25,z.enum(['all','unfinished','finished']).parse(url.searchParams.get('status')??'all')));
         if(pathname==='/standards'&&req.method==='GET')return send(res,service.registry.catalog(z.string().max(160).parse(url.searchParams.get('material')??''),z.string().max(160).parse(url.searchParams.get('supplier')??''),z.coerce.number().int().min(1).max(100000).parse(url.searchParams.get('page')??1)));
         if(pathname==='/checks'&&req.method==='GET')return send(res,{items:service.standaloneRecent(actor)});
@@ -143,7 +143,8 @@ export function startServer(options: { state?: string; port?: number; host?: str
               const data=await request.formData(),photo=data.get('photo');
               if(!(photo instanceof File))throw new ApiError(400,'请选择一张照片。');
               const revision=revisionSchema.parse(Number(data.get('revision'))),captureId=z.string().max(100).optional().parse(data.get('captureId')??undefined);
-              const updated=await service.addPhoto(id,revision,{bytes:Buffer.from(await photo.arrayBuffer()),filename:photo.name,width:Number(data.get('width')),height:Number(data.get('height')),replaceId:String(data.get('replaceId')??'')||undefined,clientId:z.string().min(1).max(100).parse(data.get('clientId'))},actor);void logClientEvents(state,actor,{events:[{at:new Date().toISOString(),phase:'server-photo-saved',captureId,bytes:photo.size,source:'server'}]}).catch(()=>{});return send(res,updated);
+              const source=z.enum(['camera','album']).parse(data.get('source')??'camera');
+              const updated=await service.addPhoto(id,revision,{bytes:Buffer.from(await photo.arrayBuffer()),filename:photo.name,width:Number(data.get('width')),height:Number(data.get('height')),replaceId:String(data.get('replaceId')??'')||undefined,clientId:z.string().min(1).max(100).parse(data.get('clientId')),source},actor);void logClientEvents(state,actor,{events:[{at:new Date().toISOString(),phase:'server-photo-saved',captureId,bytes:photo.size,source:'server'}]}).catch(()=>{});return send(res,updated);
             } finally { uploads--; }
           }
           const data=await jsonBody(req),revision=revisionSchema.parse(data.revision);
@@ -171,7 +172,7 @@ export function startServer(options: { state?: string; port?: number; host?: str
       if(res.headersSent){res.destroy();return;}
       const status=error instanceof ApiError?error.status:error instanceof z.ZodError?400:500;
       if(status===500)console.error('请求处理失败',error);
-      send(res,{message:error instanceof z.ZodError?'请求参数不完整或格式不正确。':status===500?'服务暂时无法完成操作，请稍后重试。':(error as Error).message},status);
+      send(res,{message:error instanceof z.ZodError?'请求参数不完整或格式不正确。':status===500?'服务暂时无法完成操作，请稍后重试。':(error as Error).message,...(error instanceof ApiError&&error.code?{code:error.code}:{})},status);
     }
   });
   server.requestTimeout=120000;server.headersTimeout=15000;

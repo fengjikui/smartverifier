@@ -8,7 +8,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 const suites={
   unit:['component-view','image-gestures','region-editor','domain','vision-contracts','vlm-config','whiteboard-scoring'],
   admin:['admin','admin-access','admin-users','reference-workflow','reference-analysis','reference-transform','rar-import'],
-  camera:['camera','client-events'],
+  camera:['camera','client-events','photo-policy'],
   workflow:['service','standalone','twenty-samples','paths','vlm-http','real-vision','photo-inspection','vision-starter'],
   deployment:['python-runtime','https','windows-update'],
 };

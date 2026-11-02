@@ -21,9 +21,10 @@ import type { AlbumFilter } from './inspection-overview';
 import { InspectionTransfer } from './inspection-transfer';
 import { LoginScreen } from './login-screen';
 import { CameraCapture } from './camera-capture';
+import type { SelectedPhoto } from './photo-selection';
 import type { Bootstrap, ComponentResult, Photo, SampleKind, TaskView, Verdict } from '../../shared/types';
 
-type PendingUpload={file:File;key:string;replaceId?:string};
+type PendingUpload=SelectedPhoto&{key:string;replaceId?:string;roundId:string};
 type DialogState={type:'samples';replaceId?:string}|{type:'remove';photo:Photo}|{type:'notes'}|{type:'review';component:ComponentResult}|{type:'retest'}|{type:'original';photo:Photo;selected?:string}|{type:'image';url:string;title:string}|null;
 const photoName=(p:Photo)=>'P'+String(p.sequence).padStart(3,'0');
 const uploadKey=()=>typeof crypto.randomUUID==='function'?crypto.randomUUID():Date.now().toString(36)+'-'+Array.from(crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join('');
@@ -36,6 +37,7 @@ export function App(){
   const [dialog,setDialog]=useState<DialogState>(null),[filter,setFilter]=useState<AlbumFilter>('all'),[pendingFiles,setPendingFiles]=useState<PendingUpload[]>([]);
   const [imageView,setImageView]=useState<'original'|'annotated'|'sheet'>('original'),[instruction,setInstruction]=useState(''),[verdict,setVerdict]=useState<Verdict>('PASS'),[reason,setReason]=useState('AI识别错误，人工核对后修正'),[extraReason,setExtraReason]=useState('');
   const gallery=useRef<HTMLDivElement>(null),scroll=useRef(0),replace=useRef<string|undefined>(undefined),busyRef=useRef(false);
+  const album=useRef<HTMLInputElement>(null);
   const startAttempt=useRef<{id:string;version:number;key:string}|null>(null);
   const {route,navigate:changeRoute}=useRoute();
   function navigate(next:Route,replace=false){changeRoute(next.task?{entry:route.entry,...next}:next,replace);}
@@ -68,29 +70,33 @@ export function App(){
     if(gallery.current)scroll.current=gallery.current.scrollTop;
     navigate({task:route.task,view:'detail',photo:photo.id,component:(component??photo.components.find(c=>c.ai))?.id},replaceHistory);
   }
-  function picker(_kind:'camera',replaceId?:string){replace.current=replaceId;setCaptureOpen(true);}
+  function picker(kind:'camera'|'album',replaceId?:string){replace.current=replaceId;if(kind==='album')album.current?.click();else setCaptureOpen(true);}
   async function upload(items:PendingUpload[]){
-    if(!data?.round)return;let view=data;
+    if(!data?.round)return;let view=data;const rejected:string[]=[];let saved=0;
+    if(items.some(item=>item.roundId!==view.round!.id))throw new Error('待上传照片属于另一轮检测，请返回原检测继续保存，或取消待上传照片。');
     for(let i=0;i<items.length;i++){
       const item=items[i];setPendingFiles(items.slice(i));setBusy(`正在保存照片 ${i+1}/${items.length}…`);
-      if(item.file.size>20*1024*1024)throw new Error(item.file.name+' 超过20MB，请选择较小的原始照片。');
-      cameraEvent('upload-start',{captureId:captureId(item.file),bytes:item.file.size});const at=performance.now();const size=await imageSize(item.file),form=new FormData();form.set('photo',item.file);form.set('captureId',captureId(item.file));form.set('width',String(size.width));form.set('height',String(size.height));form.set('revision',String(view.round!.revision));form.set('clientId',item.key);if(item.replaceId)form.set('replaceId',item.replaceId);
-      try{view=await request<TaskView>('/rounds/'+view.round!.id+'/photos',form);}catch(e){cameraEvent('upload-failed',{captureId:captureId(item.file),message:(e as Error).message.slice(0,180)});throw e;}cameraEvent('upload-complete',{captureId:captureId(item.file),ms:Math.round(performance.now()-at)});setData(view);setPendingFiles(items.slice(i+1));
+      if(item.file.size>20*1024*1024){rejected.push(item.file.name+'：超过20MB，未添加。');setPendingFiles(items.slice(i+1));continue;}
+      cameraEvent('upload-start',{captureId:captureId(item.file),bytes:item.file.size});const at=performance.now();let size:{width:number;height:number};
+      try{size=await imageSize(item.file);}catch{rejected.push(item.file.name+'：无法读取图片，请选择 JPG、PNG 或 WebP 原图。');setPendingFiles(items.slice(i+1));continue;}
+      const form=new FormData();form.set('photo',item.file);form.set('source',item.source);form.set('captureId',captureId(item.file));form.set('width',String(size.width));form.set('height',String(size.height));form.set('revision',String(view.round!.revision));form.set('clientId',item.key);if(item.replaceId)form.set('replaceId',item.replaceId);
+      try{view=await request<TaskView>('/rounds/'+view.round!.id+'/photos',form);saved++;}catch(e){cameraEvent('upload-failed',{captureId:captureId(item.file),message:(e as Error).message.slice(0,180)});if(e instanceof ApiError&&(e.code?.startsWith('PHOTO_')||e.status===415)){rejected.push(item.file.name+'：'+e.message);setPendingFiles(items.slice(i+1));continue;}if(rejected.length)setNotice(rejected.join('\n'));throw e;}cameraEvent('upload-complete',{captureId:captureId(item.file),ms:Math.round(performance.now()-at)});setData(view);setPendingFiles(items.slice(i+1));
     }
-    setDialog(null);overview();setNotice(hasRealRecognition(boot?.recognition)?'照片已保存，点击开始检测即可将整张原图交给VLM比对。':'照片已保存。当前服务未启用真实识别，可使用内置样例体验流程。');
+    setDialog(null);overview();if(rejected.length)setError('以下照片未添加，其他照片已保留：\n'+rejected.join('\n'));setNotice(saved?`已添加 ${saved} 张照片，可继续添加或开始检测。`:'');
   }
-  function filesPicked(files:FileList|File[]|null){if(!files?.length)return;const items=Array.from(files).slice(0,replace.current?1:undefined).map(file=>({file,key:uploadKey(),replaceId:replace.current}));replace.current=undefined;setPendingFiles(items);void run('正在保存照片…',()=>upload(items));}
+  function filesPicked(files:SelectedPhoto[]){if(!files.length||!data?.round)return;const roundId=data.round.id,items=files.slice(0,replace.current?1:undefined).map(item=>({...item,key:uploadKey(),replaceId:replace.current,roundId}));replace.current=undefined;setPendingFiles(items);void run('正在保存照片…',()=>upload(items));}
   async function update(name:string,values:Record<string,unknown>={}){if(data){const next=await action(data,name,values);setData(next);if((filter==='fail'&&!next.summary?.fail)||(filter==='attention'&&!next.summary?.qualityPhotos&&!next.summary?.failedPhotos))setFilter('all');}}
   const selectedPhoto=round?.photos.find(p=>p.id===route.photo),selectedComponent=selectedPhoto?.components.find(c=>c.id===route.component)??selectedPhoto?.components.find(c=>c.ai);
   const standalone=data?.task.origin==='standalone',finished=round?.status==='submitted'||round?.status==='completed';
   const summary=data?.summary,locked=!!busy||working||finished;
 
-  if(captureOpen&&boot&&data?.round)return <CameraCapture label={[data.task.material,data.task.modelNumber,data.task.supplier].filter(Boolean).join(' · ')} replacing={!!replace.current} onCancel={()=>{replace.current=undefined;setCaptureOpen(false);}} onDone={files=>{setCaptureOpen(false);filesPicked(files);}}/>;
+  if(captureOpen&&boot&&data?.round)return <CameraCapture label={[data.task.material,data.task.modelNumber,data.task.supplier].filter(Boolean).join(' · ')} replacing={!!replace.current} albumMaxAgeMinutes={boot.photoPolicy?.albumMaxAgeMinutes??10} existingHashes={data.round.photos.filter(p=>p.id!==replace.current).map(p=>p.hash)} onCancel={()=>{replace.current=undefined;setCaptureOpen(false);}} onDone={files=>{setCaptureOpen(false);filesPicked(files);}}/>;
   if(loading)return <div className="sv-loading"><Spinner/>正在打开检验工作台…</div>;
   if(!boot)return <LoginScreen busy={!!busy} error={error} onEnter={()=>void run('正在进入…',async()=>{setBoot(await request<Bootstrap>('/session',{}));})}/>;
 
   const mainView=route.view??'overview';
   return <div className="sv-app">
+    <input hidden ref={album} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={e=>{const files=Array.from(e.target.files??[]);e.target.value='';filesPicked(files.map(file=>({file,source:'album'})));}}/>
     <header className="sv-header">{route.task?<Btn className="sv-back" onClick={mainView==='overview'?taskList:overview}><ChevronLeft size={18}/>返回</Btn>:<img src={assetPath('tasks-scan.svg')} width="30" height="30" alt=""/>}<strong className="sv-brand">鉴微</strong><span className="sv-product">丝印检测</span><span className="sv-location">{route.task?(data?.task.number??'正在打开检测…'):route.entry==='tasks'?'模拟 MES 任务':route.entry==='history'?'最近检测':'自主检测'}</span><Pill>{hasRealRecognition(boot.recognition)?(standalone||(!route.task&&route.entry!=='tasks'))?'VLM真实识别 · 手工录入MES':'VLM真实识别 · MES模拟':'本地流程试用'}</Pill><span className="sv-person">{boot.person.name} · {boot.person.id}</span><Btn tone="quiet" className="sv-icon-button" aria-label="退出本地试用" onClick={()=>void run('正在退出…',async()=>{await request('/session',{},'DELETE');setBoot(null);setData(null);navigate({},true);})}><LogOut size={18}/></Btn></header>
     {error?<div className="sv-message error" role="alert"><AlertTriangle size={20}/><span>{error}</span><Btn tone="quiet" className="sv-icon-button" aria-label="关闭错误提示" onClick={()=>setError('')}><X size={18}/></Btn></div>:null}
     {notice?<div className="sv-message" role="status"><Info size={18}/><span>{notice}</span><Btn tone="quiet" className="sv-icon-button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={18}/></Btn></div>:null}
@@ -108,7 +114,7 @@ export function App(){
       <InspectionReport key={round.id} round={round} summary={summary} task={data.task} person={boot.person} onOriginal={photo=>{setImageView('original');setDialog({type:'original',photo});}}/>
       <footer className="sv-footer"><FooterNote standalone={standalone} title={`本轮${summary?.total??0}件 · 不合格${summary?.fail??0}件`}/><Btn tone="primary" onClick={overview}>返回照片总览</Btn></footer>
     </>:<>
-      <InspectionOverview realEnabled={hasRealRecognition(boot.recognition)} onRealTrial={()=>void run('正在添加模拟拍摄照片…',()=>update('real-trial'))} data={data} working={working} busy={!!busy} compact={density.compact} filter={filter} onFilter={value=>{scroll.current=0;setFilter(value);}} onToggleDensity={density.toggle} gallery={gallery} onScroll={top=>{scroll.current=top;}} actions={{open:openPhoto,add:picker,replace:p=>picker('camera',p.id),remove:p=>setDialog({type:'remove',photo:p}),notes:()=>{setInstruction(round.instruction);setDialog({type:'notes'});},report:()=>navigate({task:route.task,view:'report'}),samples:()=>setDialog({type:'samples'})}}/>
+      <InspectionOverview albumMaxAgeMinutes={boot.photoPolicy?.albumMaxAgeMinutes??10} realEnabled={hasRealRecognition(boot.recognition)} onRealTrial={()=>void run('正在添加模拟拍摄照片…',()=>update('real-trial'))} data={data} working={working} busy={!!busy} compact={density.compact} filter={filter} onFilter={value=>{scroll.current=0;setFilter(value);}} onToggleDensity={density.toggle} gallery={gallery} onScroll={top=>{scroll.current=top;}} actions={{open:openPhoto,add:picker,replace:p=>picker('camera',p.id),remove:p=>setDialog({type:'remove',photo:p}),notes:()=>{setInstruction(round.instruction);setDialog({type:'notes'});},report:()=>navigate({task:route.task,view:'report'}),samples:()=>setDialog({type:'samples'})}}/>
         {pendingFiles.length?<div className="sv-upload-retry" role="status">还有{pendingFiles.length}张照片未确认保存。<Btn disabled={!!busy} onClick={()=>void run('正在重试上传…',()=>upload(pendingFiles))}>重试保存</Btn><Btn tone="quiet" disabled={!!busy} onClick={()=>setPendingFiles([])}>取消待上传照片</Btn></div>:null}
       {standalone?<footer className="sv-footer sv-workflow-footer sv-standalone-footer"><FooterNote standalone title={round.status==='completed'?'本次检测已完成，结果保存在本系统':working?'正在检测，请稍候':summary?.verdict?`结论${summary.verdict==='PASS'?'合格':'不合格'} · 不良数量${summary.fail}件`:'拍清每个丝印，确认后开始检测'}/>
         <Btn disabled title="未关联MES任务，暂不支持回填">提交到 MES</Btn>{round.photos.length&&round.status!=='completed'?<Btn disabled={locked} onClick={()=>picker('camera')}><Camera size={20}/>继续拍照</Btn>:null}

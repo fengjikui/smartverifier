@@ -1,11 +1,11 @@
 import { deadline } from './camera-diagnostics';
 import type { TaskView } from '../../shared/types';
 import { apiPath } from '../../shared/paths';
-export class ApiError extends Error { status: number; constructor(message:string,status:number){super(message);this.status=status;} }
+export class ApiError extends Error { status: number; code?:string; constructor(message:string,status:number,code?:string){super(message);this.status=status;this.code=code;} }
 export async function request<T>(url:string, data?:unknown, method?:string):Promise<T>{
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),data instanceof FormData?120000:30000);
   try{const response=await fetch(apiPath(url),{signal:controller.signal,method:method??(data===undefined?'GET':'POST'),credentials:'same-origin',headers:data instanceof FormData?undefined:data===undefined?undefined:{'Content-Type':'application/json'},body:data instanceof FormData?data:data===undefined?undefined:JSON.stringify(data)});
-  const result=await response.json();if(!response.ok)throw new ApiError(result.message??'操作未完成，请稍后重试。',response.status);return result;
+  const result=await response.json();if(!response.ok)throw new ApiError(result.message??'操作未完成，请稍后重试。',response.status,result.code);return result;
   }catch(e){if(controller.signal.aborted)throw new ApiError('连接超时，已保留当前照片与输入，请重试。',408);throw e;}finally{clearTimeout(timer);}
 }
 export function action(view:TaskView, name:string, data:Record<string,unknown>={}){

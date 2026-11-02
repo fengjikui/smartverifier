@@ -21,6 +21,7 @@ export interface Photo {
   width: number; height: number; sample: SampleKind | null; status: PhotoStatus; uploadKey?: string;
   message: string; components: ComponentResult[];
   preparation?: Preparation;
+  source?: 'camera'|'album'; capturedAt?: string;
 }
 export interface Standard { id: string; version: number; material: string; supplier: string; modelNumber?: string; image: string; lines: string[]; description: string; regionDescription?:string; regions?:import('./admin.ts').ReferenceRegion[] }
 export interface Transfer { id: string; key: string; revision: number; status: 'sending' | 'success' | 'failed'; message: string; at: string; receipt?: string; reportUrl?: string }
@@ -43,4 +44,5 @@ export interface Summary {
 export interface TaskListItem extends Task { status: string; summary: Summary | null }
 export interface TaskView { task: Task; round: Round | null; effective: Round | null; summary: Summary | null }
 export interface RecognitionStatus { mode:'mock'|'vlm'|'lmstudio'; model?:string;provider?:'lmstudio'|'openai-compatible' }
-export interface Bootstrap { person: Person; mode: 'mock'; recognition?:RecognitionStatus; tasks: TaskListItem[] }
+export interface PhotoPolicy { albumMaxAgeMinutes:number; timezoneOffset:string }
+export interface Bootstrap { person: Person; mode: 'mock'; recognition?:RecognitionStatus; tasks: TaskListItem[]; photoPolicy?:PhotoPolicy }
