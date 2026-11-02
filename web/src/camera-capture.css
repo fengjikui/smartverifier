@@ -1,27 +1,75 @@
-.sv-camera-screen{height:100dvh;min-height:420px;background:#171619;color:#f8f3f4;display:flex;flex-direction:column;overflow:hidden}
-.sv-camera-screen>header{display:flex;align-items:center;gap:20px;padding:12px 24px;border-bottom:1px solid #423b40;flex-shrink:0}
-.sv-camera-screen h1{font-size:22px}.sv-camera-screen header>div{flex:1;min-width:0}.sv-camera-screen header p{font-size:14px;color:#c4bfc2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sv-camera-screen .sv-btn-quiet{color:#eee5e8}
-.sv-camera-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;flex:1;min-height:0}
-.sv-camera-view{position:relative;min-height:0;display:grid;place-items:center;overflow:hidden}.sv-camera-view video{width:100%;height:100%;object-fit:contain;min-height:0}.sv-camera-view video.is-unavailable{visibility:hidden}
-.sv-camera-placeholder{position:absolute;inset:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center}.sv-camera-placeholder p{max-width:40ch;color:#d1cbd0}
-.sv-camera-guide{position:absolute;left:16px;right:16px;bottom:16px;padding:8px;text-align:center;background:#171619cc;font-size:14px;pointer-events:none}
-.sv-camera-controls{display:flex;flex-direction:column;gap:18px;padding:24px 18px;background:#252127;min-height:0}.sv-camera-controls small{color:#cbc1c6}
-.sv-camera-shots{display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;flex:1;overflow:auto;min-height:70px}.sv-camera-shots>p{font-size:14px;color:#bbb1b9}.sv-camera-shot{position:relative;width:100px;height:78px;border:1px solid #625761;border-radius:8px;overflow:hidden}.sv-camera-shot img{width:100%;height:100%;object-fit:contain}.sv-camera-shot>span{position:absolute;left:4px;bottom:2px;background:#171619b3;padding:0 5px;font-size:13px}.sv-camera-shot button{position:absolute;top:0;right:0;width:44px;height:44px;border:0;background:#171619c9;color:#f6edf1;display:grid;place-items:center}
-.sv-camera-message{font-size:14px;color:#efe1cd;min-height:44px}.sv-camera-buttons{display:flex;flex-direction:column;align-items:center;gap:20px}.sv-camera-buttons .sv-btn{width:100%}.sv-camera-shutter{width:78px;height:78px;border-radius:50%;border:4px solid #fbf3f6;background:#c7000b;color:#fff7fa;display:grid;place-items:center;box-shadow:0 0 0 4px #ffffff26}.sv-camera-shutter:disabled{opacity:.4}
-@media(orientation:portrait),(max-width:800px){.sv-camera-screen>header{padding:12px 14px;gap:10px}.sv-camera-screen h1{font-size:20px}.sv-camera-screen header>span{font-size:14px}.sv-camera-layout{display:flex;flex-direction:column}.sv-camera-view{flex:1;min-height:180px}.sv-camera-controls{gap:10px;padding:14px 20px}.sv-camera-shots{flex:none;flex-wrap:nowrap;height:80px}.sv-camera-shot{flex:0 0 100px}.sv-camera-buttons{flex-direction:row;justify-content:space-between}.sv-camera-buttons .sv-btn{width:auto;min-width:180px}.sv-camera-shutter{width:68px;height:68px}.sv-camera-message{min-height:0}.sv-camera-guide{bottom:8px}}
-.sv-camera-diagnostics{font-size:12px;color:var(--muted);margin-top:10px}.sv-camera-diagnostics summary{cursor:pointer}.sv-camera-diagnostics p{line-height:1.6;margin:8px 0}
-
-.sv-camera-preview{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;height:100%}.sv-camera-preview small{font-size:11px}
-/* 平板：右侧快门，完成始终位于顶栏；竖屏仍保留右手快门。 */
+.sv-camera-screen{height:100dvh;min-height:420px;background:oklch(20% .008 330);color:oklch(97% .008 330);display:flex;flex-direction:column;overflow:hidden}
+.sv-camera-screen>header{display:flex;align-items:center;gap:20px;padding:12px 24px;border-bottom:1px solid oklch(34% .012 330);flex-shrink:0}
+.sv-camera-screen h1{font-size:22px}
+.sv-camera-screen header>div{flex:1;min-width:0}
+.sv-camera-screen header p{font-size:14px;color:oklch(79% .012 330);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sv-camera-screen .sv-btn-quiet{color:oklch(93% .009 330)}
+.sv-camera-screen button:focus-visible,.sv-camera-screen summary:focus-visible{outline:2px solid oklch(92% .035 330);outline-offset:3px}
 .sv-camera-screen>header>.sv-btn-primary{min-height:48px;min-width:150px;flex-shrink:0}
-.sv-camera-controls{overflow:auto;gap:14px}
-.sv-camera-buttons{flex-direction:row;justify-content:flex-end;align-items:center;gap:18px}
-.sv-camera-buttons>span{font-size:14px;color:#cbc1c6}
-.sv-camera-shots{flex:none;max-height:220px}
-.sv-camera-controls>.sv-btn{min-height:48px;flex-shrink:0;border:1px solid #625761}
-.sv-camera-album-policy{font-size:12px;line-height:1.65}
-.sv-camera-shutter{flex-shrink:0;cursor:pointer}
-@media(orientation:landscape) and (min-width:801px){.sv-camera-buttons{order:-1;margin:8px 0 12px}.sv-camera-shots{order:1;margin-top:auto}.sv-camera-diagnostics{order:2}}
-@media(orientation:portrait),(max-width:800px){.sv-camera-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}.sv-camera-shots,.sv-camera-message,.sv-camera-album-policy,.sv-camera-diagnostics,.sv-camera-controls>small{grid-column:1/-1}.sv-camera-buttons{grid-column:2;grid-row:2/4}.sv-camera-controls>.sv-btn{grid-column:1;margin:0}.sv-camera-shots{height:80px;min-height:0}.sv-camera-screen>header>.sv-btn-primary{min-width:140px}.sv-camera-message:empty{display:none}}
+.sv-camera-layout{display:grid;grid-template-columns:minmax(0,1fr) 292px;flex:1;min-height:0}
+.sv-camera-view{position:relative;min-height:0;overflow:hidden}
+.sv-camera-view video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.sv-camera-view video.is-unavailable{visibility:hidden}
+.sv-camera-placeholder{position:absolute;inset:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.sv-camera-placeholder h2{font-size:22px;font-weight:500}
+.sv-camera-placeholder>svg{color:oklch(76% .012 330)}
+.sv-camera-placeholder p{max-width:38ch;font-size:14px;line-height:1.8;color:oklch(77% .012 330)}
+.sv-camera-placeholder>.sv-btn{min-height:44px;font-size:14px}
+.sv-camera-guide{position:absolute;left:16px;right:16px;bottom:16px;padding:8px;text-align:center;background:oklch(20% .008 330 / .8);font-size:14px;pointer-events:none}
+.sv-camera-controls{display:flex;flex-direction:column;gap:18px;padding:24px 20px;background:oklch(25% .013 330);border-left:1px solid oklch(34% .012 330);min-height:0;overflow-y:auto}
+.sv-camera-selection{display:flex;flex-direction:column;gap:5px}
+.sv-camera-selection strong{font-size:16px;font-weight:500}
+.sv-camera-selection span{font-size:13px;line-height:1.6;color:oklch(77% .012 330)}
+.sv-camera-shots{display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;flex:none;max-height:260px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:oklch(48% .017 330) transparent}
+.sv-camera-shots::-webkit-scrollbar{height:6px;width:6px}
+.sv-camera-shots::-webkit-scrollbar-thumb{background:oklch(48% .017 330);border-radius:6px}
+.sv-camera-shots::-webkit-scrollbar-track{background:transparent}
+.sv-camera-shot{position:relative;width:112px;height:84px;border:1px solid oklch(43% .017 330);border-radius:8px;overflow:hidden;flex-shrink:0;background:oklch(20% .008 330)}
+.sv-camera-shot-open{width:100%;height:100%;padding:0;border:0;background:none;color:inherit;cursor:pointer}
+.sv-camera-shot>span{pointer-events:none}
+.sv-camera-shot img{width:100%;height:100%;object-fit:contain}
+.sv-camera-shot>span{position:absolute;left:4px;bottom:2px;background:oklch(20% .008 330 / .8);padding:0 5px;font-size:13px}
+.sv-camera-shot-delete{position:absolute;top:0;right:0;width:44px;height:44px;border:0;background:oklch(20% .008 330 / .8);color:oklch(97% .008 330);display:grid;place-items:center;cursor:pointer}
+.sv-camera-preview{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;height:100%}
+.sv-camera-preview small{font-size:11px}
+.sv-camera-message{font-size:13px;line-height:1.7;color:oklch(89% .075 82);padding:10px 12px;background:oklch(32% .02 60);border-radius:8px;max-height:96px;overflow:auto;flex-shrink:0}
+.sv-camera-actions{display:flex;flex-direction:column;gap:24px;flex-shrink:0}
+.sv-camera-sources{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sv-camera-sources>.sv-btn{min-height:52px;min-width:0;padding:12px 16px;border:1px solid oklch(46% .016 330);font-size:15px;white-space:nowrap}
+.sv-camera-system{color:oklch(24% .012 330);background:oklch(95% .008 330)}
+.sv-camera-buttons{display:flex;align-items:center;justify-content:flex-end;gap:16px}
+.sv-camera-buttons>span{font-size:13px;color:oklch(80% .012 330)}
+.sv-camera-shutter{width:78px;height:78px;border-radius:50%;border:4px solid oklch(97% .008 330);background:var(--brand);color:oklch(97% .008 330);display:grid;place-items:center;box-shadow:0 0 0 4px oklch(97% .008 330 / .15);flex-shrink:0;cursor:pointer}
+.sv-camera-shutter:disabled{opacity:.4;cursor:default}
+.sv-camera-resolution{font-size:12px;line-height:1.6;color:oklch(80% .012 330)}
+.sv-camera-help{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.sv-camera-help>small{font-size:12px;line-height:1.7;color:oklch(76% .012 330)}
+.sv-camera-diagnostics{font-size:12px;color:oklch(76% .012 330)}
+.sv-camera-diagnostics summary{cursor:pointer;min-height:28px;display:flex;align-items:center;gap:5px}
+.sv-camera-diagnostics summary:before{content:'›';font-size:16px}
+.sv-camera-diagnostics[open] summary:before{transform:rotate(90deg)}
+.sv-camera-diagnostics p{line-height:1.7;margin:8px 0;max-width:40ch}
+.sv-camera-diagnostics .sv-btn{min-height:44px;font-size:13px}
+@media(orientation:portrait),(max-width:800px){
+ .sv-camera-screen>header{padding:12px 20px;gap:14px}
+ .sv-camera-screen h1{font-size:20px}
+ .sv-camera-screen>header>.sv-btn-primary{min-width:140px}
+ .sv-camera-layout{display:flex;flex-direction:column}
+ .sv-camera-view{flex:1;min-height:180px}
+ .sv-camera-controls{padding:20px 28px 16px;gap:16px;border-left:0;border-top:1px solid oklch(34% .012 330);flex:none;max-height:48%;overflow:auto}
+ .sv-camera-selection{flex-direction:row;align-items:baseline;justify-content:space-between;gap:12px}
+ .sv-camera-shots{flex-wrap:nowrap;max-height:none;padding-bottom:4px;overflow-x:auto;overflow-y:hidden}
+ .sv-camera-shot{width:96px;height:76px}
+ .sv-camera-actions{flex-direction:row;align-items:center;gap:28px}
+ .sv-camera-sources{flex:1;flex-direction:row;gap:14px}
+ .sv-camera-sources>.sv-btn{flex:1;min-height:56px}
+ .sv-camera-buttons{gap:12px;flex-shrink:0}
+ .sv-camera-shutter{width:72px;height:72px}
+ .sv-camera-buttons>span{display:none}
+ .sv-camera-help{margin:0;flex-direction:row;align-items:baseline;justify-content:space-between;gap:16px}
+ .sv-camera-diagnostics{flex-shrink:0}
+ .sv-camera-diagnostics[open]{max-width:50%}
+ .sv-camera-guide{bottom:8px}
+}
 .sv-message>span{white-space:pre-line}
 .sv-message.error{max-height:30dvh;overflow-y:auto}
