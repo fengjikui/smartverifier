@@ -74,3 +74,28 @@ test('HTTP：正品查询、供应商选择、自主检测归属、任务写入�
   const started=await call('/tasks/'+(await call('/tasks?q=000007')).items[0].id+'/open',{});assert.equal(started.round.standard.material,'000007');assert.equal(started.task.origin,'demo-mes');
   assert.equal(service.store.db.prepare('SELECT COUNT(*) n FROM receipts').get()!.n,0);
 });
+
+test('最近自主检测：最多20条、同物料不同型号按记录ID打开，不混入MES或其他账号',async t=>{
+  const directory=await mkdtemp(path.join(tmpdir(),'sv-history-')),service=new InspectionService(directory,root,1);
+  t.after(async()=>{service.closing=true;service.store.close();await rm(directory,{recursive:true,force:true});});
+  const first=register(service),second=register(service,'供应商乙');
+  const expected=new Map<string,string>();
+  for(let i=0;i<23;i++){
+    const ref=i%2?first:second,view=service.startStandalone(ref.id,ref.version,'history-'+i,person);
+    expected.set(view.task.id,ref.id);
+  }
+  const other=service.startStandalone(first.id,first.version,'history-0',{id:'OTHER',name:'其他人'});
+  const mes=service.open(service.taskPage(first.material).items[0].id);
+  const records=service.standaloneRecent(person);
+  assert.equal(records.length,20);assert.equal(new Set(records.map(r=>r.id)).size,20);
+  assert.ok(!records.some(r=>r.id===mes.task.id||r.id===other.task.id));
+  for(const record of records){
+    const opened=service.open(record.id);
+    assert.equal(opened.task.id,record.id);
+    assert.equal(opened.round!.standard.id,expected.get(record.id));
+    assert.equal(opened.round!.standard.modelNumber,record.modelNumber);
+    assert.equal(record.ownerId,person.id);
+  }
+  assert.deepEqual(records.map(r=>r.createdAt),records.map(r=>r.createdAt).sort().reverse());
+  assert.equal(service.standaloneRecent({id:'OTHER',name:'其他人'}).length,1);
+});

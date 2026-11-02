@@ -23,7 +23,12 @@ export function TabletSimulator() {
   const initialTask = demo === 'photos' ? 'DEMO20PHOTOS' : demo === 'board' ? 'DEMO20BOARD' : demo === 'real' ? 'REALVISION2' : explicitTask;
   const initialReport = initialTask && new URLSearchParams(location.search).get('view') === 'report';
   const brand=loginBrand(brandId);
-  const frameUrl=reviewingLogin?markingPaths.loginPreview+'?'+new URLSearchParams({layout:loginLayout,brand:brandId}):markingPaths.workbench+(initialTask?'?task='+initialTask+(initialReport?'&view=report':''):'');
+  const frameQuery=new URLSearchParams();
+  const entry=params.get('entry');
+  if(entry&&['standards','history','tasks'].includes(entry))frameQuery.set('entry',entry);
+  if(initialTask)frameQuery.set('task',initialTask);
+  if(initialReport)frameQuery.set('view','report');
+  const frameUrl=reviewingLogin?markingPaths.loginPreview+'?'+new URLSearchParams({layout:loginLayout,brand:brandId}):markingPaths.workbench+(frameQuery.size?'?'+frameQuery:'');
 
   useEffect(()=>{
     if(!reviewingLogin)return;
